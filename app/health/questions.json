@@ -1,0 +1,1212 @@
+{
+  "version": "2026-11-05",
+  "status": "placeholder",
+  "note": "Story 6.1's sections and the Trans intake questions tab, with routing from stories 3.1 and 6.1 and the design team's prototype (Deborah-app healthBasics.json, symptoms.json). Wording and lists are placeholders until the Health Intake Routing document and the Oracle's clinical review replace this file. The rule language is described in app/health/bank.py.",
+  "body": {
+    "question": "your_body",
+    "female": ["uterus", "cervix", "ovaries"],
+    "male": ["testes", "prostate"],
+    "not_given": ["none", "prefer_not_to_say"],
+    "default": {
+      "female": ["uterus", "cervix", "ovaries", "vagina", "breast_tissue"],
+      "male": ["testes", "prostate", "penis"],
+      "intersex": [],
+      "prefer_not_to_say": []
+    }
+  },
+  "sections": [
+    {"key": "about_you", "title": "About you", "title_family": "About [Name]"},
+    {
+      "key": "body_follow_ups",
+      "title": "More about your body",
+      "title_family": "More about [Name]’s body",
+      "privacy_notice": true,
+      "show_if": {
+        "path": {"in": ["a", "b", "gender_prefer_not_to_say"]},
+        "age_group": {"not_in": ["under_13"]}
+      }
+    },
+    {
+      "key": "body_and_hormones",
+      "title": "Body and hormones",
+      "show_if": {"age_group": {"not_in": ["under_13"]}}
+    },
+    {"key": "medications", "title": "Medications, supplements and allergies"},
+    {
+      "key": "lifestyle",
+      "title": "Lifestyle",
+      "show_if": {"age_group": {"in": ["adult", "60_plus"]}}
+    },
+    {
+      "key": "symptoms",
+      "title": "Symptoms",
+      "show_if": {"age_group": {"not_in": ["under_13"]}}
+    },
+    {
+      "key": "health_checks",
+      "title": "Health checks",
+      "show_if": {"age_group": {"in": ["adult", "60_plus"]}}
+    },
+    {"key": "medical_history", "title": "Medical history"},
+    {
+      "key": "teen",
+      "title": "Home, school and wellbeing",
+      "show_if": {"age_group": {"in": ["teen"]}}
+    },
+    {
+      "key": "child",
+      "title": "Birth, growth and school",
+      "show_if": {"age_group": {"in": ["under_13"]}}
+    }
+  ],
+  "questions": [
+    {
+      "key": "main_wellness_goal",
+      "section": "about_you",
+      "kind": "text",
+      "title": "What’s the main thing you’d like to work on?",
+      "title_family": "What’s the main thing you’d like to work on for [Name]?",
+      "optional": true
+    },
+
+    {
+      "key": "intersex_variation",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Were you born with a variation in your sex characteristics, such as your chromosomes, hormones, reproductive organs or genitals? This is sometimes called being intersex.",
+      "title_family": "Was [Name] born with a variation in [their] sex characteristics, such as chromosomes, hormones, reproductive organs or genitals? This is sometimes called being intersex.",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "dont_know", "label": "I don’t know"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "write_in_choice": "yes",
+      "write_in_label": "The variation’s name, if you know it",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["a"]}}
+    },
+    {
+      "key": "your_body",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Your body: which of these do you currently have?",
+      "title_family": "Which of these does [Name] currently have?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "uterus", "label": "Uterus"},
+        {"code": "cervix", "label": "Cervix"},
+        {"code": "ovaries", "label": "Ovaries"},
+        {"code": "vagina", "label": "Vagina"},
+        {"code": "testes", "label": "Testes"},
+        {"code": "prostate", "label": "Prostate"},
+        {"code": "penis", "label": "Penis or phallus"},
+        {"code": "micropenis_macroclitoris", "label": "Micropenis or macroclitoris"},
+        {"code": "breast_tissue", "label": "Breast tissue"},
+        {"code": "none", "label": "None of these"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "exclusive": ["none", "prefer_not_to_say"],
+      "optional": true,
+      "sensitive": true
+    },
+    {
+      "key": "puberty",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Has your body gone through puberty, or is it going through it now?",
+      "title_family": "Has [Name]’s body gone through puberty, or is it going through it now?",
+      "choices": [
+        {"code": "completed", "label": "Yes, completed"},
+        {"code": "in_progress", "label": "Going through it now"},
+        {"code": "paused_with_blockers", "label": "Puberty was paused with blockers"},
+        {"code": "describe", "label": "I’m not sure / I want to describe"}
+      ],
+      "write_in_choice": "describe",
+      "write_in_label": "Tell me in your own words",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["b"]}}
+    },
+    {
+      "key": "gender_affirming_hormones",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Are you taking, or have you ever taken, gender-affirming hormones?",
+      "title_family": "Is [Name] taking, or has [Name] ever taken, gender-affirming hormones?",
+      "choices": [
+        {"code": "currently", "label": "Currently"},
+        {"code": "in_the_past", "label": "In the past"},
+        {"code": "never", "label": "Never"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["b"]}}
+    },
+    {
+      "key": "hormone_provider",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Is a health care provider advising this care and/or prescribing these therapies?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "partially", "label": "Partially"}
+      ],
+      "write_in_choice": "partially",
+      "write_in_label": "Specifically",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "gender_affirming_hormones": {"not_in": ["never"]}
+      }
+    },
+    {
+      "key": "hormone_context",
+      "section": "body_follow_ups",
+      "kind": "text",
+      "title": "Anything you’d like to share about your hormones or care?",
+      "title_family": "Anything you’d like to share about [Name]’s hormones or care?",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["b"]}, "age_group": {"in": ["adult", "60_plus"]}}
+    },
+    {
+      "key": "amab_hormones",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Which hormones are you taking, or have you taken?",
+      "title_family": "Which hormones is [Name] taking, or has [Name] taken?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "estrogen", "label": "Estrogen (estradiol)"},
+        {"code": "anti_androgen", "label": "Anti-androgen (spironolactone, bicalutamide, or other)"},
+        {"code": "progesterone", "label": "Progesterone"},
+        {"code": "puberty_blockers", "label": "Puberty blockers"},
+        {"code": "other", "label": "Other"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["male"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "gender_affirming_hormones": {"in": ["currently", "in_the_past"]}
+      }
+    },
+    {
+      "key": "amab_hormone_method",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "How are they taken?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "pill", "label": "Pill"},
+        {"code": "under_the_tongue", "label": "Under the tongue"},
+        {"code": "patch", "label": "Patch"},
+        {"code": "gel_or_cream", "label": "Gel or cream"},
+        {"code": "injection", "label": "Injection"},
+        {"code": "other", "label": "Other"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["male"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "gender_affirming_hormones": {"in": ["currently", "in_the_past"]}
+      }
+    },
+    {
+      "key": "amab_hormone_duration",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "How long have you taken them?",
+      "title_family": "How long has [Name] taken them?",
+      "choices": [
+        {"code": "under_1_year", "label": "Less than 1 year"},
+        {"code": "1_to_3_years", "label": "1–3 years"},
+        {"code": "3_to_10_years", "label": "3–10 years"},
+        {"code": "over_10_years", "label": "More than 10 years"}
+      ],
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["male"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "gender_affirming_hormones": {"in": ["currently", "in_the_past"]}
+      }
+    },
+    {
+      "key": "amab_surgeries",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Have you had any of these surgeries or procedures?",
+      "title_family": "Has [Name] had any of these surgeries or procedures?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "breast_augmentation", "label": "Breast augmentation"},
+        {"code": "orchiectomy", "label": "Orchiectomy (removal of testes)"},
+        {"code": "vaginoplasty", "label": "Vaginoplasty"},
+        {"code": "facial_surgery", "label": "Facial surgery"},
+        {"code": "hair_removal", "label": "Laser hair removal or electrolysis"},
+        {"code": "other", "label": "Other"},
+        {"code": "none", "label": "None"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "exclusive": ["none", "prefer_not_to_say"],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["male"]},
+        "age_group": {"in": ["adult", "60_plus"]}
+      }
+    },
+    {
+      "key": "afab_hormones",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Which hormones are you taking, or have you taken?",
+      "title_family": "Which hormones is [Name] taking, or has [Name] taken?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "testosterone", "label": "Testosterone"},
+        {"code": "puberty_blockers", "label": "Puberty blockers"},
+        {"code": "period_suppression", "label": "Medicine to stop periods (such as a progestin)"},
+        {"code": "other", "label": "Other"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["female"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "gender_affirming_hormones": {"in": ["currently", "in_the_past"]}
+      }
+    },
+    {
+      "key": "afab_testosterone_method",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "How is testosterone taken?",
+      "choices": [
+        {"code": "injection", "label": "Injection"},
+        {"code": "gel_or_cream", "label": "Gel or cream"},
+        {"code": "patch", "label": "Patch"},
+        {"code": "pellet", "label": "Pellet"},
+        {"code": "other", "label": "Other"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["female"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "afab_hormones": {"has": ["testosterone"]}
+      }
+    },
+    {
+      "key": "afab_hormone_duration",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "How long have you taken them?",
+      "title_family": "How long has [Name] taken them?",
+      "choices": [
+        {"code": "under_1_year", "label": "Less than 1 year"},
+        {"code": "1_to_3_years", "label": "1–3 years"},
+        {"code": "3_to_10_years", "label": "3–10 years"},
+        {"code": "over_10_years", "label": "More than 10 years"}
+      ],
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["female"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "gender_affirming_hormones": {"in": ["currently", "in_the_past"]}
+      }
+    },
+    {
+      "key": "afab_periods",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Do you still get periods or spotting?",
+      "title_family": "Does [Name] still get periods or spotting?",
+      "choices": [
+        {"code": "yes_regularly", "label": "Yes, regularly"},
+        {"code": "sometimes", "label": "Sometimes / spotting"},
+        {"code": "stopped_on_testosterone", "label": "They stopped on testosterone"},
+        {"code": "stopped_other", "label": "They stopped for another reason"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["female"]},
+        "age_group": {"in": ["adult", "60_plus"]},
+        "body": {"has": ["uterus"]}
+      }
+    },
+    {
+      "key": "afab_surgeries",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Have you had any of these surgeries or procedures?",
+      "title_family": "Has [Name] had any of these surgeries or procedures?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "mastectomy", "label": "Mastectomy (top surgery)"},
+        {"code": "hysterectomy", "label": "Hysterectomy"},
+        {"code": "ovaries_removed", "label": "Removal of ovaries"},
+        {"code": "phalloplasty", "label": "Phalloplasty or metoidioplasty"},
+        {"code": "testicular_prosthesis", "label": "Testicular prosthesis implantation"},
+        {"code": "other", "label": "Other"},
+        {"code": "none", "label": "None"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "exclusive": ["none", "prefer_not_to_say"],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {
+        "path": {"in": ["b"]},
+        "sex_at_birth": {"in": ["female"]},
+        "age_group": {"in": ["adult", "60_plus"]}
+      }
+    },
+    {
+      "key": "hormone_history",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Do you take, or have you ever taken, sex hormones or hormone-blocking medicines, for any reason?",
+      "title_family": "Does [Name] take, or has [Name] ever taken, sex hormones or hormone-blocking medicines, for any reason?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "dont_know", "label": "I don’t know"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "prefill": {"question": "hrt_status", "map": {"yes": "yes", "previously": "yes"}},
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["a"]}}
+    },
+    {
+      "key": "hormone_history_provider",
+      "section": "body_follow_ups",
+      "kind": "choice",
+      "title": "Is a health care provider advising this care and/or prescribing these therapies?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "partially", "label": "Partially"}
+      ],
+      "write_in_choice": "partially",
+      "write_in_label": "Specifically",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["a"]}, "hormone_history": {"in": ["yes"]}}
+    },
+    {
+      "key": "hormone_history_details",
+      "section": "body_follow_ups",
+      "kind": "text",
+      "title": "Which ones, and anything else you’d like to add?",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["a"]}, "hormone_history": {"in": ["yes"]}}
+    },
+    {
+      "key": "surgery_history",
+      "section": "body_follow_ups",
+      "kind": "multi_choice",
+      "title": "Have you had any surgeries or procedures that changed your reproductive or sex-related anatomy, for any reason?",
+      "title_family": "Has [Name] had any surgeries or procedures that changed [their] reproductive or sex-related anatomy, for any reason?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "mastectomy", "label": "Mastectomy or breast reduction"},
+        {"code": "breast_augmentation", "label": "Breast augmentation"},
+        {"code": "hysterectomy", "label": "Hysterectomy"},
+        {"code": "ovaries_removed", "label": "Removal of ovaries"},
+        {"code": "testes_removed", "label": "Removal of testes"},
+        {"code": "testicular_prosthesis", "label": "Testicular prosthesis implantation"},
+        {"code": "vaginoplasty", "label": "Vaginoplasty"},
+        {"code": "phalloplasty", "label": "Phalloplasty or metoidioplasty"},
+        {"code": "hair_removal", "label": "Laser hair removal or electrolysis"},
+        {"code": "other", "label": "Other"},
+        {"code": "none", "label": "None of these"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "exclusive": ["none", "prefer_not_to_say"],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "optional": true,
+      "sensitive": true,
+      "show_if": {"path": {"in": ["a"]}, "age_group": {"in": ["adult", "60_plus"]}}
+    },
+
+    {
+      "key": "periods_started",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Have your periods started?",
+      "title_family": "Has [Name] started [their] periods?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "not_yet", "label": "Not yet"},
+        {"code": "describe", "label": "I’m not sure / I want to describe"}
+      ],
+      "write_in_choice": "describe",
+      "write_in_label": "Tell me more",
+      "show_if": {"body_route": {"in": ["female", "intersex"]}, "age_group": {"in": ["teen"]}}
+    },
+    {
+      "key": "reproductive_status",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Which best describes you now?",
+      "title_family": "Which best describes [Name] now?",
+      "choices": [
+        {"code": "menstruating", "label": "Having periods"},
+        {"code": "pre_menopausal", "label": "Pre-menopausal"},
+        {"code": "peri_menopausal", "label": "Peri-menopausal"},
+        {"code": "post_menopausal", "label": "Post-menopausal"},
+        {"code": "surgically_menopausal", "label": "Surgically menopausal"},
+        {"code": "pregnant_postpartum", "label": "Pregnant or postpartum"}
+      ],
+      "show_if": {"body_route": {"in": ["female", "intersex"]}, "age_group": {"in": ["adult"]}}
+    },
+    {
+      "key": "age_first_period",
+      "section": "body_and_hormones",
+      "kind": "number",
+      "title": "How old were you when you had your first period?",
+      "title_family": "How old was [Name] at [their] first period?",
+      "min": 6,
+      "max": 25,
+      "integer": true,
+      "up_to_age": true,
+      "unit": "years",
+      "show_if": {
+        "body_route": {"in": ["female", "intersex"]},
+        "any": [
+          {"age_group": {"in": ["adult", "60_plus"]}},
+          {"periods_started": {"in": ["yes"]}}
+        ]
+      }
+    },
+    {
+      "key": "cycle_regularity",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "How regular are your periods?",
+      "title_family": "How regular are [Name]’s periods?",
+      "choices": [
+        {"code": "regular", "label": "Regular"},
+        {"code": "irregular", "label": "Irregular"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {
+        "body_route": {"in": ["female", "intersex"]},
+        "any": [
+          {"reproductive_status": {"in": ["menstruating", "pre_menopausal", "peri_menopausal"]}},
+          {"periods_started": {"in": ["yes"]}}
+        ]
+      }
+    },
+    {
+      "key": "age_last_period",
+      "section": "body_and_hormones",
+      "kind": "number",
+      "title": "At what age was your last period?",
+      "title_family": "At what age was [Name]’s last period?",
+      "min": 20,
+      "max": 70,
+      "integer": true,
+      "up_to_age": true,
+      "unit": "years",
+      "show_if": {
+        "body_route": {"in": ["female", "intersex"]},
+        "any": [
+          {"reproductive_status": {"in": ["post_menopausal"]}},
+          {"age_group": {"in": ["60_plus"]}}
+        ]
+      }
+    },
+    {
+      "key": "hysterectomy",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Have you had a hysterectomy?",
+      "title_family": "Has [Name] had a hysterectomy?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"}
+      ],
+      "show_if": {"reproductive_status": {"in": ["surgically_menopausal"]}}
+    },
+    {
+      "key": "ovaries_removed",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Have you had your ovaries removed?",
+      "title_family": "Has [Name] had [their] ovaries removed?",
+      "choices": [
+        {"code": "both", "label": "Yes, both"},
+        {"code": "one", "label": "One of them"},
+        {"code": "no", "label": "No"}
+      ],
+      "show_if": {"reproductive_status": {"in": ["surgically_menopausal"]}}
+    },
+    {
+      "key": "hrt_status",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Are you currently on hormone therapy (HRT)?",
+      "title_family": "Is [Name] currently on hormone therapy (HRT)?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "previously", "label": "Not now, but in the past"},
+        {"code": "no", "label": "No"}
+      ],
+      "show_if": {
+        "body_route": {"in": ["female", "intersex"]},
+        "any": [
+          {
+            "reproductive_status": {
+              "in": ["peri_menopausal", "post_menopausal", "surgically_menopausal"]
+            }
+          },
+          {"age_group": {"in": ["60_plus"]}}
+        ]
+      }
+    },
+    {
+      "key": "hrt_type",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Which kind of hormone therapy?",
+      "choices": [
+        {"code": "estrogen_only", "label": "Estrogen only"},
+        {"code": "combined", "label": "Estrogen and progesterone"},
+        {"code": "progesterone_only", "label": "Progesterone only"},
+        {"code": "other", "label": "Other"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other",
+      "show_if": {"hrt_status": {"in": ["yes", "previously"]}}
+    },
+    {
+      "key": "puberty_started",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Have you started puberty?",
+      "title_family": "Has [Name] started puberty?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "not_yet", "label": "Not yet"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"body_route": {"in": ["male", "intersex"]}, "age_group": {"in": ["teen"]}}
+    },
+    {
+      "key": "puberty_age",
+      "section": "body_and_hormones",
+      "kind": "number",
+      "title": "At what age did you start puberty?",
+      "title_family": "At what age did [Name] start puberty?",
+      "min": 6,
+      "max": 25,
+      "integer": true,
+      "up_to_age": true,
+      "unit": "years",
+      "show_if": {
+        "body_route": {"in": ["male", "intersex"]},
+        "any": [
+          {"age_group": {"in": ["adult", "60_plus"]}},
+          {"puberty_started": {"in": ["yes"]}}
+        ]
+      }
+    },
+    {
+      "key": "growth_concerns",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Any concerns about your growth or height?",
+      "title_family": "Any concerns about [Name]’s growth or height?",
+      "choices": [
+        {"code": "no", "label": "No"},
+        {"code": "yes", "label": "Yes"}
+      ],
+      "write_in_choice": "yes",
+      "write_in_label": "Tell me more",
+      "show_if": {"body_route": {"in": ["male", "intersex"]}, "age_group": {"in": ["teen"]}}
+    },
+    {
+      "key": "fertility_concerns",
+      "section": "body_and_hormones",
+      "kind": "choice",
+      "title": "Do you have any fertility or reproductive concerns?",
+      "title_family": "Does [Name] have any fertility or reproductive concerns?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"}
+      ],
+      "show_if": {"body_route": {"in": ["male", "intersex"]}, "age_group": {"in": ["adult"]}}
+    },
+
+    {
+      "key": "medications",
+      "section": "medications",
+      "kind": "named_list",
+      "title": "Are you currently taking any medications (prescription or over the counter)?",
+      "title_family": "Is [Name] taking any medications (prescription or over the counter)?",
+      "name_label": "Medication",
+      "detail_label": "What is it for?",
+      "missing_name_message": "Please add the name of the medication or supplement."
+    },
+    {
+      "key": "supplements",
+      "section": "medications",
+      "kind": "named_list",
+      "title": "Are you taking any supplements?",
+      "title_family": "Is [Name] taking any supplements?",
+      "name_label": "Supplement",
+      "detail_label": "What is it for?",
+      "missing_name_message": "Please add the name of the medication or supplement."
+    },
+    {
+      "key": "allergies",
+      "section": "medications",
+      "kind": "named_list",
+      "title": "Do you have any allergies?",
+      "title_family": "Does [Name] have any allergies?",
+      "name_label": "Allergy",
+      "detail_label": "What happens?",
+      "missing_name_message": "Please add the name of the allergy."
+    },
+    {
+      "key": "genesis_gold",
+      "section": "medications",
+      "kind": "choice",
+      "title": "Are you taking Genesis Gold®?",
+      "title_family": "Is [Name] taking Genesis Gold®?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"}
+      ],
+      "show_if": {"age_group": {"in": ["adult", "60_plus"]}}
+    },
+
+    {
+      "key": "sleep_hours",
+      "section": "lifestyle",
+      "kind": "number",
+      "title": "How many hours do you usually sleep a night?",
+      "title_family": "How many hours does [Name] usually sleep a night?",
+      "min": 0,
+      "max": 24,
+      "unit": "hours"
+    },
+    {
+      "key": "sleep_quality",
+      "section": "lifestyle",
+      "kind": "scale",
+      "title": "How well do you usually sleep?",
+      "title_family": "How well does [Name] usually sleep?",
+      "min": 1,
+      "max": 5,
+      "min_label": "Very badly",
+      "max_label": "Very well"
+    },
+    {
+      "key": "exercise",
+      "section": "lifestyle",
+      "kind": "choice",
+      "title": "How often do you exercise?",
+      "title_family": "How often does [Name] exercise?",
+      "choices": [
+        {"code": "rarely", "label": "Rarely or never"},
+        {"code": "1_2_a_week", "label": "1–2 times a week"},
+        {"code": "3_4_a_week", "label": "3–4 times a week"},
+        {"code": "5_plus_a_week", "label": "5 or more times a week"}
+      ]
+    },
+    {
+      "key": "diet",
+      "section": "lifestyle",
+      "kind": "choice",
+      "title": "Which best describes how you eat?",
+      "title_family": "Which best describes how [Name] eats?",
+      "choices": [
+        {"code": "everything", "label": "A bit of everything"},
+        {"code": "mostly_plants", "label": "Mostly plants"},
+        {"code": "vegetarian", "label": "Vegetarian"},
+        {"code": "vegan", "label": "Vegan"},
+        {"code": "low_carb", "label": "Low-carb or keto"},
+        {"code": "other", "label": "Other"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Other"
+    },
+    {
+      "key": "work",
+      "section": "lifestyle",
+      "kind": "choice",
+      "title": "Which best describes your work?",
+      "title_family": "Which best describes [Name]’s work?",
+      "choices": [
+        {"code": "daytime", "label": "Mostly daytime hours"},
+        {"code": "shifts", "label": "Shifts or nights"},
+        {"code": "home_or_caring", "label": "At home or caring for family"},
+        {"code": "studying", "label": "Studying"},
+        {"code": "not_working", "label": "Not working right now"},
+        {"code": "retired", "label": "Retired"}
+      ]
+    },
+    {
+      "key": "stress",
+      "section": "lifestyle",
+      "kind": "scale",
+      "title": "How stressed do you feel day to day?",
+      "title_family": "How stressed does [Name] feel day to day?",
+      "min": 1,
+      "max": 10,
+      "min_label": "Not at all",
+      "max_label": "Extremely"
+    },
+    {
+      "key": "support",
+      "section": "lifestyle",
+      "kind": "choice",
+      "title": "Do you have people to lean on?",
+      "title_family": "Does [Name] have people to lean on?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "sometimes", "label": "Sometimes"},
+        {"code": "no", "label": "No"}
+      ]
+    },
+
+    {
+      "key": "symptoms_general",
+      "section": "symptoms",
+      "kind": "checklist",
+      "title": "Have you noticed any of these lately?",
+      "title_family": "Has [Name] noticed any of these lately?",
+      "hint": "Tick what applies. Mark anything that doesn’t apply to you as N/A.",
+      "choices": [
+        {"code": "fatigue", "label": "Fatigue or exhaustion"},
+        {"code": "trouble_falling_asleep", "label": "Trouble falling asleep"},
+        {"code": "waking_at_night", "label": "Waking through the night"},
+        {"code": "daytime_sleepiness", "label": "Sleepiness during the day"},
+        {"code": "low_motivation", "label": "Lack of motivation"},
+        {"code": "hot_flashes", "label": "Hot flashes"},
+        {"code": "night_sweats", "label": "Night sweats"},
+        {"code": "always_cold", "label": "Feeling cold all the time"},
+        {"code": "anxiety", "label": "Anxiety"},
+        {"code": "low_mood", "label": "Low mood or depression"},
+        {"code": "brain_fog", "label": "Brain fog or forgetfulness"},
+        {"code": "palpitations", "label": "Palpitations or a racing heart"},
+        {"code": "weight_gain", "label": "Unexplained weight gain"},
+        {"code": "weight_loss", "label": "Unexplained weight loss"},
+        {"code": "bloating", "label": "Bloating or water retention"},
+        {"code": "constant_hunger", "label": "Overeating or constant hunger"},
+        {"code": "thirst", "label": "Excessive thirst or urination"},
+        {"code": "digestion", "label": "Constipation, diarrhea or IBS"},
+        {"code": "aches", "label": "Aches, pains or tender spots"},
+        {"code": "muscle_weakness", "label": "Muscle weakness"},
+        {"code": "skin", "label": "Skin rashes, acne or eczema"}
+      ]
+    },
+    {
+      "key": "symptoms_cycle",
+      "section": "symptoms",
+      "kind": "checklist",
+      "title": "Have you noticed any of these with your periods?",
+      "title_family": "Has [Name] noticed any of these with [their] periods?",
+      "hint": "Tick what applies. Mark anything that doesn’t apply to you as N/A.",
+      "choices": [
+        {"code": "irregular_periods", "label": "Irregular or missed periods"},
+        {"code": "heavy_periods", "label": "Heavy periods"},
+        {"code": "painful_periods", "label": "Painful periods or cramps"},
+        {"code": "pms", "label": "Mood changes before a period"},
+        {"code": "breast_tenderness", "label": "Breast tenderness"}
+      ],
+      "show_if": {"body_route": {"in": ["female", "intersex"]}}
+    },
+    {
+      "key": "symptoms_female",
+      "section": "symptoms",
+      "kind": "checklist",
+      "title": "Have you noticed any of these hormonal changes?",
+      "title_family": "Has [Name] noticed any of these hormonal changes?",
+      "hint": "Tick what applies. Mark anything that doesn’t apply to you as N/A.",
+      "choices": [
+        {"code": "low_libido", "label": "Low libido"},
+        {"code": "vaginal_dryness", "label": "Vaginal dryness"},
+        {"code": "trouble_conceiving", "label": "Trouble getting pregnant"},
+        {"code": "bladder_leaks", "label": "Bladder leaks"}
+      ],
+      "show_if": {
+        "body_route": {"in": ["female", "intersex"]},
+        "age_group": {"in": ["adult", "60_plus"]}
+      }
+    },
+    {
+      "key": "symptoms_male",
+      "section": "symptoms",
+      "kind": "checklist",
+      "title": "Have you noticed any of these hormonal changes?",
+      "title_family": "Has [Name] noticed any of these hormonal changes?",
+      "hint": "Tick what applies. Mark anything that doesn’t apply to you as N/A.",
+      "choices": [
+        {"code": "low_libido", "label": "Low libido"},
+        {"code": "erection_changes", "label": "Changes in erections"},
+        {"code": "muscle_loss", "label": "Losing muscle or strength"},
+        {"code": "fertility", "label": "Fertility concerns"},
+        {"code": "urination_changes", "label": "Changes when urinating"}
+      ],
+      "show_if": {
+        "body_route": {"in": ["male", "intersex"]},
+        "age_group": {"in": ["adult", "60_plus"]}
+      }
+    },
+
+    {
+      "key": "last_physical",
+      "section": "health_checks",
+      "kind": "date",
+      "title": "When was your last physical?",
+      "title_family": "When was [Name]’s last physical?"
+    },
+    {
+      "key": "last_bloodwork",
+      "section": "health_checks",
+      "kind": "date",
+      "title": "When did you last have bloodwork?",
+      "title_family": "When did [Name] last have bloodwork?"
+    },
+    {
+      "key": "pap_smear",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "When was your last Pap smear?",
+      "title_family": "When was [Name]’s last Pap smear?",
+      "choices": [
+        {"code": "within_1_year", "label": "In the last year"},
+        {"code": "1_to_3_years", "label": "1–3 years ago"},
+        {"code": "over_3_years", "label": "More than 3 years ago"},
+        {"code": "never", "label": "Never"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"body": {"has": ["cervix"]}}
+    },
+    {
+      "key": "mammogram",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "When was your last mammogram?",
+      "title_family": "When was [Name]’s last mammogram?",
+      "choices": [
+        {"code": "within_1_year", "label": "In the last year"},
+        {"code": "1_to_3_years", "label": "1–3 years ago"},
+        {"code": "over_3_years", "label": "More than 3 years ago"},
+        {"code": "never", "label": "Never"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"body": {"has": ["breast_tissue"]}, "age": {"min": 40}}
+    },
+    {
+      "key": "prostate_screening",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "When was your last prostate check?",
+      "title_family": "When was [Name]’s last prostate check?",
+      "choices": [
+        {"code": "within_1_year", "label": "In the last year"},
+        {"code": "1_to_3_years", "label": "1–3 years ago"},
+        {"code": "over_3_years", "label": "More than 3 years ago"},
+        {"code": "never", "label": "Never"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"body": {"has": ["prostate"]}, "age": {"min": 45}}
+    },
+    {
+      "key": "colon_screening",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "When was your last colon cancer screening?",
+      "title_family": "When was [Name]’s last colon cancer screening?",
+      "choices": [
+        {"code": "within_1_year", "label": "In the last year"},
+        {"code": "1_to_3_years", "label": "1–3 years ago"},
+        {"code": "over_3_years", "label": "More than 3 years ago"},
+        {"code": "never", "label": "Never"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"age": {"min": 45}}
+    },
+    {
+      "key": "bone_density",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "When was your last bone density scan?",
+      "title_family": "When was [Name]’s last bone density scan?",
+      "choices": [
+        {"code": "within_1_year", "label": "In the last year"},
+        {"code": "1_to_3_years", "label": "1–3 years ago"},
+        {"code": "over_3_years", "label": "More than 3 years ago"},
+        {"code": "never", "label": "Never"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "show_if": {"body_route": {"in": ["female", "intersex"]}, "age_group": {"in": ["60_plus"]}}
+    },
+    {
+      "key": "vaccinations",
+      "section": "health_checks",
+      "kind": "choice",
+      "title": "Are your vaccinations up to date?",
+      "title_family": "Are [Name]’s vaccinations up to date?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ]
+    },
+
+    {
+      "key": "conditions",
+      "section": "medical_history",
+      "kind": "multi_choice",
+      "title": "Have you been diagnosed with any of these?",
+      "title_family": "Has [Name] been diagnosed with any of these?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "thyroid", "label": "A thyroid condition"},
+        {"code": "diabetes", "label": "Diabetes or prediabetes"},
+        {"code": "high_blood_pressure", "label": "High blood pressure"},
+        {"code": "high_cholesterol", "label": "High cholesterol"},
+        {"code": "heart", "label": "A heart condition"},
+        {"code": "pcos", "label": "PCOS"},
+        {"code": "endometriosis", "label": "Endometriosis"},
+        {"code": "osteoporosis", "label": "Osteoporosis or bone loss"},
+        {"code": "autoimmune", "label": "An autoimmune condition"},
+        {"code": "asthma", "label": "Asthma"},
+        {"code": "mental_health", "label": "Depression, anxiety or another mental health condition"},
+        {"code": "cancer", "label": "Cancer"},
+        {"code": "other", "label": "Other"},
+        {"code": "none", "label": "None of these"}
+      ],
+      "exclusive": ["none"],
+      "write_in_choice": "other",
+      "write_in_label": "Other"
+    },
+    {
+      "key": "family_history",
+      "section": "medical_history",
+      "kind": "multi_choice",
+      "title": "Do any of these run in your family?",
+      "title_family": "Do any of these run in [Name]’s family?",
+      "hint": "Choose all that apply.",
+      "choices": [
+        {"code": "thyroid", "label": "Thyroid conditions"},
+        {"code": "diabetes", "label": "Diabetes"},
+        {"code": "heart", "label": "Heart disease"},
+        {"code": "high_blood_pressure", "label": "High blood pressure"},
+        {"code": "cancer", "label": "Cancer"},
+        {"code": "osteoporosis", "label": "Osteoporosis"},
+        {"code": "dementia", "label": "Dementia"},
+        {"code": "autoimmune", "label": "Autoimmune conditions"},
+        {"code": "mental_health", "label": "Depression or other mental health conditions"},
+        {"code": "other", "label": "Other"},
+        {"code": "none", "label": "None of these"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ],
+      "exclusive": ["none", "not_sure"],
+      "write_in_choice": "other",
+      "write_in_label": "Other"
+    },
+
+    {
+      "key": "teen_home",
+      "section": "teen",
+      "kind": "choice",
+      "title": "Who do you live with?",
+      "title_family": "Who does [Name] live with?",
+      "choices": [
+        {"code": "both_parents", "label": "Both parents"},
+        {"code": "one_parent", "label": "One parent"},
+        {"code": "two_homes", "label": "Between two homes"},
+        {"code": "other_family", "label": "Other family"},
+        {"code": "other", "label": "Someone else"}
+      ],
+      "write_in_choice": "other",
+      "write_in_label": "Who?"
+    },
+    {
+      "key": "teen_school",
+      "section": "teen",
+      "kind": "choice",
+      "title": "How is school going?",
+      "title_family": "How is school going for [Name]?",
+      "choices": [
+        {"code": "well", "label": "Well"},
+        {"code": "okay", "label": "Okay"},
+        {"code": "hard", "label": "It’s hard right now"},
+        {"code": "not_in_school", "label": "Not in school"}
+      ]
+    },
+    {
+      "key": "teen_wellbeing",
+      "section": "teen",
+      "kind": "scale",
+      "title": "How have you been feeling lately?",
+      "title_family": "How has [Name] been feeling lately?",
+      "min": 1,
+      "max": 5,
+      "min_label": "Really low",
+      "max_label": "Really good"
+    },
+    {
+      "key": "teen_safety",
+      "section": "teen",
+      "kind": "choice",
+      "title": "Do you feel safe at home and at school?",
+      "title_family": "Does [Name] feel safe at home and at school?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "mostly", "label": "Mostly"},
+        {"code": "no", "label": "No"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ]
+    },
+    {
+      "key": "teen_sexual_health",
+      "section": "teen",
+      "kind": "choice",
+      "title": "Are you sexually active?",
+      "title_family": "Is [Name] sexually active?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"},
+        {"code": "prefer_not_to_say", "label": "Prefer not to say"}
+      ],
+      "optional": true,
+      "sensitive": true
+    },
+    {
+      "key": "teen_puberty_blockers",
+      "section": "teen",
+      "kind": "choice",
+      "title": "Are you using any puberty blockers?",
+      "title_family": "Is [Name] using any puberty blockers?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "no", "label": "No"}
+      ],
+      "write_in_choice": "yes",
+      "write_in_label": "Details",
+      "optional": true,
+      "sensitive": true
+    },
+    {
+      "key": "teen_worries",
+      "section": "teen",
+      "kind": "text",
+      "title": "Is there anything you’re worried about?",
+      "title_family": "Is there anything you’re worried about for [Name]?",
+      "optional": true
+    },
+
+    {
+      "key": "child_carers",
+      "section": "child",
+      "kind": "text",
+      "title": "Who cares for you day to day?",
+      "title_family": "Who cares for [Name] day to day?"
+    },
+    {
+      "key": "child_birth",
+      "section": "child",
+      "kind": "choice",
+      "title": "Were you born early, on time or late?",
+      "title_family": "Was [Name] born early, on time or late?",
+      "choices": [
+        {"code": "early", "label": "Early"},
+        {"code": "on_time", "label": "On time"},
+        {"code": "late", "label": "Late"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ]
+    },
+    {
+      "key": "child_growth",
+      "section": "child",
+      "kind": "choice",
+      "title": "Any concerns about your growth?",
+      "title_family": "Any concerns about [Name]’s growth?",
+      "choices": [
+        {"code": "no", "label": "No"},
+        {"code": "yes", "label": "Yes"}
+      ],
+      "write_in_choice": "yes",
+      "write_in_label": "Tell me more"
+    },
+    {
+      "key": "child_milestones",
+      "section": "child",
+      "kind": "choice",
+      "title": "Are you reaching milestones, like talking and walking, as expected?",
+      "title_family": "Is [Name] reaching milestones, like talking and walking, as expected?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "some_delays", "label": "Some delays"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ]
+    },
+    {
+      "key": "child_school",
+      "section": "child",
+      "kind": "choice",
+      "title": "How is school or nursery going?",
+      "title_family": "How is school or nursery going for [Name]?",
+      "choices": [
+        {"code": "well", "label": "Well"},
+        {"code": "okay", "label": "Okay"},
+        {"code": "hard", "label": "It’s hard right now"},
+        {"code": "not_started", "label": "Not started yet"}
+      ]
+    },
+    {
+      "key": "child_safety",
+      "section": "child",
+      "kind": "choice",
+      "title": "Do you seem safe and happy at home and at school?",
+      "title_family": "Does [Name] seem safe and happy at home and at school?",
+      "choices": [
+        {"code": "yes", "label": "Yes"},
+        {"code": "mostly", "label": "Mostly"},
+        {"code": "no", "label": "No"},
+        {"code": "not_sure", "label": "I’m not sure"}
+      ]
+    }
+  ]
+}

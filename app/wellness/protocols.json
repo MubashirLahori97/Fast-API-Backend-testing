@@ -1,0 +1,69 @@
+{
+  "tabs": [
+    {
+      "key": "genesis-gold",
+      "title": "Genesis Gold®",
+      "product": true,
+      "sections": [
+        {
+          "key": "genesis-gold",
+          "title": "Genesis Gold®",
+          "parts": ["What it is", "What’s inside", "What it supports", "How to take it"]
+        }
+      ]
+    },
+    {
+      "key": "sacred-seven",
+      "title": "Sacred Seven®",
+      "product": true,
+      "sections": [
+        {
+          "key": "sacred-seven",
+          "title": "Sacred Seven®",
+          "parts": ["What it is", "When it’s recommended", "How to take it"]
+        }
+      ]
+    },
+    {
+      "key": "gen-pro",
+      "title": "Gen-Pro®",
+      "product": true,
+      "sections": [
+        {
+          "key": "gen-pro",
+          "title": "Gen-Pro®",
+          "parts": ["What it is", "When it’s recommended", "The directions on the label"]
+        }
+      ]
+    },
+    {
+      "key": "lifestyle",
+      "title": "Lifestyle protocols",
+      "product": false,
+      "sections": [
+        {
+          "key": "healthy-four",
+          "title": "Nutrition: the DMAR® Healthy Four",
+          "titles": ["DMAR® Healthy Four", "Healthy Four"]
+        },
+        {"key": "insulin-resistance-diet", "title": "The Insulin Resistance Diet"},
+        {"key": "beet-test", "title": "The Beet Test", "cleanse": true},
+        {"key": "liver-kidney-cleanse", "title": "The Liver-Kidney Cleanse", "cleanse": true},
+        {"key": "hiit", "title": "HIIT"},
+        {"key": "contraction-relaxation", "title": "Contraction-Relaxation"},
+        {"key": "calm", "title": "CALM", "external": "calm_guide"},
+        {"key": "healing-meditation", "title": "The Healing Meditation"},
+        {
+          "key": "seven-secrets",
+          "title": "The 7 Secrets to Healthy Hormones",
+          "titles": ["Seven Secrets to Healthy Hormones"]
+        },
+        {
+          "key": "deep-sleep",
+          "title": "Sleep: Deep Sleep & Longevity",
+          "titles": ["Deep Sleep & Longevity"]
+        }
+      ]
+    }
+  ]
+}

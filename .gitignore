@@ -1,0 +1,9 @@
+# Python cache files
+__pycache__/
+*.pyc
+
+# Virtual environment: uv rebuilds it from uv.lock on each machine
+.venv/
+
+# Secrets (passwords, API keys) - never commit
+.env

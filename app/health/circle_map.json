@@ -1,0 +1,76 @@
+{
+  "version": "placeholder-2026-11-10",
+  "status": "placeholder",
+  "note": "PLACEHOLDER. Not Deborah's map. Story 6.1's Hypothalamus Circle Map is Deborah's predefined map, which we don't have yet. These areas, labels and symptom links were made up by the backend team from the symptom checklists in questions.json so the endpoint can be built and tried. Replace this whole file (or point settings.health_circle_map_path at Deborah's version) once her map is in. Each symptom's 'matches' are 'question_key.choice_code' from questions.json; a symptom is highlighted when any of them is ticked.",
+  "title": "Hypothalamus Circle Map",
+  "centre": "Hypothalamus",
+  "areas": [
+    {
+      "key": "sleep",
+      "label": "Sleep",
+      "symptoms": [
+        {"key": "trouble_falling_asleep", "label": "Trouble falling asleep", "matches": ["symptoms_general.trouble_falling_asleep"]},
+        {"key": "waking_at_night", "label": "Waking in the night", "matches": ["symptoms_general.waking_at_night"]},
+        {"key": "daytime_sleepiness", "label": "Daytime sleepiness", "matches": ["symptoms_general.daytime_sleepiness"]}
+      ]
+    },
+    {
+      "key": "energy",
+      "label": "Energy and metabolism",
+      "symptoms": [
+        {"key": "fatigue", "label": "Fatigue", "matches": ["symptoms_general.fatigue"]},
+        {"key": "weight_gain", "label": "Weight gain", "matches": ["symptoms_general.weight_gain"]},
+        {"key": "weight_loss", "label": "Weight loss", "matches": ["symptoms_general.weight_loss"]},
+        {"key": "muscle_weakness", "label": "Muscle weakness or loss", "matches": ["symptoms_general.muscle_weakness", "symptoms_male.muscle_loss"]}
+      ]
+    },
+    {
+      "key": "temperature",
+      "label": "Temperature",
+      "symptoms": [
+        {"key": "hot_flashes", "label": "Hot flashes", "matches": ["symptoms_general.hot_flashes"]},
+        {"key": "night_sweats", "label": "Night sweats", "matches": ["symptoms_general.night_sweats"]},
+        {"key": "always_cold", "label": "Always cold", "matches": ["symptoms_general.always_cold"]}
+      ]
+    },
+    {
+      "key": "mood",
+      "label": "Mood and stress",
+      "symptoms": [
+        {"key": "anxiety", "label": "Anxiety", "matches": ["symptoms_general.anxiety"]},
+        {"key": "low_mood", "label": "Low mood", "matches": ["symptoms_general.low_mood"]},
+        {"key": "low_motivation", "label": "Low motivation", "matches": ["symptoms_general.low_motivation"]},
+        {"key": "brain_fog", "label": "Brain fog", "matches": ["symptoms_general.brain_fog"]},
+        {"key": "palpitations", "label": "Palpitations", "matches": ["symptoms_general.palpitations"]}
+      ]
+    },
+    {
+      "key": "appetite",
+      "label": "Appetite, thirst and digestion",
+      "symptoms": [
+        {"key": "constant_hunger", "label": "Constant hunger", "matches": ["symptoms_general.constant_hunger"]},
+        {"key": "thirst", "label": "Thirst", "matches": ["symptoms_general.thirst"]},
+        {"key": "bloating", "label": "Bloating", "matches": ["symptoms_general.bloating"]},
+        {"key": "digestion", "label": "Digestion changes", "matches": ["symptoms_general.digestion"]}
+      ]
+    },
+    {
+      "key": "hormones",
+      "label": "Hormones and reproduction",
+      "symptoms": [
+        {"key": "cycle_changes", "label": "Period changes", "matches": ["symptoms_cycle.irregular_periods", "symptoms_cycle.heavy_periods", "symptoms_cycle.painful_periods", "symptoms_cycle.pms"]},
+        {"key": "breast_tenderness", "label": "Breast tenderness", "matches": ["symptoms_cycle.breast_tenderness"]},
+        {"key": "low_libido", "label": "Low libido", "matches": ["symptoms_female.low_libido", "symptoms_male.low_libido"]},
+        {"key": "fertility", "label": "Fertility concerns", "matches": ["symptoms_female.trouble_conceiving", "symptoms_male.fertility"]}
+      ]
+    },
+    {
+      "key": "body",
+      "label": "Skin, aches and body",
+      "symptoms": [
+        {"key": "aches", "label": "Aches and pains", "matches": ["symptoms_general.aches"]},
+        {"key": "skin", "label": "Skin changes", "matches": ["symptoms_general.skin"]}
+      ]
+    }
+  ]
+}
