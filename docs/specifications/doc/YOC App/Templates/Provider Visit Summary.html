@@ -1,0 +1,862 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Provider Visit Summary</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── Layout: single-column document, max 720px, brand palette ── */
+:root {
+  --purple: #613977;
+  --gold:   #c9a94e;
+  --pink:   #cd497f;
+  --bg:     #faf9f7;
+  --bg2:    #f2eff9;
+  --fg:     #1e1624;
+  --fg2:    #4a3d56;
+  --fg3:    #7a6a87;
+  --border: #ddd6e8;
+  --input-bg: #ffffff;
+  --section-border: #e8e2f3;
+  --pill-bg: #ede8f5;
+  --required: #cd497f;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'EB Garamond', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:     #16101e;
+    --bg2:    #1f1730;
+    --fg:     #ede8f5;
+    --fg2:    #c5b8d4;
+    --fg3:    #8b7a9a;
+    --border: #352844;
+    --input-bg: #211830;
+    --section-border: #2e2240;
+    --pill-bg: #2a1f3d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:     #16101e;
+  --bg2:    #1f1730;
+  --fg:     #ede8f5;
+  --fg2:    #c5b8d4;
+  --fg3:    #8b7a9a;
+  --border: #352844;
+  --input-bg: #211830;
+  --section-border: #2e2240;
+  --pill-bg: #2a1f3d;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin: 0;
+  padding-inline: 20px;
+  padding-block: 32px 48px;
+}
+
+.page-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.doc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--purple);
+  flex-wrap: wrap;
+}
+.doc-header-left h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--purple);
+  margin: 0 0 4px;
+  text-wrap: balance;
+  letter-spacing: 0.01em;
+}
+.doc-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--fg3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.oracle-badge {
+  flex-shrink: 0;
+  background: var(--purple);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: 3px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ── Patient meta row ── */
+.meta-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 28px;
+}
+.meta-item label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 3px;
+}
+.meta-item input, .meta-item select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.meta-item input:focus, .meta-item select:focus {
+  border-color: var(--purple);
+}
+.meta-item select option { background: var(--input-bg); }
+
+/* ── Sections ── */
+.section {
+  border: 1px solid var(--section-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--section-border);
+  padding: 10px 16px;
+}
+.section-num {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple);
+  min-width: 22px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: 0.01em;
+}
+.section-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Fields ── */
+.field label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 4px;
+}
+.field label .req { color: var(--required); margin-left: 2px; }
+.field input[type="text"],
+.field input[type="date"],
+.field textarea,
+.field select {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  padding: 7px 10px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s;
+  min-width: 0;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px rgba(97,57,119,0.12);
+}
+.field textarea { min-height: 72px; line-height: 1.55; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
+
+/* ── Lab table ── */
+.lab-table-wrap { overflow-x: auto; }
+table.labs {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  min-width: 420px;
+}
+.labs th {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 7px 10px;
+  text-align: left;
+}
+.labs td {
+  border-bottom: 1px solid var(--section-border);
+  padding: 6px 10px;
+  vertical-align: middle;
+}
+.labs tr:last-child td { border-bottom: none; }
+.labs td input[type="text"] {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 4px 7px;
+  width: 100%;
+  outline: none;
+  min-width: 0;
+}
+.labs td input:focus { border-color: var(--purple); }
+.add-lab-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 4px;
+  color: var(--fg3);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  width: 100%;
+  text-align: left;
+  margin-top: 6px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.add-lab-btn:hover { border-color: var(--purple); color: var(--purple); }
+.del-row-btn {
+  background: none;
+  border: none;
+  color: var(--fg3);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.del-row-btn:hover { color: var(--pink); }
+
+/* ── Rx changes ── */
+.rx-list { display: flex; flex-direction: column; gap: 8px; }
+.rx-row { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: center; }
+@media (max-width: 560px) { .rx-row { grid-template-columns: 1fr 1fr; } }
+.rx-row .change-type {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 5px 7px;
+  outline: none;
+  width: 100%;
+}
+.change-type:focus { border-color: var(--purple); }
+.change-type option { background: var(--input-bg); }
+
+/* ── Next steps checklist ── */
+.next-list { display: flex; flex-direction: column; gap: 8px; }
+.next-item { display: flex; gap: 10px; align-items: flex-start; }
+.next-item .priority {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+.priority.urgent { background: rgba(205,73,127,0.15); color: var(--pink); }
+.priority.schedule { background: rgba(201,169,78,0.2); color: #8a6c1a; }
+.priority.routine { background: var(--pill-bg); color: var(--purple); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .priority.schedule { color: var(--gold); } }
+:root[data-theme="dark"] .priority.schedule { color: var(--gold); }
+.next-item input[type="text"] {
+  flex: 1;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  padding: 6px 9px;
+  outline: none;
+  min-width: 0;
+}
+.next-item input:focus { border-color: var(--purple); }
+
+/* ── Notes/Oracle summary ── */
+.oracle-note {
+  background: var(--bg2);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+  color: var(--fg2);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+/* ── Actions footer ── */
+.doc-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 10px 22px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--purple); color: #fff; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary { background: none; border: 1.5px solid var(--border); color: var(--fg2); }
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+
+/* ── Copy success state ── */
+.copy-toast {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+  padding: 10px 0;
+  align-self: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.copy-toast.show { opacity: 1; }
+
+/* ── Pre-view output ── */
+#output-area { display: none; }
+#output-area.visible { display: block; }
+.output-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 22px;
+  margin-top: 28px;
+  white-space: pre-wrap;
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  line-height: 1.7;
+  color: var(--fg);
+}
+.output-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple);
+  margin: 0 0 12px;
+  letter-spacing: 0.01em;
+}
+.output-card .output-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+</style>
+
+<div class="page-wrap">
+
+  <div class="doc-header">
+    <div class="doc-header-left">
+      <h1>Provider Visit Summary</h1>
+      <div class="doc-subtitle">Your Oracle Clinician · Genesis Health Products Inc.</div>
+    </div>
+    <div class="oracle-badge">Oracle</div>
+  </div>
+
+  <!-- ── Patient Meta ── -->
+  <div class="meta-row">
+    <div class="meta-item">
+      <label for="pt-name">Patient name</label>
+      <input type="text" id="pt-name" placeholder="Full name">
+    </div>
+    <div class="meta-item">
+      <label for="pt-dob">Date of birth</label>
+      <input type="date" id="pt-dob">
+    </div>
+    <div class="meta-item">
+      <label for="visit-date">Visit date</label>
+      <input type="date" id="visit-date">
+    </div>
+    <div class="meta-item">
+      <label for="prepared-by">Prepared by Oracle</label>
+      <input type="text" id="prepared-by" value="Your Oracle Clinician" readonly style="opacity:0.6;cursor:default;">
+    </div>
+  </div>
+
+  <!-- ── Section 1: Chief Complaint ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">1</div>
+      <div class="section-title">Chief Complaint</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="cc-primary">Primary concern brought to the visit <span class="req">*</span></label>
+        <textarea id="cc-primary" placeholder="e.g., Persistent fatigue and weight gain despite being told labs are normal; seeking clarification on perimenopausal transition"></textarea>
+      </div>
+      <div class="field">
+        <label for="cc-duration">How long has this been going on?</label>
+        <input type="text" id="cc-duration" placeholder="e.g., 8–12 months, worsening since last spring">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Provider Seen ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">2</div>
+      <div class="section-title">Provider Seen</div>
+    </div>
+    <div class="section-body">
+      <div class="field-row">
+        <div class="field">
+          <label for="prov-name">Provider name</label>
+          <input type="text" id="prov-name" placeholder="Dr. / NP / PA name">
+        </div>
+        <div class="field">
+          <label for="prov-specialty">Specialty</label>
+          <select id="prov-specialty">
+            <option value="">— Select —</option>
+            <option>Primary Care / Family Medicine</option>
+            <option>OB-GYN</option>
+            <option>Endocrinology</option>
+            <option>Integrative / Functional Medicine</option>
+            <option>Rheumatology</option>
+            <option>Neurology</option>
+            <option>Urology</option>
+            <option>Cardiology</option>
+            <option>Psychiatry</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="prov-practice">Practice / clinic name</label>
+          <input type="text" id="prov-practice" placeholder="Optional">
+        </div>
+        <div class="field">
+          <label for="followup-scheduled">Follow-up appointment</label>
+          <input type="text" id="followup-scheduled" placeholder="e.g., 6 weeks, pending labs">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: What I Took Away ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">3</div>
+      <div class="section-title">What I Took Away from This Visit</div>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label for="takeaway-diagnosis">Diagnosis or impression given</label>
+        <textarea id="takeaway-diagnosis" placeholder="e.g., Provider attributed symptoms to perimenopause and stress. No new diagnosis made. Suggested 'watchful waiting' for now."></textarea>
+      </div>
+      <div class="field">
+        <label for="takeaway-understanding">My own understanding of what was discussed</label>
+        <textarea id="takeaway-understanding" placeholder="e.g., Provider confirmed TSH is within range but agreed to expand thyroid panel. I raised hypothalamic support; they were open to my using Genesis Gold® alongside current treatment."></textarea>
+      </div>
+      <div class="field">
+        <label for="takeaway-concerns">Concerns or questions that were not addressed</label>
+        <textarea id="takeaway-concerns" placeholder="e.g., Did not have time to discuss sleep quality or DHEA-S. Want to raise at follow-up."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Labs Ordered ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">4</div>
+      <div class="section-title">Labs Ordered</div>
+    </div>
+    <div class="section-body">
+      <div class="lab-table-wrap">
+        <table class="labs" id="labs-table">
+          <thead>
+            <tr>
+              <th>Lab / Test</th>
+              <th>Ordered by</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="labs-body">
+            <tr>
+              <td><input type="text" placeholder="e.g., FSH (Day 3–5 of cycle)"></td>
+              <td><input type="text" placeholder="Provider / Oracle"></td>
+              <td><input type="text" placeholder="Pending / Drawn / Resulted"></td>
+              <td><button class="del-row-btn" onclick="deleteRow(this)" title="Remove">×</button></td>
+            </tr>
+            <tr>
+              <td><input type="text" placeholder="e.g., Free T3 + Free T4 + TSH"></td>
+              <td><input type="text" placeholder="Provider / Oracle"></td>
+              <td><input type="text" placeholder="Pending / Drawn / Resulted"></td>
+              <td><button class="del-row-btn" onclick="deleteRow(this)" title="Remove">×</button></td>
+            </tr>
+            <tr>
+              <td><input type="text" placeholder="e.g., Morning cortisol + DHEA-S"></td>
+              <td><input type="text" placeholder="Provider / Oracle"></td>
+              <td><input type="text" placeholder="Pending / Drawn / Resulted"></td>
+              <td><button class="del-row-btn" onclick="deleteRow(this)" title="Remove">×</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="add-lab-btn" onclick="addLabRow()">+ Add lab</button>
+      <div class="field" style="margin-top:8px;">
+        <label for="labs-notes">Lab notes</label>
+        <input type="text" id="labs-notes" placeholder="e.g., Quest Diagnostics. Results expected in 5–7 business days. Provider will call if abnormal.">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 5: Prescription Changes ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">5</div>
+      <div class="section-title">Changes in Prescription / Supplements</div>
+    </div>
+    <div class="section-body">
+      <div class="rx-list" id="rx-list">
+        <div class="rx-row">
+          <div class="field" style="margin:0"><input type="text" class="rx-name" placeholder="Medication or supplement name" style="width:100%"></div>
+          <div class="field" style="margin:0">
+            <select class="change-type">
+              <option value="">Change type</option>
+              <option>New — started</option>
+              <option>Dose increased</option>
+              <option>Dose decreased</option>
+              <option>Discontinued</option>
+              <option>Continued — no change</option>
+              <option>Added (OTC/supplement)</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0"><input type="text" placeholder="New dose / notes" style="width:100%"></div>
+          <button class="del-row-btn" onclick="deleteRxRow(this)" title="Remove">×</button>
+        </div>
+      </div>
+      <button class="add-lab-btn" onclick="addRxRow()" style="margin-top:8px;">+ Add medication or supplement</button>
+      <div class="field" style="margin-top:10px;">
+        <label for="genesis-note">Genesis Gold® / Sacred Seven® status</label>
+        <input type="text" id="genesis-note" placeholder="e.g., Continuing Genesis Gold® 2 tsp/day. Provider aware and supportive. Starting 60-day trial.">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 6: Next Steps ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num">6</div>
+      <div class="section-title">Next Steps</div>
+    </div>
+    <div class="section-body">
+      <div class="next-list" id="next-list">
+        <div class="next-item">
+          <select class="priority" onchange="this.className='priority '+this.value" style="flex-shrink:0;border:1px solid var(--border);border-radius:3px;cursor:pointer;">
+            <option value="routine" class="routine">Routine</option>
+            <option value="schedule" class="schedule">Schedule</option>
+            <option value="urgent" class="urgent">Urgent</option>
+          </select>
+          <input type="text" placeholder="e.g., Pick up lab order from portal and go to Quest this week">
+          <button class="del-row-btn" onclick="deleteNextRow(this)" title="Remove">×</button>
+        </div>
+        <div class="next-item">
+          <select class="priority" onchange="this.className='priority '+this.value" style="flex-shrink:0;border:1px solid var(--border);border-radius:3px;cursor:pointer;">
+            <option value="routine" class="routine">Routine</option>
+            <option value="schedule" class="schedule">Schedule</option>
+            <option value="urgent" class="urgent">Urgent</option>
+          </select>
+          <input type="text" placeholder="e.g., Follow up with Oracle once results are in — 2 weeks">
+          <button class="del-row-btn" onclick="deleteNextRow(this)" title="Remove">×</button>
+        </div>
+        <div class="next-item">
+          <select class="priority" onchange="this.className='priority '+this.value" style="flex-shrink:0;border:1px solid var(--border);border-radius:3px;cursor:pointer;">
+            <option value="schedule" class="schedule">Schedule</option>
+            <option value="routine" class="routine">Routine</option>
+            <option value="urgent" class="urgent">Urgent</option>
+          </select>
+          <input type="text" placeholder="e.g., Schedule follow-up with provider in 6 weeks">
+          <button class="del-row-btn" onclick="deleteNextRow(this)" title="Remove">×</button>
+        </div>
+      </div>
+      <button class="add-lab-btn" onclick="addNextRow()" style="margin-top:8px;">+ Add next step</button>
+    </div>
+  </div>
+
+  <!-- ── Oracle notes ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-num" style="color:var(--gold);">Or</div>
+      <div class="section-title">Oracle's Notes for This Visit</div>
+    </div>
+    <div class="section-body">
+      <div class="oracle-note" id="oracle-note-text">
+        Oracle pre-populates this section with a brief summary of the clinical context, the hypothalamic support rationale, and any specific questions to raise at this visit. This text is generated from your Oracle session and is not editable.
+      </div>
+      <div class="field" style="margin-top:10px;">
+        <label for="patient-notes">Your own notes from the visit</label>
+        <textarea id="patient-notes" placeholder="Anything you want to remember — tone of the appointment, how you felt the provider responded, things to mention next time…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer actions ── -->
+  <div class="doc-footer">
+    <button class="btn btn-primary" onclick="copyToClipboard()">Copy summary to clipboard</button>
+    <button class="btn btn-secondary" onclick="clearAll()">Clear form</button>
+    <div class="copy-toast" id="copy-toast">Copied to clipboard</div>
+  </div>
+
+  <div id="output-area">
+    <div class="output-card">
+      <h3>Summary text</h3>
+      <div id="output-text"></div>
+      <div class="output-actions">
+        <button class="btn btn-secondary" onclick="document.getElementById('output-area').classList.remove('visible')">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function deleteRow(btn) {
+  const row = btn.closest('tr');
+  const tbody = document.getElementById('labs-body');
+  if (tbody.rows.length > 1) row.remove();
+}
+
+function addLabRow() {
+  const tbody = document.getElementById('labs-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" placeholder="Lab name"></td>
+    <td><input type="text" placeholder="Provider / Oracle"></td>
+    <td><input type="text" placeholder="Status"></td>
+    <td><button class="del-row-btn" onclick="deleteRow(this)" title="Remove">×</button></td>`;
+  tbody.appendChild(tr);
+  tr.querySelector('input').focus();
+}
+
+function deleteRxRow(btn) {
+  const list = document.getElementById('rx-list');
+  if (list.children.length > 1) btn.closest('.rx-row').remove();
+}
+
+function addRxRow() {
+  const list = document.getElementById('rx-list');
+  const div = document.createElement('div');
+  div.className = 'rx-row';
+  div.innerHTML = `
+    <div class="field" style="margin:0"><input type="text" class="rx-name" placeholder="Medication or supplement name" style="width:100%"></div>
+    <div class="field" style="margin:0">
+      <select class="change-type">
+        <option value="">Change type</option>
+        <option>New — started</option>
+        <option>Dose increased</option>
+        <option>Dose decreased</option>
+        <option>Discontinued</option>
+        <option>Continued — no change</option>
+        <option>Added (OTC/supplement)</option>
+      </select>
+    </div>
+    <div class="field" style="margin:0"><input type="text" placeholder="New dose / notes" style="width:100%"></div>
+    <button class="del-row-btn" onclick="deleteRxRow(this)" title="Remove">×</button>`;
+  list.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+function deleteNextRow(btn) {
+  const list = document.getElementById('next-list');
+  if (list.children.length > 1) btn.closest('.next-item').remove();
+}
+
+function addNextRow() {
+  const list = document.getElementById('next-list');
+  const div = document.createElement('div');
+  div.className = 'next-item';
+  div.innerHTML = `
+    <select class="priority" onchange="this.className='priority '+this.value" style="flex-shrink:0;border:1px solid var(--border);border-radius:3px;cursor:pointer;">
+      <option value="routine" class="routine">Routine</option>
+      <option value="schedule" class="schedule">Schedule</option>
+      <option value="urgent" class="urgent">Urgent</option>
+    </select>
+    <input type="text" placeholder="Next step">
+    <button class="del-row-btn" onclick="deleteNextRow(this)" title="Remove">×</button>`;
+  list.appendChild(div);
+  div.querySelector('input').focus();
+}
+
+function gatherSummary() {
+  const v = id => document.getElementById(id)?.value?.trim() || '';
+  const lines = [];
+
+  lines.push('PROVIDER VISIT SUMMARY');
+  lines.push('Generated by Your Oracle Clinician · Genesis Health Products Inc.');
+  lines.push('');
+
+  const name = v('pt-name'), dob = v('pt-dob'), vdate = v('visit-date');
+  if (name) lines.push(`Patient: ${name}`);
+  if (dob) lines.push(`DOB: ${dob}`);
+  if (vdate) lines.push(`Visit date: ${vdate}`);
+  lines.push('');
+
+  lines.push('── CHIEF COMPLAINT ──');
+  const cc = v('cc-primary');
+  if (cc) lines.push(cc);
+  const dur = v('cc-duration');
+  if (dur) lines.push(`Duration: ${dur}`);
+  lines.push('');
+
+  lines.push('── PROVIDER SEEN ──');
+  const pname = v('prov-name'), pspec = v('prov-specialty'), pprac = v('prov-practice'), pfu = v('followup-scheduled');
+  if (pname) lines.push(`Provider: ${pname}${pspec ? ' · ' + pspec : ''}`);
+  if (pprac) lines.push(`Practice: ${pprac}`);
+  if (pfu) lines.push(`Follow-up: ${pfu}`);
+  lines.push('');
+
+  lines.push('── WHAT I TOOK AWAY ──');
+  const diag = v('takeaway-diagnosis'), und = v('takeaway-understanding'), con = v('takeaway-concerns');
+  if (diag) lines.push(`Diagnosis / impression: ${diag}`);
+  if (und) lines.push(`My understanding: ${und}`);
+  if (con) lines.push(`Unresolved questions: ${con}`);
+  lines.push('');
+
+  lines.push('── LABS ORDERED ──');
+  document.querySelectorAll('#labs-body tr').forEach(tr => {
+    const cells = tr.querySelectorAll('input[type="text"]');
+    const lab = cells[0]?.value?.trim(), ord = cells[1]?.value?.trim(), stat = cells[2]?.value?.trim();
+    if (lab) lines.push(`• ${lab}${ord ? ' (ordered by: ' + ord + ')' : ''}${stat ? ' — ' + stat : ''}`);
+  });
+  const lnotes = v('labs-notes');
+  if (lnotes) lines.push(`Notes: ${lnotes}`);
+  lines.push('');
+
+  lines.push('── PRESCRIPTION / SUPPLEMENT CHANGES ──');
+  document.querySelectorAll('#rx-list .rx-row').forEach(row => {
+    const name = row.querySelector('.rx-name')?.value?.trim();
+    const chg = row.querySelector('.change-type')?.value;
+    const note = row.querySelectorAll('input[type="text"]')[1]?.value?.trim();
+    if (name) lines.push(`• ${name}${chg ? ' — ' + chg : ''}${note ? ' (' + note + ')' : ''}`);
+  });
+  const ggnote = v('genesis-note');
+  if (ggnote) lines.push(`Genesis Gold® / Sacred Seven®: ${ggnote}`);
+  lines.push('');
+
+  lines.push('── NEXT STEPS ──');
+  document.querySelectorAll('#next-list .next-item').forEach(item => {
+    const pri = item.querySelector('select')?.value?.toUpperCase() || 'ROUTINE';
+    const txt = item.querySelector('input')?.value?.trim();
+    if (txt) lines.push(`[${pri}] ${txt}`);
+  });
+  lines.push('');
+
+  const pnotes = v('patient-notes');
+  if (pnotes) {
+    lines.push('── PERSONAL NOTES ──');
+    lines.push(pnotes);
+    lines.push('');
+  }
+
+  lines.push('─────────────────────────────────────');
+  lines.push('Your Oracle Clinician · yourOracleApp.com');
+
+  return lines.join('\n');
+}
+
+function copyToClipboard() {
+  const text = gatherSummary();
+  const toast = document.getElementById('copy-toast');
+  try {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2200);
+    }).catch(() => fallbackCopy(text));
+  } catch(e) { fallbackCopy(text); }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  const toast = document.getElementById('copy-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function clearAll() {
+  document.querySelectorAll('input[type="text"], textarea').forEach(el => {
+    if (!el.readOnly) el.value = '';
+  });
+  document.querySelectorAll('input[type="date"]').forEach(el => el.value = '');
+  document.querySelectorAll('select:not(.priority):not(#prov-specialty)').forEach(el => el.value = '');
+  document.getElementById('prov-specialty').value = '';
+}
+</script>
+
+</body></html>

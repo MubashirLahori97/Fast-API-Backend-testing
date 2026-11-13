@@ -1,0 +1,1468 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Oracle · Healing Protocols</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap">
+
+<style>
+:root {
+  --purple:     #613977;
+  --purple-mid: #7d4e96;
+  --purple-lt:  #f0eaf5;
+  --purple-bdr: #ddd0ea;
+  --gold:       #c9a94e;
+  --gold-lt:    #fdf6e3;
+  --gold-bdr:   #e8d49a;
+  --pink:       #cd497f;
+  --pink-lt:    #fdf0f5;
+  --pink-bdr:   #f0c0d4;
+  --bg:         #faf9f7;
+  --bg2:        #f4f1f8;
+  --bg3:        #eee8f2;
+  --fg:         #1e1624;
+  --fg2:        #4a3d56;
+  --fg3:        #7a6a87;
+  --border:     #ddd6e8;
+  --font-d: 'Cormorant Garamond', Georgia, serif;
+  --font-b: 'EB Garamond', Georgia, serif;
+  --font-m: 'DM Mono', 'Courier New', monospace;
+  --r: 8px;
+  --nav-h: 52px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --purple-lt:  #241632;
+    --purple-bdr: #3d2d52;
+    --gold-lt:    #221c08;
+    --gold-bdr:   #5a4a1e;
+    --pink-lt:    #2a0f1a;
+    --pink-bdr:   #6a2040;
+    --bg:         #16101e;
+    --bg2:        #1e1530;
+    --bg3:        #261a38;
+    --fg:         #ede8f5;
+    --fg2:        #c5b8d4;
+    --fg3:        #8b7a9a;
+    --border:     #352844;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --purple-lt:  #241632;
+  --purple-bdr: #3d2d52;
+  --gold-lt:    #221c08;
+  --gold-bdr:   #5a4a1e;
+  --pink-lt:    #2a0f1a;
+  --pink-bdr:   #6a2040;
+  --bg:         #16101e;
+  --bg2:        #1e1530;
+  --bg3:        #261a38;
+  --fg:         #ede8f5;
+  --fg2:        #c5b8d4;
+  --fg3:        #8b7a9a;
+  --border:     #352844;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-b);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── top nav ── */
+.top-nav {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
+  height: var(--nav-h);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.top-nav::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 12px;
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  cursor: pointer;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.nav-tab .nav-icon { font-size: 1rem; line-height: 1; }
+.nav-tab:hover { color: var(--fg2); }
+.nav-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+.nav-tab[data-tab="gg"].active   { color: var(--gold);       border-bottom-color: var(--gold); }
+.nav-tab[data-tab="s7"].active   { color: var(--purple);     border-bottom-color: var(--purple); }
+.nav-tab[data-tab="gp"].active   { color: var(--pink);       border-bottom-color: var(--pink); }
+.nav-tab[data-tab="lp"].active   { color: var(--purple-mid); border-bottom-color: var(--purple-mid); }
+
+/* ── lp accent ── */
+.lp-color { color: var(--purple-mid); }
+.lp-page .benefit-list li::before { color: var(--purple-mid); }
+
+/* ── protocol card ── */
+.protocol-block {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.protocol-block + .protocol-block { margin-top: 0; }
+.protocol-title {
+  font-family: var(--font-d);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.protocol-sub {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--purple-mid);
+  margin-bottom: 10px;
+}
+.protocol-body {
+  font-size: 0.95rem;
+  color: var(--fg2);
+  line-height: 1.65;
+}
+.protocol-body p { margin-bottom: 8px; }
+.protocol-body p:last-child { margin-bottom: 0; }
+.protocol-body strong { color: var(--fg); }
+
+/* ── numbered steps ── */
+.steps-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.steps-list li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 0.95rem;
+  color: var(--fg2);
+  line-height: 1.6;
+}
+.step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--purple-lt);
+  border: 1px solid var(--purple-bdr);
+  color: var(--purple-mid);
+  font-family: var(--font-m);
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+/* ── phase pill ── */
+.phase-pill {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.phase-1 { background: var(--gold-lt);   color: var(--gold);       border: 1px solid var(--gold-bdr); }
+.phase-2 { background: var(--purple-lt); color: var(--purple-mid); border: 1px solid var(--purple-bdr); }
+.phase-3 { background: var(--pink-lt);   color: var(--pink);       border: 1px solid var(--pink-bdr); }
+
+/* ── macro row ── */
+.macro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+.macro-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  text-align: center;
+}
+.macro-icon { font-size: 1.3rem; margin-bottom: 4px; }
+.macro-name {
+  font-family: var(--font-m);
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 6px;
+}
+.macro-rule {
+  font-family: var(--font-d);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.35;
+}
+
+/* ── placeholder ── */
+.placeholder-block {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  text-align: center;
+  color: var(--fg3);
+  font-style: italic;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+.placeholder-block .placeholder-icon { font-size: 1.6rem; margin-bottom: 8px; }
+
+/* ── beet test visual ── */
+.beet-scale {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  margin: 12px 0;
+  border-radius: var(--r);
+  overflow: hidden;
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.beet-zone {
+  flex: 1;
+  padding: 10px 8px;
+  text-align: center;
+  line-height: 1.4;
+}
+.beet-fast  { background: var(--pink-lt);   border: 1px solid var(--pink-bdr);   color: var(--pink); }
+.beet-ok    { background: var(--gold-lt);   border: 1px solid var(--gold-bdr);   color: #7a5e10; }
+.beet-slow  { background: var(--purple-lt); border: 1px solid var(--purple-bdr); color: var(--purple-mid); }
+.beet-zone strong { display: block; font-size: 1rem; font-family: var(--font-d); margin-bottom: 2px; }
+
+/* ── pages ── */
+.page { display: none; flex: 1; overflow-y: auto; padding: 28px 20px 60px; }
+.page.active { display: block; }
+
+.wrap { max-width: 580px; margin: 0 auto; }
+
+/* ── page header ── */
+.product-eyebrow {
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.gg-color  { color: var(--gold); }
+.s7-color  { color: var(--purple-mid); }
+.gp-color  { color: var(--pink); }
+
+h1 {
+  font-family: var(--font-d);
+  font-size: 2.1rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-wrap: balance;
+  margin-bottom: 6px;
+}
+.product-tagline {
+  font-family: var(--font-d);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--fg3);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* ── CTA button ── */
+.btn-buy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border: none;
+  border-radius: var(--r);
+  font-family: var(--font-d);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  margin-bottom: 28px;
+}
+.btn-buy:hover { opacity: 0.85; }
+.btn-gg { background: var(--gold);   color: #1a1200; }
+.btn-s7 { background: var(--purple); color: #fff; }
+.btn-gp { background: var(--pink);   color: #fff; }
+
+/* secondary link */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  font-family: var(--font-d);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg2);
+  text-decoration: none;
+  transition: all 0.15s;
+  margin-left: 10px;
+  margin-bottom: 28px;
+}
+.btn-secondary:hover { border-color: var(--purple-bdr); color: var(--purple); }
+
+/* ── section ── */
+.section { margin-bottom: 28px; }
+.section-label {
+  font-family: var(--font-m);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ── cards ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+}
+.card-title {
+  font-family: var(--font-d);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.card-body {
+  font-size: 0.9rem;
+  color: var(--fg3);
+  line-height: 1.5;
+}
+
+/* ── benefit list ── */
+.benefit-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.benefit-list li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.97rem;
+  color: var(--fg2);
+  line-height: 1.5;
+}
+.benefit-list li::before {
+  content: '✦';
+  font-size: 0.6rem;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.gg-page  .benefit-list li::before { color: var(--gold); }
+.s7-page  .benefit-list li::before { color: var(--purple-mid); }
+.gp-page  .benefit-list li::before { color: var(--pink); }
+
+/* ── when to use callout ── */
+.callout {
+  border-radius: var(--r);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  font-size: 0.96rem;
+  line-height: 1.6;
+}
+.callout-title {
+  font-family: var(--font-d);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+.callout-gg { background: var(--gold-lt);   border: 1px solid var(--gold-bdr);   color: var(--fg2); }
+.callout-s7 { background: var(--purple-lt); border: 1px solid var(--purple-bdr); color: var(--fg2); }
+.callout-gp { background: var(--pink-lt);   border: 1px solid var(--pink-bdr);   color: var(--fg2); }
+
+/* ── dosing table ── */
+.dose-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.dose-table th {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.dose-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg2);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.dose-table tr:last-child td { border-bottom: none; }
+.dose-table td:first-child { font-weight: 500; color: var(--fg); white-space: nowrap; }
+
+/* ── pricing ── */
+.price-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.price-card {
+  flex: 1;
+  min-width: 130px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  text-align: center;
+}
+.price-card.featured { border-color: var(--gold); }
+.price-card.featured-s7 { border-color: var(--purple-bdr); }
+.price-card.featured-gp { border-color: var(--pink-bdr); }
+.price-label {
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 6px;
+}
+.price-amount {
+  font-family: var(--font-d);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.1;
+}
+.price-sub {
+  font-size: 0.82rem;
+  color: var(--fg3);
+  margin-top: 3px;
+}
+.price-badge {
+  display: inline-block;
+  margin-top: 6px;
+  background: var(--gold-lt);
+  color: var(--gold);
+  border: 1px solid var(--gold-bdr);
+  border-radius: 20px;
+  padding: 2px 8px;
+  font-family: var(--font-m);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.price-badge-s7 { background: var(--purple-lt); color: var(--purple-mid); border-color: var(--purple-bdr); }
+.price-badge-gp { background: var(--pink-lt);   color: var(--pink);       border-color: var(--pink-bdr); }
+
+/* ── stack guide ── */
+.stack-guide {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 18px;
+}
+.stack-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+.stack-item:last-child { border-bottom: none; }
+.stack-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+.dot-gold   { background: var(--gold); }
+.dot-purple { background: var(--purple-mid); }
+.dot-pink   { background: var(--pink); }
+
+.stack-item strong { color: var(--fg); }
+
+/* ── divider ── */
+hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* ── fine print ── */
+.fine-print {
+  font-size: 0.82rem;
+  color: var(--fg3);
+  line-height: 1.55;
+  font-style: italic;
+}
+</style>
+
+<!-- ── navigation ── -->
+<nav class="top-nav" role="tablist">
+  <button class="nav-tab active" data-tab="gg" role="tab" aria-selected="true">
+    <span class="nav-icon">✦</span>Genesis Gold
+  </button>
+  <button class="nav-tab" data-tab="s7" role="tab" aria-selected="false">
+    <span class="nav-icon">◈</span>Sacred Seven
+  </button>
+  <button class="nav-tab" data-tab="gp" role="tab" aria-selected="false">
+    <span class="nav-icon">◇</span>Gen-Pro
+  </button>
+  <button class="nav-tab" data-tab="lp" role="tab" aria-selected="false">
+    <span class="nav-icon">❧</span>Lifestyle
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     GENESIS GOLD PAGE
+══════════════════════════════════════ -->
+<div class="page gg-page active" id="page-gg" role="tabpanel">
+  <div class="wrap">
+    <div class="product-eyebrow gg-color">Daily Foundation · Hypothalamic Support</div>
+    <h1>Genesis Gold®</h1>
+    <p class="product-tagline">The only whole-food supplement formulated to nourish your hypothalamus — the master regulator of your entire hormonal system.</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:28px;">
+      <a href="https://shop.genesisgold.com/products/genesis-gold" target="_blank" class="btn-buy btn-gg">
+        Shop Genesis Gold →
+      </a>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Why it works</div>
+      <p style="color:var(--fg2);margin-bottom:14px;">Most supplements target individual hormones. Genesis Gold goes upstream — directly to the hypothalamus, the tiny master gland that orchestrates your hormones, immune system, metabolism, mood, and sleep. When the hypothalamus is properly nourished, your body begins to recalibrate from the root.</p>
+      <p style="color:var(--fg2);">One scoop each morning. That's it. The formula has been in clinical use since 2003 — developed by Deborah Maragopoulos, FNP, after 30+ years of seeing what conventional approaches miss.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">What's inside</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Sacred Seven®</div>
+          <div class="card-body">21 free-form amino acids in 7 functional sets — the proprietary hypothalamic signaling complex at the heart of the formula.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Whole Plant Foods</div>
+          <div class="card-body">Chlorella, spirulina, blue-green algae, broccoli sprouts, quinoa sprouts, hemp seed, kelp, and more.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">19 Adaptogenic Herbs</div>
+          <div class="card-body">Ashwagandha, maca, turmeric, reishi, green tea, maitake, and others that support the stress-hormone axis.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Detoxifying Phytonutrients</div>
+          <div class="card-body">Milk thistle, beet root, artichoke, garlic, ginger, royal jelly — supporting liver and cellular detox pathways.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Digestive Support</div>
+          <div class="card-body">11 probiotic strains, FOS prebiotic, and a full digestive enzyme complex to ensure complete absorption.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">What it supports</div>
+      <ul class="benefit-list">
+        <li>Hormone balance across your full cycle — estrogen, progesterone, thyroid, adrenals, insulin</li>
+        <li>Energy, metabolism, and healthy weight regulation</li>
+        <li>Sleep quality and circadian rhythm</li>
+        <li>Neurotransmitter production for mood and cognition</li>
+        <li>Immune resilience and reduced inflammation</li>
+        <li>Gut health and nutrient absorption</li>
+        <li>Cellular detoxification</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">How to take it</div>
+      <div class="callout callout-gg">
+        <div class="callout-title">Daily protocol</div>
+        One scoop each morning in cool water — shake, don't stir. Wait at least 15 minutes before eating. Hydrate well throughout the day.<br><br>
+        <strong>Dosing by body weight:</strong><br>
+        Under 100 lb → one order lasts ~6 weeks<br>
+        ~150 lb → one order lasts ~1 month<br>
+        ~200 lb → one order lasts ~3 weeks<br><br>
+        <em>Healing takes time — allow one month per year your hormones have been imbalanced. Most people notice a meaningful shift by 90 days.</em>
+      </div>
+      <p class="fine-print">Note: Sea vegetation in the formula contains natural iodine. If you have hyperthyroidism, start with Sacred Seven alone and add Genesis Gold gradually. These statements have not been evaluated by the FDA. Genesis Gold is not intended to diagnose, treat, cure, or prevent any disease.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">Pricing</div>
+      <div class="price-row">
+        <div class="price-card featured">
+          <div class="price-label">Monthly subscription</div>
+          <div class="price-amount">$4<span style="font-size:1rem">/day</span></div>
+          <div class="price-sub">~$120/month · free shipping for life</div>
+          <div class="price-badge">Best value</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">One-time purchase</div>
+          <div class="price-amount">$4.50<span style="font-size:1rem">/day</span></div>
+          <div class="price-sub">+ shipping</div>
+        </div>
+      </div>
+      <p style="font-size:0.9rem;color:var(--fg3);">Subscription includes: Genesis Health Club membership · weekly newsletters · monthly live Q&A with Deborah · 90-day healing success series · anniversary gifts · priority support</p>
+    </div>
+
+    <a href="https://shop.genesisgold.com/products/genesis-gold" target="_blank" class="btn-buy btn-gg" style="margin-top:8px;">
+      Subscribe &amp; Save →
+    </a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SACRED SEVEN PAGE
+══════════════════════════════════════ -->
+<div class="page s7-page" id="page-s7" role="tabpanel">
+  <div class="wrap">
+    <div class="product-eyebrow s7-color">Add-On · Intensified Hypothalamic Support</div>
+    <h1>Sacred Seven®</h1>
+    <p class="product-tagline">The concentrated amino acid complex at the heart of Genesis Gold — taken separately when your body needs deeper, faster support.</p>
+
+    <a href="https://shop.genesisgold.com/products/sacred-seven" target="_blank" class="btn-buy btn-s7">
+      Shop Sacred Seven →
+    </a>
+
+    <div class="section">
+      <div class="section-label">What it is</div>
+      <p style="color:var(--fg2);margin-bottom:14px;">Sacred Seven is the proprietary amino acid complex that makes Genesis Gold work. It contains 21 free-form amino acids in seven functional sets — sourced from non-GMO beets and formulated in a precise ratio designed specifically to support hypothalamic signaling. It's not a generic amino acid blend. The ratio is everything.</p>
+      <p style="color:var(--fg2);">Genesis Gold already contains Sacred Seven. When you add it separately, you're amplifying the signal to your hypothalamus — accelerating the healing process or meeting a greater demand your body is currently carrying.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">The seven amino acid sets</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-title">Structural</div>
+          <div class="card-body">Building blocks for tissue repair and cellular integrity.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Detox</div>
+          <div class="card-body">Support liver function and cellular waste clearance.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Energy</div>
+          <div class="card-body">Fuel mitochondrial function and metabolic efficiency.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Hormone Signaling</div>
+          <div class="card-body">Precursors for the neuro-endocrine messaging cascade.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Growth &amp; Repair</div>
+          <div class="card-body">Support growth hormone axis and tissue regeneration.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Brain-Gut Axis</div>
+          <div class="card-body">Nourish the enteric nervous system and gut-brain signaling.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Mood &amp; Calm</div>
+          <div class="card-body">Precursors for serotonin, GABA, and calming neurotransmitters.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">When Deborah recommends adding Sacred Seven</div>
+      <div class="callout callout-s7">
+        <div class="callout-title">Signs your body needs more</div>
+        <ul class="benefit-list" style="margin-top:4px;">
+          <li>You're managing an autoimmune condition</li>
+          <li>You're coming off antidepressants, anti-anxiety medication, or other psychiatric medications</li>
+          <li>You have ADHD, brain fog, or significant cognitive load</li>
+          <li>You're navigating major life stress — loss, illness, caregiving, burnout</li>
+          <li>You have multiple complex health issues layered together</li>
+          <li>You want to accelerate your healing timeline</li>
+          <li>You need extra brain support: focus, calm, mood stability</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">How to take it</div>
+      <div class="callout callout-s7">
+        <div class="callout-title">Daily protocol</div>
+        Take alongside your Genesis Gold each morning. Mix together in cool water — never hot, as heat degrades the amino acids. Shake to blend. Store in a cool, dry place and use within six months of opening.<br><br>
+        <strong>Serving:</strong> 5,000 mg per serving · Non-GMO · Small-batch GMP certified
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">Pricing</div>
+      <div class="price-row">
+        <div class="price-card featured-s7">
+          <div class="price-label">Subscription</div>
+          <div class="price-amount">$79<span style="font-size:1rem">.20</span></div>
+          <div class="price-sub">per order · free shipping</div>
+          <div class="price-badge price-badge-s7">10% off</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">One-time</div>
+          <div class="price-amount">$88</div>
+          <div class="price-sub">+ shipping</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">Two-pack</div>
+          <div class="price-amount">$158<span style="font-size:1rem">.40</span></div>
+          <div class="price-sub">subscription</div>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://shop.genesisgold.com/products/sacred-seven" target="_blank" class="btn-buy btn-s7" style="margin-top:8px;">
+      Add Sacred Seven →
+    </a>
+
+    <p class="fine-print" style="margin-top:16px;">These statements have not been evaluated by the FDA. Sacred Seven is not intended to diagnose, treat, cure, or prevent any disease. Consult your healthcare provider before use if you take medications or have a medical condition.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GEN-PRO PAGE
+══════════════════════════════════════ -->
+<div class="page gp-page" id="page-gp" role="tabpanel">
+  <div class="wrap">
+    <div class="product-eyebrow gp-color">Topical · Bioidentical Progesterone Cream</div>
+    <h1>Gen-Pro™</h1>
+    <p class="product-tagline">Bioidentical progesterone in a transdermal liposomal base — formulated with a compounding pharmacist, clinically refined over 30 years.</p>
+
+    <a href="https://genesisgold.com/gen-pro/" target="_blank" class="btn-buy btn-gp">
+      Shop Gen-Pro →
+    </a>
+
+    <div class="section">
+      <div class="section-label">What it is</div>
+      <p style="color:var(--fg2);margin-bottom:14px;">Gen-Pro delivers USP bioidentical progesterone — sourced from Mexican wild yam — through a liposomal transdermal base that maximizes absorption. Each pump delivers 25 mg of progesterone. It's paraben-free, soy-free, petroleum-free, and made in an FDA-approved USA facility.</p>
+      <p style="color:var(--fg2);">Progesterone is your calming, balancing hormone — and one of the first to decline. When it drops, estrogen dominance follows: anxiety, sleep disruption, irregular cycles, hot flashes, and mood swings. Gen-Pro helps restore that balance directly.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">When Deborah recommends Gen-Pro</div>
+      <div class="callout callout-gp">
+        <div class="callout-title">Signs you may need progesterone support</div>
+        <ul class="benefit-list" style="margin-top:4px;">
+          <li>PMS, PMDD, or estrogen dominance symptoms</li>
+          <li>Irregular cycles or secondary amenorrhea</li>
+          <li>PCOS or luteal phase insufficiency</li>
+          <li>Infertility, repeat miscarriage, or threatened miscarriage</li>
+          <li>Perimenopause: hot flashes, night sweats, sleep disruption, anxiety</li>
+          <li>Postmenopause hormone support</li>
+          <li>Men: high estrogen relative to testosterone, or on testosterone replacement therapy</li>
+        </ul>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">Dosing by life stage</div>
+      <p style="color:var(--fg3);font-size:0.88rem;margin-bottom:12px;">Apply to clean, dry skin of the inner thighs. Each pump = 25 mg progesterone.</p>
+      <div style="overflow-x:auto;">
+        <table class="dose-table">
+          <thead>
+            <tr>
+              <th>Life Stage</th>
+              <th>Protocol</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Menopause</td>
+              <td>2 pumps (50 mg) twice daily · stop 3 days/month</td>
+            </tr>
+            <tr>
+              <td>Perimenopause</td>
+              <td>4 pumps (100 mg) twice daily · cycle days 12–25</td>
+            </tr>
+            <tr>
+              <td>PMS / premenstrual</td>
+              <td>4 pumps (100 mg) twice daily · second half of cycle as needed</td>
+            </tr>
+            <tr>
+              <td>Secondary amenorrhea</td>
+              <td>8 pumps (200 mg) twice daily · 10 days</td>
+            </tr>
+            <tr>
+              <td>Corpus luteal defect / early pregnancy support</td>
+              <td>4 pumps (100 mg) twice daily · ovulation through 14 weeks (adjusted to serum levels)</td>
+            </tr>
+            <tr>
+              <td>Men (on testosterone replacement)</td>
+              <td>~1 pump (25 mg) per 200 mg testosterone · adjust ratio as needed</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="fine-print" style="margin-top:10px;">Always discuss dosing with your provider if you are pregnant, nursing, or managing a hormone-related condition. Serum progesterone testing can guide adjustments.</p>
+    </div>
+
+    <hr>
+
+    <div class="section">
+      <div class="section-label">Pricing</div>
+      <div class="price-row">
+        <div class="price-card featured-gp">
+          <div class="price-label">Subscription</div>
+          <div class="price-amount">$63</div>
+          <div class="price-sub">per month · free shipping</div>
+          <div class="price-badge price-badge-gp">10% off</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">One-time</div>
+          <div class="price-amount">$70</div>
+          <div class="price-sub">+ shipping</div>
+        </div>
+        <div class="price-card">
+          <div class="price-label">90-Day Program</div>
+          <div class="price-amount">$180</div>
+          <div class="price-sub">3-month supply</div>
+        </div>
+      </div>
+    </div>
+
+    <a href="https://genesisgold.com/gen-pro/" target="_blank" class="btn-buy btn-gp" style="margin-top:8px;">
+      Shop Gen-Pro →
+    </a>
+
+    <p class="fine-print" style="margin-top:16px;">Formulated for external use. These statements have not been evaluated by the FDA and are not intended to diagnose, treat, cure, or prevent any disease. Consult your healthcare provider before use, especially during pregnancy or if you are taking hormone therapy.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LIFESTYLE PROTOCOLS PAGE
+══════════════════════════════════════ -->
+<div class="page lp-page" id="page-lp" role="tabpanel">
+  <div class="wrap">
+    <div class="product-eyebrow lp-color">DMAR® Protocols · Deborah Maragopoulos, FNP</div>
+    <h1>Lifestyle Protocols</h1>
+    <p class="product-tagline">The foundational practices that amplify everything Genesis Gold does — nutrition, movement, cleansing, and mind-body awareness.</p>
+
+    <!-- ── NUTRITION FOUNDATION ── -->
+    <div class="section">
+      <div class="section-label">Nutrition Foundation — The DMAR® Healthy Four</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">Your body is built from what you eat. These four macros — in the right amounts for your unique body weight and activity level — form the non-negotiable base of healing.</p>
+
+      <div class="macro-grid">
+        <div class="macro-card">
+          <div class="macro-icon">🥩</div>
+          <div class="macro-name">Protein</div>
+          <div class="macro-rule">0.5–1 g per pound of lean body mass</div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon">🫒</div>
+          <div class="macro-name">Fat</div>
+          <div class="macro-rule">0.5 g per pound of lean body mass</div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon">🌾</div>
+          <div class="macro-name">Carbohydrates</div>
+          <div class="macro-rule">15–80 g per meal based on activity</div>
+        </div>
+        <div class="macro-card">
+          <div class="macro-icon">💧</div>
+          <div class="macro-name">Water</div>
+          <div class="macro-rule">½ oz per pound of body weight daily</div>
+        </div>
+      </div>
+
+      <div class="protocol-block" style="margin-top:14px;">
+        <div class="protocol-title">How to calculate your lean body mass (LBM)</div>
+        <div class="protocol-body">
+          <p>LBM = Total weight − (Total weight × Body fat %)</p>
+          <p><strong>Protein:</strong> Eat 0.5–1 g × your LBM in pounds. Minimum 0.5 g for general maintenance; move toward 1 g when actively building muscle, recovering from injury, or losing weight to prevent muscle loss. Choose clean sources: pasture-raised eggs, wild fish, grass-fed meat, legumes.</p>
+          <p><strong>Fat:</strong> 0.5 g × LBM. Prioritize omega-3s (wild fish, flaxseed, walnuts), omega-6s (vegetables, nuts, seeds), and omega-9s (extra-virgin olive oil). Eliminate trans fats entirely.</p>
+          <p><strong>Carbohydrates:</strong> Keep carbs to 40% of total calories. If overweight or sedentary: 15 g per meal. At ideal weight with moderate activity: up to 50 g per meal. Athletic/highly active: up to 80 g per meal.</p>
+          <p><strong>Water:</strong> Drink ½ oz per pound of body weight per day. Begin every morning with lemon water upon waking to stimulate digestive enzymes and kidney function.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── INSULIN RESISTANCE DIET ── -->
+    <div class="section">
+      <div class="section-label">Insulin Resistance Diet — Three-Phase Protocol</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">Insulin resistance underlies most hormonal imbalance and metabolic dysfunction. This phased approach resets insulin sensitivity without crash dieting.</p>
+
+      <div class="protocol-block">
+        <div class="phase-pill phase-1">Phase I · Reset</div>
+        <div class="protocol-title">Eliminate Grains, Sugar &amp; Starch</div>
+        <div class="protocol-body">
+          <p>Remove all grains, sugars, and starchy vegetables. Focus on: <strong>eggs, non-starchy vegetables, clean protein, and healthy fats.</strong> Start each morning with <strong>lemon water</strong> before anything else. Take supplements before meals.</p>
+          <p>Continue Phase I until insulin resistance symptoms resolve and you feel stable energy throughout the day.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="phase-pill phase-2">Phase II · Reintroduce</div>
+        <div class="protocol-title">Add Gluten-Free Sprouted &amp; Whole Grains</div>
+        <div class="protocol-body">
+          <p>Gradually reintroduce <strong>gluten-free sprouted grains and whole grains</strong> once Phase I stabilization is achieved. Monitor how your body responds. If bloating, fatigue, or cravings return — return to Phase I briefly before trying again.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="phase-pill phase-3">Phase III · Maintenance</div>
+        <div class="protocol-title">Sustainable Eating with Portion Awareness</div>
+        <div class="protocol-body">
+          <p>Long-term, use the DMAR® Healthy Four macros above as your guide. Carbohydrate portions are calibrated to your activity level each day. Lemon water upon waking and supplements before meals continue as daily habits.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── BEET TEST ── -->
+    <div class="section">
+      <div class="section-label">Beet Test — Gut Transit Self-Assessment</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">Do this <em>before</em> starting a liver cleanse — transit time tells you how long to run the cleanse and whether beets can be included in your first cleanse dinner.</p>
+
+      <div class="protocol-block">
+        <div class="protocol-title">How to Test</div>
+        <div class="protocol-body">
+          <p>Eat <strong>½ cup of fresh beets</strong> with dinner (not canned — the canning process interferes with the release of betalain, the natural red pigment that makes beets detectable in stool). Note the time. Watch for the distinctive pink or red color to appear in your stool. Note when it arrives.</p>
+        </div>
+      </div>
+
+      <div class="beet-scale">
+        <div class="beet-zone beet-fast">
+          <strong>&lt; 8 hrs</strong>
+          Too Fast
+          <div style="margin-top:4px;font-size:0.75rem;">Poor absorption; nutrients passing before uptake</div>
+        </div>
+        <div class="beet-zone beet-ok">
+          <strong>8–12 hrs</strong>
+          Optimal
+          <div style="margin-top:4px;font-size:0.75rem;">Healthy transit, good absorption</div>
+        </div>
+        <div class="beet-zone beet-slow">
+          <strong>&gt; 12 hrs</strong>
+          Too Slow
+          <div style="margin-top:4px;font-size:0.75rem;">Constipation risk; toxin reabsorption</div>
+        </div>
+      </div>
+
+      <div class="callout callout-s7" style="margin-top:4px;">
+        <div class="callout-title">What your result means</div>
+        <p><strong>Under 8 hours:</strong> Gut is moving too fast. Focus on fiber, healthy fats, and addressing underlying inflammation or stress. May need gut-lining support.</p>
+        <p style="margin-top:6px;"><strong>8–12 hours:</strong> Healthy transit. Keep doing what you're doing. You can include beets in your first liver cleanse dinner.</p>
+        <p style="margin-top:6px;"><strong>Over 12 hours:</strong> Slow transit — extend your liver cleanse to the full 7 days. Increase water (½ oz/lb body weight), add more fiber-rich vegetables, and rule out thyroid or hormonal causes with your provider.</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── LIVER-KIDNEY CLEANSE ── -->
+    <div class="section">
+      <div class="section-label">DMAR® Natural Liver-Kidney Cleanse</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">Periodic cleansing removes the toxic load that blocks hormonal signaling. This protocol targets both drainage organs in sequence. Run the Beet Test first to determine your cleanse length (3 days for normal transit; 7 days for slow). Use Genesis Gold throughout — one scoop per 50 lbs body weight.</p>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Step 1 · Kidney Cleanse</div>
+        <div class="protocol-title">Asparagus + Coke Flush</div>
+        <div class="protocol-body">
+          <p>Blend <strong>5–6 raw asparagus stalks</strong> with <strong>4–6 oz of flat classic or Mexican Coke</strong> (glass bottle, real cane sugar — let it go completely flat before blending, not diet). Drink immediately.</p>
+          <p>Follow with <strong>marshmallow root tea flush:</strong> steep 4 tablespoons marshmallow root in 1 quart of boiling water. Drink throughout the day to flush the kidneys.</p>
+          <p>For kidney stones: repeat this protocol as needed until stones pass.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Step 2 · Liver Cleanse Diet (3–7 Days)</div>
+        <div class="protocol-title">Gentle Liver Support Diet</div>
+        <div class="protocol-body">
+          <p><strong>Morning:</strong> Lemon tea upon waking → fibrous fruit → whole grain (this order matters for bile stimulation).</p>
+          <p><strong>Lunch &amp; Dinner:</strong> 2–4 cups of steamed or roasted vegetables — eat across all three categories: roots, stalks, and leafy greens.</p>
+          <p><strong>Each evening:</strong> 1 tablespoon olive oil + lemon juice to support bile duct flow.</p>
+          <p><strong>Take:</strong> 2 Lipotrope capsules twice daily with meals to support fat metabolism in the liver.</p>
+          <p><strong>Avoid for the full 3–7 days:</strong> saturated fat, animal protein, caffeine, alcohol, sugar, and all processed foods.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Step 3 · Optional Gallbladder Flush</div>
+        <div class="protocol-title">Gallbladder Flush Drink</div>
+        <div class="protocol-body">
+          <p>Combine and drink <strong>all at once:</strong></p>
+          <ul style="list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:5px;">
+            <li style="display:flex;gap:8px;align-items:flex-start;font-size:0.93rem;color:var(--fg2);">
+              <span style="color:var(--purple-mid);font-size:0.7rem;margin-top:4px;">◆</span> Juice of 1 orange + juice of 1 lemon
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;font-size:0.93rem;color:var(--fg2);">
+              <span style="color:var(--purple-mid);font-size:0.7rem;margin-top:4px;">◆</span> ¼ teaspoon cayenne pepper
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;font-size:0.93rem;color:var(--fg2);">
+              <span style="color:var(--purple-mid);font-size:0.7rem;margin-top:4px;">◆</span> 1 teaspoon fresh minced garlic
+            </li>
+            <li style="display:flex;gap:8px;align-items:flex-start;font-size:0.93rem;color:var(--fg2);">
+              <span style="color:var(--purple-mid);font-size:0.7rem;margin-top:4px;">◆</span> ¼ cup extra-virgin olive oil
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── HIIT EXERCISE ── -->
+    <div class="section">
+      <div class="section-label">HIIT Exercise Protocol</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">High-Intensity Interval Training 3 times per week reduces insulin resistance, builds lean mass, and improves cardiovascular function — in under 20 minutes per session.</p>
+
+      <div class="protocol-block">
+        <div class="protocol-title">Interval Structure</div>
+        <ul class="steps-list">
+          <li>
+            <span class="step-num">1</span>
+            <span><strong>Warm-up:</strong> 5–7 minutes at comfortable, steady pace (walking, light cycling, easy rowing).</span>
+          </li>
+          <li>
+            <span class="step-num">2</span>
+            <span><strong>High-intensity burst:</strong> 20 seconds at maximum effort — run, cycle, row, or elliptical. You should not be able to hold a conversation.</span>
+          </li>
+          <li>
+            <span class="step-num">3</span>
+            <span><strong>Recovery:</strong> 60–90 seconds at slow, easy pace to bring heart rate down.</span>
+          </li>
+          <li>
+            <span class="step-num">4</span>
+            <span><strong>Repeat:</strong> complete 3 rounds of the 20-second burst + recovery cycle.</span>
+          </li>
+          <li>
+            <span class="step-num">5</span>
+            <span><strong>Cool-down:</strong> 5–7 minutes at comfortable pace. Stretch.</span>
+          </li>
+        </ul>
+        <div class="protocol-body" style="margin-top:12px;">
+          <p><strong>Frequency:</strong> 3 times per week. Rest at least one day between sessions. This is sufficient — more is not better with HIIT.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── CONTRACTION / RELAXATION ── -->
+    <div class="section">
+      <div class="section-label">Contraction-Relaxation Exercise</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">A somatic body-wave practice for releasing stored tension and reconnecting with the nervous system. Practice any time — especially beneficial before sleep or after stress.</p>
+
+      <div class="protocol-block">
+        <div class="protocol-title">The Body Wave</div>
+        <div class="protocol-body">
+          <p><strong>Begin:</strong> Lie on your back in a comfortable position. Take a few slow breaths.</p>
+          <p><strong>Sequentially contract</strong> each body part, moving upward from feet to face:</p>
+        </div>
+        <ul class="steps-list" style="margin-top:8px;">
+          <li><span class="step-num">↑</span><span>Toes → lower legs → upper legs → buttocks</span></li>
+          <li><span class="step-num">↑</span><span>Lower back → belly → chest → shoulders</span></li>
+          <li><span class="step-num">↑</span><span>Arms → hands → neck → jaw → face</span></li>
+        </ul>
+        <div class="protocol-body" style="margin-top:12px;">
+          <p><strong>Hold</strong> the full-body contraction for a breath. Then <strong>slowly release</strong> in the same order — toes first, face last. Breathe deeply as you release.</p>
+          <p><strong>Repeat</strong> the full wave twice more (3 waves total). Rest in stillness afterward, noticing the sensation of release.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── CALM PRACTICE ── -->
+    <div class="section">
+      <div class="section-label">CALM — Daily Mindfulness Practice</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">A four-part daily practice for returning to your center — written by Deborah Maragopoulos, FNP. CALM stands for <strong>Connect · Attitude · Love · Meditation</strong>. Each element builds on the last, shifting you out of stress response and into the parasympathetic state where healing happens.</p>
+
+      <div class="protocol-block" style="border-color:var(--purple-bdr);background:var(--purple-lt);">
+        <div class="protocol-sub" style="color:var(--purple-mid);">C · Connect</div>
+        <div class="protocol-title">Conscious Breath</div>
+        <div class="protocol-body">
+          <p>Begin by connecting to your breath. A slow, conscious inhale through the nose and exhale through the mouth activates the vagus nerve and signals safety to your hypothalamus. Even three conscious breaths can interrupt a stress response and begin to shift your physiology.</p>
+          <p><strong>Practice:</strong> Inhale for 4 counts, hold for 4, exhale for 6–8. Repeat 3–5 times.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block" style="border-color:var(--gold-bdr);background:var(--gold-lt);">
+        <div class="protocol-sub" style="color:var(--gold);">A · Attitude</div>
+        <div class="protocol-title">Opportunity, Not Obstacle</div>
+        <div class="protocol-body">
+          <p>Every challenge contains the seed of its solution. When you choose to see difficulty as an opportunity rather than an obstacle, you shift from the stress axis (cortisol, adrenaline) to the growth axis (DHEA, oxytocin). This is not toxic positivity — it is deliberate neurological reframing.</p>
+          <p><strong>Practice:</strong> Name one thing that feels hard right now. Ask: <em>What is this teaching me? What becomes possible from here?</em></p>
+        </div>
+      </div>
+
+      <div class="protocol-block" style="border-color:var(--pink-bdr);background:var(--pink-lt);">
+        <div class="protocol-sub" style="color:var(--pink);">L · Love</div>
+        <div class="protocol-title">Choose Love Over Fear</div>
+        <div class="protocol-body">
+          <p>Fear is the language of survival mode. Love — in its broadest sense: appreciation, compassion, belonging — is the language of thriving. Choosing love is a moment-to-moment practice that directly influences the neuropeptides your hypothalamus releases, shifting your entire hormonal milieu.</p>
+          <p><strong>Practice:</strong> Bring to mind one person, place, or experience you love. Hold it in your chest. Let your heart soften and expand.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">M · Meditation</div>
+        <div class="protocol-title">Daily Stillness</div>
+        <div class="protocol-body">
+          <p>Even five minutes of daily meditation measurably reduces cortisol, lowers inflammatory markers, and — over time — increases gray matter density in areas governing attention and self-regulation. The hypothalamus responds directly to the quieting of the nervous system.</p>
+          <p><strong>Practice:</strong> Sit quietly. Follow the breath. When the mind wanders, return — without judgment. Start with 5 minutes; build toward 20.</p>
+        </div>
+      </div>
+
+      <div class="callout callout-s7" style="margin-top:4px;">
+        <div class="callout-title">Full Guide</div>
+        <p>Read the complete CALM practice guide on the Genesis Gold blog: <a href="https://genesisgold.com/blog/how-to-be-the-calm-in-your-life/" target="_blank" style="color:var(--purple-mid);font-weight:500;"><em>How to Be the Calm in Your Life</em> →</a></p>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── HEALING MEDITATION ── -->
+    <div class="section">
+      <div class="section-label">Healing Meditation</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">A chakra-based grounding visualization for activating the body's innate healing intelligence. "Intention + Desire + Ripe Timing = Manifestation." — Deborah Maragopoulos, <em>LoveDance</em></p>
+
+      <div class="protocol-block">
+        <div class="protocol-title">Chakra Grounding Visualization</div>
+        <div class="protocol-body">
+          <p>Settle into a comfortable position. Close your eyes and breathe slowly. Move through each energy center, pausing to feel each one open and fill with light:</p>
+        </div>
+        <ul class="steps-list" style="margin-top:10px;">
+          <li>
+            <span class="step-num" style="background:var(--pink-lt);border-color:var(--pink-bdr);color:var(--pink);">1</span>
+            <span><strong>Root (Earth Red)</strong> — base of the spine. Grounding, safety, foundation. Feel your connection to the earth.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:#fff3e0;border-color:#f0c080;color:#c06000;">2</span>
+            <span><strong>Sacral (Orange)</strong> — belly. Creativity, flow, vitality. Sense warmth and movement here.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:var(--gold-lt);border-color:var(--gold-bdr);color:#8a6a10;">3</span>
+            <span><strong>Solar Plexus (Yellow)</strong> — above the navel. Personal power, confidence, will. Feel your center strengthen.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:#e8f5e8;border-color:#a0d0a0;color:#2e7a2e;">4</span>
+            <span><strong>Heart (Green)</strong> — chest. Love, compassion, integration. Let the heart merge with all centers below it.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:#e3f0f8;border-color:#90c0d8;color:#1a6080;">5</span>
+            <span><strong>Throat (Blue)</strong> — neck. Expression, truth, communication. Feel clarity rise.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:#e8e8f8;border-color:#9090c8;color:#3030a0;">6</span>
+            <span><strong>Third Eye (Indigo)</strong> — center of the forehead. Intuition, inner knowing, vision. See with the mind's eye.</span>
+          </li>
+          <li>
+            <span class="step-num" style="background:var(--purple-lt);border-color:var(--purple-bdr);color:var(--purple-mid);">7</span>
+            <span><strong>Crown (Violet)</strong> — top of the head. Transcendence, divine connection. Open and receive.</span>
+          </li>
+        </ul>
+        <div class="protocol-body" style="margin-top:12px;">
+          <p>When all seven centers are open and glowing, hold the full column of light for several breaths. Set your healing intention clearly. Then gently return.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ── 7 SECRETS ── -->
+    <div class="section">
+      <div class="section-label">7 Secrets to Healthy Hormones</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:18px;line-height:1.6;">Seven small daily shifts that make a profound difference in hormonal health — from sleep to stress to connection. Each one speaks directly to your hypothalamus.</p>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #1</div>
+        <div class="protocol-title">Sleep in the Dark</div>
+        <div class="protocol-body">
+          <p>Your pineal gland can only produce melatonin in complete darkness. Any artificial light shuts off melatonin production — and without it, you never reach deep REM sleep. That keeps you in low-grade fight-or-flight, which disrupts every hormone downstream. Lack of adequate sleep is one of the leading causes of hypothalamic dysfunction, affecting sex hormones, weight, memory, and mood.</p>
+          <p><strong>Blackout curtains, no screens after dark, no nightlights.</strong> Your hormones sleep in the dark too.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #2</div>
+        <div class="protocol-title">Eat Good Fats</div>
+        <div class="protocol-body">
+          <p>Hormones are made from fat. Every steroid hormone — cortisol, estrogen, progesterone, testosterone, DHEA — contains a cholesterol molecule. Your cell membranes are built from fat, and if they're not healthy, hormone receptor sites can't function properly. Man-made fats can't be used by your body to build healthy cells.</p>
+          <p><strong>Choose:</strong> natural saturated fats (butter, coconut oil), omega-3-rich fats (wild salmon, walnuts, flaxseed), and omega-9s (extra-virgin olive oil). These build the cell membranes that let your hormones work.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #3</div>
+        <div class="protocol-title">Limit Excess Carbohydrates</div>
+        <div class="protocol-body">
+          <p>Glucose fuels energy production — but consuming more carbohydrates than you can expend leads to fat storage, insulin strain, and eventually insulin-resistant diabetes. Too much circulating sugar and insulin causes hypothalamic inflammation, especially combined with a high-fat diet.</p>
+          <p><strong>Cut:</strong> processed carbs (flour, pasta, white rice). <strong>Choose</strong> whole fresh fruit over juice. Avoid sweetened beverages. Limit alcohol. Your hypothalamus will thank you.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #4</div>
+        <div class="protocol-title">Relax and Rejuvenate</div>
+        <div class="protocol-body">
+          <p>Under stress, your adrenals enter fight-or-flight — and they don't distinguish between a missed appointment and a predator. It's the same response either way. All reserves fuel survival, leaving little for healthy hormone production. Chronic stress leads to hypothalamic dysfunction and adrenal fatigue.</p>
+          <p><strong>Every day:</strong> make time to unwind. Take vacations. Move your body gently. Breathe. Your hypothalamus controls the stress response — give it relief and it will give your hormones harmony.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #5</div>
+        <div class="protocol-title">Give and Receive 12 Hugs a Day</div>
+        <div class="protocol-body">
+          <p>Touch is therapeutic. Studies show that hugging measurably reduces stress hormones. Close physical contact also triggers the hypothalamus to produce <strong>oxytocin</strong> — the bonding hormone — and allows us to share pheromones, the tiny inhaled hormones that help us feel safe, choose a mate, and feel loved.</p>
+          <p>Connecting to others keeps your hormones healthy. Aim for at least 12 hugs a day.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Secret #6</div>
+        <div class="protocol-title">Honor Your Natural Cycles</div>
+        <div class="protocol-body">
+          <p>Your body responds to the seasons. At the end of winter, hormones rise — spring fever is real, and it's metabolic as well as reproductive. Thyroid, adrenal, pituitary, immune, and brain chemistry are all primed for the longer days ahead. Your body also responds to lunar cycles: emergency rooms are busier on the full moon, and women's cycles often sync with it.</p>
+          <p>Don't resist Mother Nature — listen to her. Go with the flow, and your hormones will harmonize.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block" style="border-color:var(--gold-bdr);background:var(--gold-lt);">
+        <div class="protocol-sub" style="color:var(--gold);">Secret #7 · Most Important</div>
+        <div class="protocol-title">Feed Your Hypothalamus</div>
+        <div class="protocol-body">
+          <p>The hypothalamus is an amazing, under-appreciated organ that orchestrates your body's entire symphony of hormones. Hormones sing to the DNA, and the DNA dances accordingly. Disease is miscommunication between hormones and the genetic blueprint. <em>Health is Hormones in Harmony.</em></p>
+          <p>When I couldn't find anything that would give the hypothalamus what it needed to do its job, I created it. <strong>Genesis Gold®</strong> feeds your hypothalamus from the inside out — so it can run your system and keep your Hormones in Harmony®.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLEEP PROTOCOLS ── -->
+    <div class="section">
+      <div class="section-label">Sleep — Deep Sleep &amp; Longevity</div>
+      <p style="font-size:0.95rem;color:var(--fg2);margin-bottom:14px;line-height:1.6;">Deep sleep is the only time your body runs its full repair program — glymphatic brain flush, growth hormone release, DNA repair, immune signaling. Short or fragmented deep sleep halts all of it. Research shows that sleeping outside the optimal range accelerates biological aging in nearly every organ.</p>
+
+      <div class="callout callout-s7" style="margin-bottom:18px;">
+        <div class="callout-title">The short version</div>
+        <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;font-size:0.93rem;color:var(--fg2);">
+          <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> Deep sleep (slow-wave) = 10–20% of a normal night — about 40–110 minutes</li>
+          <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> It clusters in the first third of the night — a consistent bedtime protects it better than sleeping in</li>
+          <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> Your hypothalamus sets the timing for every repair process that follows</li>
+          <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> Deep sleep declines with age — protecting what you have matters more each decade</li>
+        </ul>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Habit #1</div>
+        <div class="protocol-title">Fix Your Bedtime — Same Time Every Night</div>
+        <div class="protocol-body">
+          <p>Your hypothalamic circadian clock doesn't understand "catching up on sleep." It only understands consistency. Vary by no more than ±30 minutes. Stick with it for two weeks and you'll notice sleep onset accelerating — your brain has learned when to shut down.</p>
+          <p>Going to bed late costs you <strong>deep sleep specifically</strong> — not just sleep in general. Deep sleep front-loads into the first two cycles.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Habit #2</div>
+        <div class="protocol-title">60-Minute Wind-Down Before Bed</div>
+        <div class="protocol-body">
+          <p>For the 60 minutes before bed: no screens, no large meals, no intense exercise, no work messages.</p>
+          <ul style="list-style:none;padding:0;margin-top:8px;display:flex;flex-direction:column;gap:5px;font-size:0.93rem;color:var(--fg2);">
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> Blue light activates the hypothalamus, which suppresses melatonin (see Secret #1)</li>
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> A large meal raises core body temperature exactly when it needs to fall</li>
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> Work messages activate stress circuits that oppose sleep onset</li>
+          </ul>
+          <p style="margin-top:8px;">These 60 minutes are your transition from high-alert mode to repair mode.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Habit #3</div>
+        <div class="protocol-title">Keep Your Bedroom Cool: 64–68°F (18–20°C)</div>
+        <div class="protocol-body">
+          <p>A drop in core body temperature is the physiological trigger for deep sleep onset. Room temperature isn't a comfort preference — it's a hormonal signal.</p>
+          <p>If you feel cold, <strong>wear socks.</strong> Warm feet dilate blood vessels in your extremities, which releases heat from your core and accelerates the temperature drop. Counterintuitive — but it works.</p>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Habit #4</div>
+        <div class="protocol-title">Stop Eating 3 Hours Before Bed</div>
+        <div class="protocol-body">
+          <p>Late eating disrupts deep sleep three ways:</p>
+          <ul style="list-style:none;padding:0;margin-top:8px;display:flex;flex-direction:column;gap:5px;font-size:0.93rem;color:var(--fg2);">
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> <span><strong>Core temperature:</strong> digesting raises it just when it needs to drop to trigger slow-wave sleep</span></li>
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> <span><strong>Reflux:</strong> lying down on a full stomach fragments sleep even without fully waking</span></li>
+            <li style="display:flex;gap:8px;"><span style="color:var(--purple-mid);flex-shrink:0;">◆</span> <span><strong>Clock mismatch:</strong> feeding your liver, gut, and pancreas at 10 PM tells them it's still daytime while your brain is trying to shut down</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="protocol-block">
+        <div class="protocol-sub">Hour by Hour</div>
+        <div class="protocol-title">What Your Hypothalamus Does While You Sleep</div>
+        <div class="protocol-body">
+          <p style="margin-bottom:10px;font-size:0.88rem;color:var(--fg3);font-style:italic;">Timed from sleep onset — works whether you sleep at 10 PM or 2 AM. Clock times assume a 10 PM bedtime.</p>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="dose-table">
+            <thead>
+              <tr>
+                <th>Hours After Onset</th>
+                <th>What's Happening</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0–1 hr<br><span style="font-weight:400;color:var(--fg3);font-size:0.85rem;">~10–11 PM</span></td>
+                <td>SCN signals pineal gland → melatonin release → GABA deactivates arousal centers → sleep onset. Miss this window and sleep onset becomes significantly harder.</td>
+              </tr>
+              <tr>
+                <td>1–3 hrs<br><span style="font-weight:400;color:var(--fg3);font-size:0.85rem;">~11 PM–1 AM</span></td>
+                <td><strong>Deep sleep peak.</strong> Glymphatic flush clears beta-amyloid and tau from the brain. Hypothalamus pulses GHRH → pituitary releases growth hormone for cellular repair. Memories consolidate from short- to long-term. These are the golden hours.</td>
+              </tr>
+              <tr>
+                <td>3–5 hrs<br><span style="font-weight:400;color:var(--fg3);font-size:0.85rem;">~1–3 AM</span></td>
+                <td>DNA repair at full capacity. Liver detoxification peaks. Prolactin surge supports immune signaling and tissue repair.</td>
+              </tr>
+              <tr>
+                <td>5–7 hrs<br><span style="font-weight:400;color:var(--fg3);font-size:0.85rem;">~3–5 AM</span></td>
+                <td><strong>REM dominance.</strong> Information transfers from hippocampus to cortex. Emotional memories reprocessed. Hypothalamic MCH neurons fire almost exclusively here.</td>
+              </tr>
+              <tr>
+                <td>7–9 hrs<br><span style="font-weight:400;color:var(--fg3);font-size:0.85rem;">~5–7 AM</span></td>
+                <td>SCN receives light cues → melatonin shuts off → dopamine promotes alertness → cortisol awakening response releases stored sugar to fuel brain and body. Natural wake window — no alarm needed.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="protocol-block" style="border-color:var(--gold-bdr);background:var(--gold-lt);">
+        <div class="protocol-sub" style="color:var(--gold);">The Genesis Gold Connection</div>
+        <div class="protocol-title">Feed the Master Clock</div>
+        <div class="protocol-body">
+          <p>A portion of your hypothalamus sits behind a more permeable blood-brain barrier — the median eminence — with fenestrated vessels that draw directly from your bloodstream. What you feed your hypothalamus matters more here than almost anywhere else in the nervous system.</p>
+          <p>Over more than twenty years of clinical use, patients consistently report <strong>deeper sleep, more vivid dreams, and improved memory and concentration</strong> with Genesis Gold. Those who use it continuously tend to have biological ages younger than their chronological ages.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="fine-print" style="margin-top:8px;">DMAR® protocols are authored by Deborah Maragopoulos, FNP. These recommendations support optimal wellness and are not a substitute for individualized medical care. Always work with your healthcare provider when managing an active condition.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HOW THEY WORK TOGETHER — bottom of GG page
+     (injected as last section)
+══════════════════════════════════════ -->
+<script>
+// inject stack guide into GG page
+const ggWrap = document.querySelector('#page-gg .wrap');
+const stackHTML = `
+  <hr>
+  <div class="section">
+    <div class="section-label">How the products work together</div>
+    <div class="stack-guide">
+      <div class="stack-item">
+        <div class="stack-dot dot-gold"></div>
+        <div><strong>Genesis Gold®</strong> — Start here. The daily foundation for everyone. Nourishes the hypothalamus and sets the stage for all other healing.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot dot-purple"></div>
+        <div><strong>+ Sacred Seven®</strong> — Add when you need more: autoimmune conditions, coming off psychiatric medications, high cognitive demand, accelerated healing, or major stress load.</div>
+      </div>
+      <div class="stack-item">
+        <div class="stack-dot dot-pink"></div>
+        <div><strong>+ Gen-Pro™</strong> — Add when progesterone specifically is low: perimenopause, PMS/PMDD, PCOS, infertility support, or if you're a man on testosterone replacement.</div>
+      </div>
+    </div>
+  </div>
+`;
+ggWrap.insertAdjacentHTML('beforeend', stackHTML);
+
+// ── tab navigation ──
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.nav-tab').forEach(t => {
+      t.classList.remove('active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    tab.setAttribute('aria-selected', 'true');
+    const page = document.getElementById('page-' + target);
+    page.classList.add('active');
+    page.scrollTop = 0;
+  });
+});
+</script>
+
+</body></html>

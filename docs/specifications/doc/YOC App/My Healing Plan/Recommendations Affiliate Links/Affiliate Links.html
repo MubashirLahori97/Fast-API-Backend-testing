@@ -1,0 +1,439 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Affiliate Links</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+  /* layout: two-column card grid, header strip, sticky nav */
+  :root {
+    --bg: #FAF8F4;
+    --bg2: #FFFFFF;
+    --fg: #1C1A17;
+    --fg2: #5C5750;
+    --gold: #B8902A;
+    --gold-lt: #F5EDD6;
+    --gold-bdr: #D4B060;
+    --rule: #E8E2D8;
+    --chip-bg: #EFE9DC;
+    --chip-fg: #7A6840;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #18160F; --bg2: #221F17; --fg: #EDE8DE; --fg2: #9A9080;
+      --gold: #D4A840; --gold-lt: #2A220E; --gold-bdr: #7A6020;
+      --rule: #2E2A20; --chip-bg: #2E2A1A; --chip-fg: #B09050;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #18160F; --bg2: #221F17; --fg: #EDE8DE; --fg2: #9A9080;
+    --gold: #D4A840; --gold-lt: #2A220E; --gold-bdr: #7A6020;
+    --rule: #2E2A20; --chip-bg: #2E2A1A; --chip-fg: #B09050;
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+    padding-block: 0;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* Header */
+  .page-header {
+    padding-block: 36px 20px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  .page-header .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--fg);
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .page-header p {
+    color: var(--fg2);
+    margin: 0;
+    font-size: 13px;
+  }
+
+  /* Section headers */
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--fg2);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* Cards grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card-name {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--fg);
+    line-height: 1.2;
+  }
+  .card-sub {
+    font-size: 11px;
+    color: var(--fg2);
+    margin-top: -6px;
+    font-style: italic;
+  }
+
+  /* Links within card */
+  .link-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .link-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--fg2);
+  }
+  .link-val {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .link-val a {
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 32px);
+    min-width: 0;
+  }
+  .link-val a:hover { text-decoration: underline; }
+  .copy-btn {
+    flex-shrink: 0;
+    background: var(--chip-bg);
+    color: var(--chip-fg);
+    border: none;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .04em;
+    transition: opacity .15s;
+  }
+  .copy-btn:hover { opacity: .75; }
+  .copy-btn.copied { color: #3A8A3A; background: #D4F0D4; }
+
+  /* Coupon chip */
+  .coupon-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .coupon-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--gold-lt);
+    border: 1px solid var(--gold-bdr);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--gold);
+    font-family: 'Inter', monospace;
+  }
+
+  /* Sub-items (nested products) */
+  .sub-items {
+    border-top: 1px solid var(--rule);
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sub-item-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--fg2);
+    margin-bottom: 3px;
+    font-style: italic;
+  }
+
+  /* Note */
+  .note {
+    font-size: 11px;
+    color: var(--fg2);
+    background: var(--gold-lt);
+    border: 1px solid var(--gold-bdr);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: -4px;
+  }
+
+  /* Updated footer */
+  footer {
+    margin-top: 40px;
+    padding-block: 20px;
+    border-top: 1px solid var(--rule);
+    font-size: 11px;
+    color: var(--fg2);
+    text-align: center;
+  }
+</style>
+
+<div class="page-header">
+  <div class="eyebrow">The Hormone Queen® · Deborah Maragopoulos, MN FNP</div>
+  <h1>Affiliate & Partner Links</h1>
+  <p>Master reference for all affiliate links and coupon codes to share with followers and clients.</p>
+</div>
+
+<!-- DIAGNOSTICS -->
+<div class="section-label">Diagnostics</div>
+<div class="cards">
+
+  <div class="card">
+    <div class="card-name">Genova Connect</div>
+    <div class="card-sub">GI Effects stool analysis</div>
+    <div class="link-row">
+      <div class="link-label">Affiliate link</div>
+      <div class="link-val">
+        <a href="https://connect.gdx.net/products/gut-health?utm_source=affiliates&sharedid=&irpid=6090685&irgwc=1&afsrc=1" target="_blank">connect.gdx.net · GI Stool Analysis</a>
+        <button class="copy-btn" data-copy="https://connect.gdx.net/products/gut-health?utm_source=affiliates&sharedid=&irpid=6090685&irgwc=1&afsrc=1">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">SiphoxHealth</div>
+    <div class="card-sub">At-home blood panel (Deborah's wish list)</div>
+    <div class="link-row">
+      <div class="link-label">Affiliate link</div>
+      <div class="link-val">
+        <a href="https://siphoxhealth.com/deborah" target="_blank">siphoxhealth.com/deborah</a>
+        <button class="copy-btn" data-copy="https://siphoxhealth.com/deborah">Copy</button>
+      </div>
+    </div>
+    <div class="coupon-row">
+      <span class="coupon-chip">deborah20</span>
+      <button class="copy-btn" data-copy="deborah20">Copy</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- THERAPEUTICS & DEVICES -->
+<div class="section-label">Therapeutics & Devices</div>
+<div class="cards">
+
+  <div class="card">
+    <div class="card-name">NovaaLab</div>
+    <div class="card-sub">Red light therapy pads & devices</div>
+    <div class="link-row">
+      <div class="link-label">Affiliate link</div>
+      <div class="link-val">
+        <a href="https://tidd.ly/3RxKIWM" target="_blank">tidd.ly/3RxKIWM</a>
+        <button class="copy-btn" data-copy="https://tidd.ly/3RxKIWM">Copy</button>
+      </div>
+    </div>
+    <div class="coupon-row">
+      <span class="coupon-chip">DEBORAHMARAGOPOULOS10</span>
+      <button class="copy-btn" data-copy="DEBORAHMARAGOPOULOS10">Copy</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">Dr. Alex Lloyd's Healing Shop</div>
+    <div class="card-sub">Vagus nerve devices</div>
+    <div class="sub-items">
+      <div>
+        <div class="sub-item-name">Q3 Vagus Nerve Patch</div>
+        <div class="link-val">
+          <a href="https://store.dralexanderloyd.com/products/quantum-3vagus-nerve-patch?ref=errjrtux&variant=40096883703962" target="_blank">quantum-3vagus-nerve-patch</a>
+          <button class="copy-btn" data-copy="https://store.dralexanderloyd.com/products/quantum-3vagus-nerve-patch?ref=errjrtux&variant=40096883703962">Copy</button>
+        </div>
+      </div>
+      <div>
+        <div class="sub-item-name">Q3 Wearable Band — vagus nerve calming</div>
+        <div class="link-val">
+          <a href="https://store.dralexanderloyd.com/products/quantum-3-wearable-band?ref=errjrtux&variant=42853634703587" target="_blank">quantum-3-wearable-band</a>
+          <button class="copy-btn" data-copy="https://store.dralexanderloyd.com/products/quantum-3-wearable-band?ref=errjrtux&variant=42853634703587">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">TABU</div>
+    <div class="card-sub">Nuri Wand — pelvic floor vibrator, vaginal wand + lubricant</div>
+    <div class="link-row">
+      <div class="link-label">Golden Hour Kit (wand + lubricant)</div>
+      <div class="link-val">
+        <a href="https://shrsl.com/4p2ji" target="_blank">shrsl.com/4p2ji</a>
+        <button class="copy-btn" data-copy="https://shrsl.com/4p2ji">Copy</button>
+      </div>
+    </div>
+    <div class="coupon-row">
+      <span class="coupon-chip">DEBORAH10</span>
+      <button class="copy-btn" data-copy="DEBORAH10">Copy</button>
+    </div>
+    <div class="sub-items">
+      <div>
+        <div class="sub-item-name">Nuri Wand only</div>
+        <div class="link-val">
+          <a href="https://shrsl.com/4p4ju" target="_blank">shrsl.com/4p4ju</a>
+          <button class="copy-btn" data-copy="https://shrsl.com/4p4ju">Copy</button>
+        </div>
+      </div>
+      <div>
+        <div class="sub-item-name">Merchant default link (all products)</div>
+        <div class="link-val">
+          <a href="https://shareasale.com/r.cfm?b=2045024&u=4419218&m=125861&urllink=&afftrack=" target="_blank">shareasale.com · TABU</a>
+          <button class="copy-btn" data-copy="https://shareasale.com/r.cfm?b=2045024&u=4419218&m=125861&urllink=&afftrack=">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">IntimateRose</div>
+    <div class="card-sub">Pelvic floor vibrator & intimate wellness</div>
+    <div class="link-row">
+      <div class="link-label">Affiliate link</div>
+      <div class="link-val">
+        <a href="https://www.intimaterose.com/deborah7" target="_blank">intimaterose.com/deborah7</a>
+        <button class="copy-btn" data-copy="https://www.intimaterose.com/deborah7">Copy</button>
+      </div>
+    </div>
+    <div class="coupon-row">
+      <span class="coupon-chip">DEBORAH7</span>
+      <button class="copy-btn" data-copy="DEBORAH7">Copy</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">Early 2 Bed</div>
+    <div class="card-sub">Pelvic floor kegel exercise weights</div>
+    <div class="link-row">
+      <div class="link-label">Referral link (all products)</div>
+      <div class="link-val">
+        <a href="https://www.early2bed.com/?ref=genesisgold" target="_blank">early2bed.com/?ref=genesisgold</a>
+        <button class="copy-btn" data-copy="https://www.early2bed.com/?ref=genesisgold">Copy</button>
+      </div>
+    </div>
+    <div class="sub-items">
+      <div>
+        <div class="sub-item-name">Ami Kegel Ball Set of 3</div>
+        <div class="link-val">
+          <a href="https://www.early2bed.com/ami-set-of-3.html?ref=genesisgold" target="_blank">ami-set-of-3</a>
+          <button class="copy-btn" data-copy="https://www.early2bed.com/ami-set-of-3.html?ref=genesisgold">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-name">Lumen</div>
+    <div class="card-sub">CO₂ device for measuring fat burning</div>
+    <div class="link-row">
+      <div class="link-label">Affiliate link</div>
+      <div class="link-val">
+        <a href="https://lumen.sjv.io/Deborah" target="_blank">lumen.sjv.io/Deborah</a>
+        <button class="copy-btn" data-copy="https://lumen.sjv.io/Deborah">Copy</button>
+      </div>
+    </div>
+    <div class="coupon-row">
+      <span class="coupon-chip">GENISISGOLD</span>
+      <button class="copy-btn" data-copy="GENISISGOLD">Copy</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- SUPPLEMENTS -->
+<div class="section-label">Supplements & Dispensary</div>
+<div class="cards">
+
+  <div class="card">
+    <div class="card-name">FullScript</div>
+    <div class="card-sub">Professional supplement dispensary</div>
+    <div class="link-row">
+      <div class="link-label">Practitioner store</div>
+      <div class="link-val">
+        <a href="https://us.fullscript.com/welcome/dmaragopoulos-fnp/" target="_blank">fullscript.com · dmaragopoulos-fnp</a>
+        <button class="copy-btn" data-copy="https://us.fullscript.com/welcome/dmaragopoulos-fnp/">Copy</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<footer>
+  Deborah Maragopoulos, MN FNP · The Hormone Queen® · Genesis Health Products Inc.<br>
+  Updated October 2026
+</footer>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = btn.dataset.copy;
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+      }).catch(() => {
+        // fallback: select nearby link text
+        const link = btn.closest('.link-val, .coupon-row')?.querySelector('a, .coupon-chip');
+        if (link) {
+          const r = document.createRange();
+          r.selectNode(link);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(r);
+        }
+      });
+    });
+  });
+</script>
+
+</body></html>

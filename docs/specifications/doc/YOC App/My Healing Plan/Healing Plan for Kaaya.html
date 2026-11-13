@@ -1,0 +1,706 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Healing Plan for Kaaya</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+/* ── Layout: single column, max 720px, pillar cards stacked ── */
+:root {
+  --bg: #faf8f5;
+  --surface: #ffffff;
+  --surface-2: #f3f0eb;
+  --border: #e2dbd0;
+  --fg: #2b2420;
+  --fg-2: #6b5f57;
+  --fg-3: #9b8e86;
+  --gold: #9a7b3e;
+  --gold-light: #c9a96e;
+  --gold-pale: #f5edd8;
+  --sage: #5a7a62;
+  --sage-pale: #eaf1eb;
+  --clinical: #3a5a7a;
+  --clinical-pale: #e8f0f7;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1c1814;
+    --surface: #261f19;
+    --surface-2: #2f2720;
+    --border: #3d3028;
+    --fg: #f0ebe3;
+    --fg-2: #b8a898;
+    --fg-3: #7a6c60;
+    --gold: #c9a96e;
+    --gold-light: #e8c98a;
+    --gold-pale: #2e2410;
+    --sage: #7aaa82;
+    --sage-pale: #182219;
+    --clinical: #6a9abf;
+    --clinical-pale: #0f1e2e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1c1814;
+  --surface: #261f19;
+  --surface-2: #2f2720;
+  --border: #3d3028;
+  --fg: #f0ebe3;
+  --fg-2: #b8a898;
+  --fg-3: #7a6c60;
+  --gold: #c9a96e;
+  --gold-light: #e8c98a;
+  --gold-pale: #2e2410;
+  --sage: #7aaa82;
+  --sage-pale: #182219;
+  --clinical: #6a9abf;
+  --clinical-pale: #0f1e2e;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 48px;
+}
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Header ── */
+.plan-header {
+  border-bottom: 1.5px solid var(--gold);
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.plan-brand {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.plan-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(28px, 6vw, 40px);
+  font-weight: 600;
+  line-height: 1.1;
+  text-wrap: balance;
+  color: var(--fg);
+  margin: 0;
+}
+.plan-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+.plan-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-top: 4px;
+}
+.plan-meta-item {
+  font-size: 13px;
+  color: var(--fg-2);
+}
+.plan-meta-item strong {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+/* ── Clinical Summary Card ── */
+.clinical-card {
+  background: var(--clinical-pale);
+  border: 1px solid color-mix(in srgb, var(--clinical) 30%, transparent);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.clinical-card-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clinical);
+  margin: 0;
+}
+.clinical-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+.clinical-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.clinical-label {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  font-weight: 500;
+}
+.clinical-value {
+  font-size: 13.5px;
+  color: var(--fg);
+  line-height: 1.4;
+}
+
+/* ── Condition-specific section ── */
+.condition-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.condition-header {
+  background: var(--gold-pale);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.condition-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.condition-icon svg { display: block; }
+.condition-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--fg);
+  margin: 0;
+}
+.condition-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rec-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.rec-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+.rec-text {
+  font-size: 14px;
+  color: var(--fg);
+  line-height: 1.55;
+}
+.rec-text .dose {
+  font-family: 'Inter', monospace;
+  font-size: 13px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+  color: var(--fg-2);
+}
+.rec-note {
+  margin-left: 16px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border-left: 3px solid var(--gold-light);
+  border-radius: 0 6px 6px 0;
+  font-size: 13.5px;
+  color: var(--fg-2);
+  line-height: 1.5;
+}
+
+/* ── Pillars ── */
+.pillars-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 4px;
+}
+.pillars-sub {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(22px, 4vw, 28px);
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+
+.pillar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.pillar-head {
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.pillar-head:hover { background: var(--surface-2); }
+.pillar-number {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  min-width: 28px;
+}
+.pillar-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--fg);
+  flex: 1;
+}
+.pillar-tag {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.pillar-chevron {
+  color: var(--fg-3);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.pillar.open .pillar-chevron { transform: rotate(180deg); }
+.pillar-body {
+  display: none;
+  padding: 0 20px 18px;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--border);
+}
+.pillar.open .pillar-body { display: flex; }
+
+/* Pillar accent colors */
+.pillar-1 .pillar-head { border-left: 3px solid var(--gold); }
+.pillar-1 .pillar-tag { background: var(--gold-pale); color: var(--gold); }
+.pillar-2 .pillar-head { border-left: 3px solid var(--sage); }
+.pillar-2 .pillar-tag { background: var(--sage-pale); color: var(--sage); }
+.pillar-3 .pillar-head { border-left: 3px solid #7a6abf; }
+.pillar-3 .pillar-tag { background: #f0eef9; color: #7a6abf; }
+.pillar-4 .pillar-head { border-left: 3px solid var(--clinical); }
+.pillar-4 .pillar-tag { background: var(--clinical-pale); color: var(--clinical); }
+.pillar-5 .pillar-head { border-left: 3px solid #b0607a; }
+.pillar-5 .pillar-tag { background: #fceef2; color: #b0607a; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .pillar-3 .pillar-tag { background: #1e1a30; color: #a090ef; }
+  :root:not([data-theme="light"]) .pillar-5 .pillar-tag { background: #2a1018; color: #e08090; }
+}
+:root[data-theme="dark"] .pillar-3 .pillar-tag { background: #1e1a30; color: #a090ef; }
+:root[data-theme="dark"] .pillar-5 .pillar-tag { background: #2a1018; color: #e08090; }
+
+/* ── Product card ── */
+.product-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--gold-pale);
+  border: 1px solid color-mix(in srgb, var(--gold) 25%, transparent);
+  border-radius: 8px;
+}
+.product-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.product-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--fg);
+}
+.product-dose {
+  font-size: 13px;
+  color: var(--fg-2);
+  margin-top: 2px;
+}
+.product-note {
+  font-size: 12px;
+  color: var(--fg-3);
+  font-style: italic;
+  margin-top: 3px;
+}
+
+/* ── Resources footer ── */
+.resources {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.resources-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+}
+.resource-link a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.resource-link a:hover { text-decoration: underline; }
+
+/* ── Signature ── */
+.signature {
+  text-align: center;
+  padding-top: 8px;
+}
+.signature-name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-style: italic;
+  color: var(--gold);
+}
+.signature-title {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pillar-body { transition: none; }
+}
+</style>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <header class="plan-header">
+    <p class="plan-brand">Your Oracle Clinician · Genesis Health</p>
+    <h1 class="plan-title">Healing Plan<br><em>for Kaaya</em></h1>
+    <div class="plan-meta">
+      <span class="plan-meta-item"><strong>Prepared by:</strong> Deborah Maragopoulos, MN FNP</span>
+      <span class="plan-meta-item"><strong>Date:</strong> October 2026</span>
+    </div>
+  </header>
+
+  <!-- Clinical Summary -->
+  <section class="clinical-card" aria-label="Clinical Summary">
+    <h2 class="clinical-card-title">Clinical Summary</h2>
+    <div class="clinical-grid">
+      <div class="clinical-item">
+        <span class="clinical-label">Primary Concerns</span>
+        <span class="clinical-value">Fatigue, irregular menses, memory issues, weight gain</span>
+      </div>
+      <div class="clinical-item">
+        <span class="clinical-label">History</span>
+        <span class="clinical-value">PCOS, Hashimoto's, microprolactinoma, Lyme + Bartonella</span>
+      </div>
+      <div class="clinical-item">
+        <span class="clinical-label">Cycle Pattern</span>
+        <span class="clinical-value">~42–45 day cycles; spotting up to 10 days; LMP 9-23 (spotted)</span>
+      </div>
+      <div class="clinical-item">
+        <span class="clinical-label">Family History</span>
+        <span class="clinical-value">PCOS, Type II Diabetes</span>
+      </div>
+      <div class="clinical-item">
+        <span class="clinical-label">Care Team</span>
+        <span class="clinical-value">Naturopath (Lyme specialist)</span>
+      </div>
+      <div class="clinical-item">
+        <span class="clinical-label">Allergies</span>
+        <span class="clinical-value">NKDA</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Condition-specific: PCOS -->
+  <section class="condition-section" aria-label="PCOS Recommendations">
+    <div class="condition-header">
+      <div class="condition-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="white" stroke-width="1.5"/><path d="M7 4v3l2 1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h2 class="condition-title">For PCOS</h2>
+    </div>
+    <div class="condition-body">
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text">Reduce hypothalamic inflammation — Genesis Gold will support this directly</span>
+      </div>
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text">Order <strong>AMH</strong> now to check ovarian reserve</span>
+      </div>
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text">Menstrual cycle control — take a break from current progesterone once <a href="https://shop.genesisgold.com/products/gen-pro" target="_blank" rel="noopener" style="color:var(--gold);">Gen-Pro</a> arrives, then:</span>
+      </div>
+      <div class="rec-note">
+        <strong>Day 4:</strong> Gen-Pro <span class="dose">25–50 mg</span> AM and PM<br>
+        <strong>Day 14:</strong> Increase to <span class="dose">200 mg</span> AM and <span class="dose">200 mg</span> PM<br>
+        <span style="font-size:12px; color: var(--fg-3);">One pump = 25 mg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Condition-specific: Gut -->
+  <section class="condition-section" aria-label="Gut Health Recommendations">
+    <div class="condition-header">
+      <div class="condition-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M4 3c0 2 4 2 4 4s-4 2-4 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M8 3c1 1.5 1 3 0 4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h2 class="condition-title">Intestinal Dysbiosis</h2>
+    </div>
+    <div class="condition-body">
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text">Order <strong>Genova GI Effects</strong> — check microbiology, H. pylori, and gut membrane efficiency</span>
+      </div>
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text"><strong>Stop berberine and probiotics now</strong> — wait two full weeks before collecting stool sample</span>
+      </div>
+      <div class="rec-note">Begin <a href="https://shop.genesisgold.com/products/genesis-gold" target="_blank" rel="noopener" style="color:var(--gold);">Genesis Gold®</a> once intestinal dysbiosis is resolved</div>
+    </div>
+  </section>
+
+  <!-- Condition-specific: Hyperprolactinemia -->
+  <section class="condition-section" aria-label="Hyperprolactinemia Recommendations">
+    <div class="condition-header">
+      <div class="condition-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v4M7 10v2M3 7H1M13 7h-2M4.22 4.22L2.8 2.8M11.2 11.2l-1.42-1.42M4.22 9.78L2.8 11.2M11.2 2.8L9.78 4.22" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h2 class="condition-title">Hyperprolactinemia</h2>
+    </div>
+    <div class="condition-body">
+      <div class="rec-item">
+        <div class="rec-dot"></div>
+        <span class="rec-text">Request from HCP: <strong>Bromocriptine</strong> <span class="dose">2.5 mg tablet intravaginally by 8 AM</span></span>
+      </div>
+      <div class="rec-note">
+        Intravaginal route avoids first-pass liver metabolism, reducing risk of hypertension and headaches
+      </div>
+    </div>
+  </section>
+
+  <!-- To Do -->
+  <section class="condition-section" aria-label="To Do">
+    <div class="condition-header">
+      <div class="condition-icon" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 4h8M3 7h8M3 10h5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h2 class="condition-title">To Do</h2>
+    </div>
+    <div class="condition-body">
+      <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Keep a <strong>3-day diet log</strong> and send your lean body mass (lbs) — use the body fat calculator in your resources below so protein needs can be calculated</span></div>
+      <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Consider adding <strong>2 Brazil nuts/day</strong> for selenium to support T4→T3 conversion</span></div>
+      <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Request <strong>AMH</strong> lab to check ovarian reserve</span></div>
+      <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Request <strong>Bromocriptine 2.5 mg</strong> prescription from HCP</span></div>
+      <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Order <strong>Genova GI Effects</strong> stool test — stop berberine and probiotics 2 weeks before collecting</span></div>
+    </div>
+  </section>
+
+  <!-- Five Pillars -->
+  <div>
+    <p class="pillars-title">Your Path to Healing</p>
+    <p class="pillars-sub">The Five Pillars of Hypothalamic Health</p>
+
+    <!-- Immediate dietary note before pillars -->
+    <div style="background:var(--sage-pale); border:1px solid color-mix(in srgb, var(--sage) 25%, transparent); border-radius:var(--r); padding:14px 18px; margin-bottom:18px; display:flex; gap:10px; align-items:flex-start;">
+      <svg style="flex-shrink:0; margin-top:2px;" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6" stroke="var(--sage)" stroke-width="1.4"/><path d="M8 5v3.5M8 10.5v.5" stroke="var(--sage)" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <p style="margin:0; font-size:13.5px; color:var(--fg); line-height:1.55;"><strong style="color:var(--sage);">Immediate dietary action:</strong> Keep a 3-day diet log and send your lean body mass (lbs) — use the body fat calculator in your resources below. Protein needs will be calculated from your LBM.</p>
+    </div>
+
+    <!-- Pillar 1 -->
+    <div style="display:flex; flex-direction:column; gap:10px;">
+
+    <div class="pillar pillar-1 open" role="region" aria-label="Pillar 1: Foundational Support">
+      <div class="pillar-head" role="button" tabindex="0" aria-expanded="true">
+        <span class="pillar-number">I</span>
+        <span class="pillar-name">Foundational Support</span>
+        <span class="pillar-tag">Nutraceuticals</span>
+        <svg class="pillar-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="pillar-body">
+        <p style="font-size:13.5px; color:var(--fg-2); margin:8px 0 4px; font-style:italic;">Balance your neuro-immune-endocrine system from the top down — hypothalamic support first. Wait 15 minutes to eat after taking.</p>
+        <div class="product-row">
+          <div class="product-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="white" stroke-width="1.5"/><path d="M8 5v3M8 10v.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="product-name"><a href="https://shop.genesisgold.com/products/genesis-gold" target="_blank" rel="noopener" style="color:var(--fg); text-decoration:none;">Genesis Gold®</a></div>
+            <div class="product-dose">1/3 scoop per 50 lbs of body weight · daily</div>
+          </div>
+        </div>
+        <div class="product-row">
+          <div class="product-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 8c0-1.66 1.34-3 3-3s3 1.34 3 3-1.34 3-3 3-3-1.34-3-3z" stroke="white" stroke-width="1.5"/><path d="M8 2v1M8 13v1M2 8h1M13 8h1" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="product-name"><a href="https://shop.genesisgold.com/products/sacred-seven" target="_blank" rel="noopener" style="color:var(--fg); text-decoration:none;">Sacred Seven®</a></div>
+            <div class="product-dose">1 scoop · daily</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pillar 2 -->
+    <div class="pillar pillar-2" role="region" aria-label="Pillar 2: Diet">
+      <div class="pillar-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="pillar-number">II</span>
+        <span class="pillar-name">Diet</span>
+        <span class="pillar-tag">Nutrition</span>
+        <svg class="pillar-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="pillar-body">
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Follow the <strong>DMAR nutritional path</strong> to healing</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Macronutrients calculated from lean body mass (LBM)</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text"><strong>Chrononutrition:</strong> eat heaviest meals early in the day; no more than 20% of daily protein needs after dark</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Increase breakfast protein</span></div>
+      </div>
+    </div>
+
+    <!-- Pillar 3 -->
+    <div class="pillar pillar-3" role="region" aria-label="Pillar 3: Activity">
+      <div class="pillar-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="pillar-number">III</span>
+        <span class="pillar-name">Activity</span>
+        <span class="pillar-tag">Movement</span>
+        <svg class="pillar-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="pillar-body">
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text"><strong>Aerobic activity in the morning</strong> — goal: HIIT 3× per week</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text"><strong>Resistance training</strong> at least 2× per week</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Don't forget to <strong>stretch</strong></span></div>
+      </div>
+    </div>
+
+    <!-- Pillar 4 -->
+    <div class="pillar pillar-4" role="region" aria-label="Pillar 4: Sleep">
+      <div class="pillar-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="pillar-number">IV</span>
+        <span class="pillar-name">Sleep</span>
+        <span class="pillar-tag">Recovery</span>
+        <svg class="pillar-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="pillar-body">
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Get off digital devices <strong>after dusk</strong></span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Use <strong>white noise</strong> if needed</span></div>
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text">Sleep in <strong>complete darkness</strong></span></div>
+      </div>
+    </div>
+
+    <!-- Pillar 5 -->
+    <div class="pillar pillar-5" role="region" aria-label="Pillar 5: Mindset">
+      <div class="pillar-head" role="button" tabindex="0" aria-expanded="false">
+        <span class="pillar-number">V</span>
+        <span class="pillar-name">Mindset</span>
+        <span class="pillar-tag">Inner Work</span>
+        <svg class="pillar-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2c-2.21 0-4 1.79-4 4 0 2 1.5 3.5 1.5 5h5C10.5 9.5 12 8 12 6c0-2.21-1.79-4-4-4z" stroke="white" stroke-width="1.3"/><path d="M6 14h4" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="pillar-body">
+        <div class="rec-item"><div class="rec-dot"></div><span class="rec-text"><strong>Daily CALM practice</strong> — <a href="https://genesisgold.com/blog/how-to-be-the-calm-in-your-life/" target="_blank" style="color:var(--gold);">How to Be the Calm in Your Life</a> (Connect · Attitude · Love · Meditation)</span></div>
+      </div>
+    </div>
+
+    </div><!-- end pillars -->
+  </div>
+
+  <!-- Resources -->
+  <section class="resources" aria-label="Resources">
+    <p class="resources-title">Your Resources</p>
+    <div class="resource-link">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="2" stroke="var(--fg-3)" stroke-width="1.3"/><path d="M5 7l2 2 4-4" stroke="var(--fg-3)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Educational videos: <a href="https://youtube.com/c/DeborahMaragopoulosFNP" target="_blank" rel="noopener">youtube.com/c/DeborahMaragopoulosFNP</a>
+    </div>
+    <div class="resource-link">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1C3.69 1 1 3.69 1 7s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6z" stroke="var(--fg-3)" stroke-width="1.3"/><path d="M1 7h12M7 1a9.3 9.3 0 010 12M7 1a9.3 9.3 0 000 12" stroke="var(--fg-3)" stroke-width="1.3"/></svg>
+      Fullscript dispensary (supplements): <a href="https://us.fullscript.com/welcome/dmaragopoulos-" target="_blank" rel="noopener">us.fullscript.com/welcome/dmaragopoulos-</a>
+    </div>
+    <div class="resource-link">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 2c-1.1 0-2 .9-2 2 0 .74.4 1.38 1 1.73V9h2V5.73c.6-.35 1-.99 1-1.73 0-1.1-.9-2-2-2z" stroke="var(--fg-3)" stroke-width="1.3"/><path d="M5 9c-.55 0-1 .45-1 1s.45 1 1 1h4c.55 0 1-.45 1-1s-.45-1-1-1" stroke="var(--fg-3)" stroke-width="1.3"/></svg>
+      <a href="https://genesisgold.com/blog/how-to-be-the-calm-in-your-life/" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:500;">CALM practice guide: <em>How to Be the Calm in Your Life</em></a> — by Deborah Maragopoulos, FNP
+    </div>
+    <div class="resource-link">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="5" r="2.5" stroke="var(--fg-3)" stroke-width="1.3"/><path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="var(--fg-3)" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Lean body mass calculator: <a href="https://www.calculator.net/body-fat-calculator.html" target="_blank" rel="noopener">calculator.net/body-fat-calculator</a>
+    </div>
+  </section>
+
+  <!-- Signature -->
+  <div class="signature">
+    <div class="signature-name">Deborah Maragopoulos</div>
+    <div class="signature-title">MN, FNP · The Hormone Queen® · Genesis Health</div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelectorAll('.pillar-head').forEach(head => {
+    function toggle() {
+      const pillar = head.closest('.pillar');
+      const isOpen = pillar.classList.toggle('open');
+      head.setAttribute('aria-expanded', isOpen);
+    }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+</script>
+
+</body></html>

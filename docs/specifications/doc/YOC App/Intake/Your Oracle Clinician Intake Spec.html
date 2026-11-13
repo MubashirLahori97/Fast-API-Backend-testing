@@ -1,0 +1,1301 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Your Oracle Clinician Intake Spec</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=EB+Garamond:wght@400;500&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky nav tabs, scrollable content panel, dense reference doc */
+:root {
+  --purple:    #613977;
+  --purple-lt: #f2ecf6;
+  --purple-md: #d4bfe0;
+  --gold:      #c9a94e;
+  --gold-lt:   #fdf6e8;
+  --pink:      #cd497f;
+  --green:     #3a7a55;
+  --green-lt:  #eef7f2;
+  --red:       #b94040;
+  --red-lt:    #fdf0f0;
+  --bg:        #faf9f7;
+  --surface:   #ffffff;
+  --surface2:  #f5f2f8;
+  --fg:        #1a1018;
+  --fg2:       #4a3f47;
+  --fg3:       #8a7a86;
+  --border:    #e2dae6;
+  --mono:      'DM Mono', 'Courier New', monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #13101a;
+    --surface:   #1d1826;
+    --surface2:  #251f30;
+    --fg:        #ede8f2;
+    --fg2:       #bfb2cc;
+    --fg3:       #8a7a96;
+    --border:    #2e2640;
+    --purple-lt: #1e1428;
+    --gold-lt:   #1e1608;
+    --green-lt:  #0c1e14;
+    --red-lt:    #1e0c0c;
+    --purple-md: #4a2e60;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #13101a;
+  --surface:   #1d1826;
+  --surface2:  #251f30;
+  --fg:        #ede8f2;
+  --fg2:       #bfb2cc;
+  --fg3:       #8a7a96;
+  --border:    #2e2640;
+  --purple-lt: #1e1428;
+  --gold-lt:   #1e1608;
+  --green-lt:  #0c1e14;
+  --red-lt:    #1e0c0c;
+  --purple-md: #4a2e60;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  padding-inline: 0;
+  padding-block: 0;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  background: var(--purple);
+  color: #fff;
+  padding: 18px 24px 14px;
+}
+.page-header h1 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  margin: 0 0 2px;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.page-header .sub {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 0;
+  background: var(--surface2);
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 10;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+.tab-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  padding: 10px 14px 9px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 0.88rem;
+  color: var(--fg3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover { color: var(--fg); }
+.tab-btn.active {
+  color: var(--purple);
+  border-bottom-color: var(--purple);
+  font-weight: 500;
+}
+.tab-btn.new-tab {
+  color: var(--pink);
+}
+.tab-btn.new-tab.active {
+  color: var(--pink);
+  border-bottom-color: var(--pink);
+}
+
+/* ── CONTENT PANELS ── */
+.panel { display: none; padding: 20px 24px 40px; max-width: 860px; }
+.panel.active { display: block; }
+
+/* ── SECTION HEADERS ── */
+.section-head {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple);
+  margin: 24px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  text-wrap: balance;
+}
+.section-head:first-child { margin-top: 0; }
+.section-head.pink { color: var(--pink); border-bottom-color: var(--pink); }
+
+.subsection {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin: 16px 0 6px;
+  font-family: 'EB Garamond', Georgia, serif;
+}
+
+/* ── FIELD TABLE ── */
+.field-table-wrap { overflow-x: auto; margin-bottom: 12px; }
+table.fields {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  min-width: 520px;
+}
+table.fields th {
+  background: var(--surface2);
+  color: var(--fg3);
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--border);
+}
+table.fields td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--fg2);
+  line-height: 1.45;
+}
+table.fields tr:last-child td { border-bottom: none; }
+table.fields td:first-child { color: var(--fg); font-weight: 500; }
+table.fields td code {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  background: var(--surface2);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--purple);
+}
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.badge-req  { background: var(--red-lt);   color: var(--red);   }
+.badge-opt  { background: var(--gold-lt);  color: var(--gold);  }
+.badge-cond { background: var(--purple-lt);color: var(--purple);}
+.badge-sys  { background: var(--green-lt); color: var(--green); }
+.badge-new  { background: #fce4ee; color: var(--pink); }
+
+/* ── DECISION TREE ── */
+.tree { margin: 8px 0 16px; }
+.tree-node {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+}
+.tree-node .q {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: #fff;
+  font-size: 0.65rem;
+  font-family: var(--mono);
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 2px;
+}
+.tree-node .q.branch { background: var(--gold); }
+.tree-node .q.skip   { background: var(--fg3); }
+.tree-node .q.pink   { background: var(--pink); }
+.tree-body { flex: 1; min-width: 0; }
+.tree-body strong { color: var(--fg); }
+.tree-body .route {
+  font-size: 0.82rem;
+  color: var(--fg3);
+  margin-top: 2px;
+  font-family: var(--mono);
+}
+.route .yes { color: var(--green); }
+.route .no  { color: var(--red); }
+.route .arrow { color: var(--fg3); margin: 0 4px; }
+
+/* ── NOTE BOXES ── */
+.note {
+  border-left: 3px solid var(--gold);
+  background: var(--gold-lt);
+  padding: 9px 13px;
+  font-size: 0.87rem;
+  color: var(--fg2);
+  margin: 10px 0;
+  line-height: 1.5;
+  border-radius: 0 4px 4px 0;
+}
+.note strong { color: var(--fg); }
+.note.purple { border-left-color: var(--purple); background: var(--purple-lt); }
+.note.green  { border-left-color: var(--green);  background: var(--green-lt); }
+.note.red    { border-left-color: var(--red);    background: var(--red-lt); }
+.note.pink   { border-left-color: var(--pink);   background: #fce4ee; }
+
+/* ── SYMPTOM CHECKLIST ── */
+.symptom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 24px;
+  font-size: 0.87rem;
+  color: var(--fg2);
+  margin: 6px 0 12px;
+}
+@media (max-width: 500px) { .symptom-grid { grid-template-columns: 1fr; } }
+.symptom-grid li {
+  list-style: none;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 6px;
+}
+.symptom-grid li::before { content: '☐'; color: var(--fg3); flex-shrink: 0; }
+
+/* ── FLOW DIAGRAM (text-based) ── */
+.flow {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  font-size: 0.84rem;
+  font-family: var(--mono);
+  color: var(--fg2);
+  margin: 10px 0;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+.flow .step { color: var(--fg); }
+.flow .arrow { color: var(--fg3); }
+.flow .branch { color: var(--purple); }
+.flow .label { color: var(--gold); }
+.flow .label-pink { color: var(--pink); }
+.flow .label-red  { color: var(--red);  }
+
+/* ── PATHWAY CARDS ── */
+.pathway-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 12px 0;
+}
+@media (max-width: 560px) { .pathway-grid { grid-template-columns: 1fr; } }
+.pathway-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 14px;
+  background: var(--surface);
+}
+.pathway-card .pc-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.pathway-card .pc-label.self    { color: var(--purple); }
+.pathway-card .pc-label.ped     { color: var(--green); }
+.pathway-card .pc-label.elder   { color: var(--gold); }
+.pathway-card .pc-label.partner { color: var(--fg3); }
+.pathway-card h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--fg);
+}
+.pathway-card p {
+  font-size: 0.84rem;
+  color: var(--fg2);
+  margin: 0 0 6px;
+  line-height: 1.45;
+}
+.pathway-card ul {
+  margin: 4px 0 0;
+  padding-left: 16px;
+  font-size: 0.82rem;
+  color: var(--fg2);
+}
+.pathway-card ul li { margin-bottom: 2px; }
+
+/* ── ESCALATION TABLE ── */
+.esc-band {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px;
+  border-radius: 4px;
+  font-size: 0.86rem;
+  margin-bottom: 4px;
+}
+.esc-band .dot {
+  flex-shrink: 0;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.esc-band.green  { background: var(--green-lt); }
+.esc-band.green  .dot { background: var(--green); }
+.esc-band.gold   { background: var(--gold-lt);  }
+.esc-band.gold   .dot { background: var(--gold);  }
+.esc-band.orange { background: #fff3e0; }
+.esc-band.orange .dot { background: #e07b00; }
+.esc-band.red    { background: var(--red-lt);   }
+.esc-band.red    .dot { background: var(--red);   }
+
+/* ── MISC ── */
+ul.plain { margin: 6px 0 12px; padding-left: 18px; }
+ul.plain li { margin-bottom: 3px; font-size: 0.9rem; color: var(--fg2); }
+ul.plain li strong { color: var(--fg); }
+p.body { font-size: 0.9rem; color: var(--fg2); margin: 6px 0 12px; line-height: 1.6; }
+
+</style>
+
+<div class="page-header">
+  <h1>Your Oracle Clinician — Intake Form Specification</h1>
+  <div class="sub">For development team · Genesis Health Products Inc. · v1.2 Oct 2026 — Gender &amp; Sex Variations intake added</div>
+</div>
+
+<div class="tab-bar" role="tablist">
+  <button class="tab-btn active" onclick="show('overview')"   role="tab">Overview &amp; Routing</button>
+  <button class="tab-btn"        onclick="show('signup')"     role="tab">Sign-Up</button>
+  <button class="tab-btn"        onclick="show('adult-f')"    role="tab">Adult Female</button>
+  <button class="tab-btn"        onclick="show('adult-m')"    role="tab">Adult Male</button>
+  <button class="tab-btn"        onclick="show('adolescent')" role="tab">Adolescent</button>
+  <button class="tab-btn"        onclick="show('pediatric')"  role="tab">Pediatric</button>
+  <button class="tab-btn new-tab" onclick="show('dependent')" role="tab">Dependent &amp; Proxy ★</button>
+  <button class="tab-btn new-tab" onclick="show('gender-sex')" role="tab">Gender &amp; Sex Variations ★</button>
+  <button class="tab-btn"        onclick="show('consult')"    role="tab">Consult Context</button>
+  <button class="tab-btn"        onclick="show('tech')"       role="tab">Tech Notes</button>
+</div>
+
+<!-- ═══════════════════ OVERVIEW ═══════════════════ -->
+<div id="overview" class="panel active">
+
+  <div class="section-head">Profile Type Routing</div>
+  <p class="body">The account holder is always an adult (18+). They may create dependent sub-profiles for family members. Profile type determines which health intake form is presented. The routing decision happens immediately after sign-up.</p>
+
+  <div class="flow">
+<span class="step">Account created (adult 18+)</span>
+  <span class="arrow">↓</span>
+<span class="branch">Is this profile for you or a family member?</span>
+  <span class="arrow">↓</span>
+<span class="label">FOR SELF</span>  <span class="arrow">→</span>  <span class="step">Health Profile: sex at birth → gender ID → age → route to Adult F or Adult M</span>
+<span class="label">FOR DEPENDENT</span>  <span class="arrow">→</span>  <span class="step">Enter dependent's name + DOB</span>
+  <span class="arrow">↓</span>
+<span class="branch">Age of dependent?</span>
+  <span class="arrow">↓</span>
+<span class="label">Under 13</span>  <span class="arrow">→</span>  <span class="step">Pediatric intake (filled by parent)</span>
+<span class="label">13–17</span>    <span class="arrow">→</span>  <span class="step">Adolescent intake</span>
+<span class="label">18+</span>       <span class="arrow">→</span>  <span class="step">Adult intake (F or M path) with proxy flag</span>
+  </div>
+
+  <div class="note purple"><strong>Teenagers (13–17) as primary account holders:</strong> A teen may create their own account directly. They follow the Adolescent intake path. Legal acknowledgment language appears on sign-up (no hard gate, no parental consent requirement, but terms note that users under 18 are using the service with awareness of their age). Content and recommendations adapt to developmental context.</div>
+
+  <div class="section-head">Where Fields Live</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Layer</th><th>Purpose</th><th>When collected</th><th>Mandatory?</th></tr></thead>
+      <tbody>
+        <tr><td>Sign-Up</td><td>Account identity, legal, basic analytics</td><td>First visit, once</td><td>Most required</td></tr>
+        <tr><td>Health Profile</td><td>Persistent clinical context for all interactions</td><td>Immediately after sign-up; editable anytime</td><td>Core fields required</td></tr>
+        <tr><td>Consult Context</td><td>Session-specific chief complaint and history</td><td>Each new conversation or consultation</td><td>Chief complaint required</td></tr>
+        <tr><td>Bot (dynamic)</td><td>Clarifying questions the agent asks mid-session</td><td>During conversation, driven by AI</td><td>N/A — agent-controlled</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Badge Legend</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;font-size:0.87rem;">
+    <span><span class="badge badge-req">REQUIRED</span> — must be completed to proceed</span>
+    <span><span class="badge badge-opt">OPTIONAL</span> — can be skipped, improves experience</span>
+    <span><span class="badge badge-cond">CONDITIONAL</span> — shown only if prior answer triggers it</span>
+    <span><span class="badge badge-sys">SYSTEM</span> — auto-populated, not user-entered</span>
+    <span><span class="badge badge-new">NEW v1.1 / v1.2</span> — added in a recent version</span>
+  </div>
+
+  <div class="section-head">Key Design Principles from Deborah</div>
+  <ul class="plain">
+    <li><strong>Decision tree logic throughout:</strong> answers must branch correctly. If male at birth, menstruation questions do not appear. If post-menopausal, cycle questions stop. Trans man may still have periods — gender ID field is how the system knows to ask.</li>
+    <li><strong>No repeated fields:</strong> if medications were entered in the health profile, the consult screen does not ask again. Surface them as a pre-populated review, not a re-entry.</li>
+    <li><strong>Narrative-aware:</strong> the bot handles open narrative input, not just checkbox answers. The health profile uses structured fields; the bot conversation can receive free text.</li>
+    <li><strong>Knowledge base is live:</strong> new articles are authored continuously. The ingestion pipeline must support ongoing sync, not one-time upload.</li>
+    <li><strong>Pronouns:</strong> sex at birth + gender identification together determine pronoun use (he/she/they) throughout the app interface and any generated summaries.</li>
+    <li><strong>Proxy sessions:</strong> when asking about a dependent family member, the Oracle's response mode, escalation thresholds, and recommendation language all adapt to the proxy pathway. See Dependent &amp; Proxy tab.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════ SIGN-UP ═══════════════════ -->
+<div id="signup" class="panel">
+
+  <div class="section-head">Sign-Up Fields</div>
+  <p class="body">Keep sign-up minimal. The goal is to get the client into the system. Clinical detail belongs in the health profile, which is a mandatory next step.</p>
+
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>First name</td><td>Text</td><td><span class="badge badge-req">REQUIRED</span></td><td></td></tr>
+        <tr><td>Last name</td><td>Text</td><td><span class="badge badge-req">REQUIRED</span></td><td></td></tr>
+        <tr><td>Email address</td><td>Email</td><td><span class="badge badge-req">REQUIRED</span></td><td>Used for login and communications</td></tr>
+        <tr><td>Password</td><td>Password</td><td><span class="badge badge-req">REQUIRED</span></td><td>Min 8 chars, 1 uppercase, 1 number</td></tr>
+        <tr><td>Country / region</td><td>Dropdown</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Analytics only — adoption by region, product availability flags.</td></tr>
+        <tr><td>How did you hear about us?</td><td>Dropdown + text</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Referral source analytics</td></tr>
+        <tr><td>Existing Genesis Gold customer?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Routes to tailored onboarding copy if Yes</td></tr>
+        <tr><td>Social login (Google / Facebook)</td><td>OAuth</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Low priority; assess technical implications before building.</td></tr>
+        <tr><td>Accept Terms &amp; Privacy Policy</td><td>Checkbox</td><td><span class="badge badge-req">REQUIRED</span></td><td>Single checkbox. Re-prompts only on T&amp;C change or session cache reset.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note"><strong>Not at sign-up:</strong> Date of birth, gender, age — all belong in the health profile where they can be used clinically. Sign-up has no age restriction; legal language in T&amp;C acknowledges under-18 users.</div>
+
+  <div class="section-head">Freemium Launch Model</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Tier</th><th>Access</th><th>Gate</th></tr></thead>
+      <tbody>
+        <tr><td>Free (launch period)</td><td>First 3 questions</td><td>No card required. After 3rd response, interface grays out with subscription prompt.</td></tr>
+        <tr><td>Subscriber</td><td>Full access</td><td>Subscription via Stripe. Tiered pricing TBD.</td></tr>
+        <tr><td>Free trial (future promo)</td><td>First 3 questions</td><td>Same mechanic — reuse for relaunch campaigns without rebuilding.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note green"><strong>Payment integration:</strong> Stripe (existing account). Products connect via Shopify. App subscriptions through Stripe directly.</div>
+</div>
+
+<!-- ═══════════════════ ADULT FEMALE ═══════════════════ -->
+<div id="adult-f" class="panel">
+
+  <div class="section-head">Routing Into This Profile</div>
+  <div class="tree">
+    <div class="tree-node"><div class="q">1</div><div class="tree-body"><strong>Sex at birth?</strong><div class="route"><span class="yes">Female</span><span class="arrow">→</span> continue this path · <span class="no">Male</span><span class="arrow">→</span> Adult Male profile · <span class="yes">Intersex</span><span class="arrow">→</span> continue this path, note in profile</div></div></div>
+    <div class="tree-node"><div class="q">2</div><div class="tree-body"><strong>Gender identification?</strong><div class="route">Male / Female / Non-binary / [text field] — sets pronouns app-wide (he/she/they)</div></div></div>
+    <div class="tree-node"><div class="q branch">3</div><div class="tree-body"><strong>Reproductive status</strong> (determines menstrual / hormonal question branching)<div class="route"><span class="yes">Pre-menopausal</span> · <span class="yes">Peri-menopausal</span> · <span class="yes">Post-menopausal (natural)</span> · <span class="yes">Surgically menopausal (hysterectomy ± oophorectomy)</span> · <span class="yes">Pregnant / postpartum</span></div></div></div>
+    <div class="tree-node"><div class="q branch">4</div><div class="tree-body"><strong>If peri- or post-menopausal (natural or surgical):</strong> Currently on hormone replacement therapy (HRT)?<div class="route"><span class="yes">Yes</span><span class="arrow">→</span> show HRT detail fields · <span class="no">No</span><span class="arrow">→</span> skip · <span class="yes">Previously, not now</span><span class="arrow">→</span> show prior HRT fields</div></div></div>
+  </div>
+  <div class="note purple"><strong>N/A logic:</strong> Menstrual cycle questions are N/A for post-menopausal, surgically menopausal, and trans female clients. The system suppresses those fields automatically based on reproductive status + gender identification — but always displays the symptom checklist in full with an N/A option per item, since menopausal symptoms apply across all these groups.</div>
+
+  <div class="section-head">Core Health Profile Fields</div>
+  <div class="subsection">Identity &amp; Basics</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Date of birth</td><td>Date</td><td><span class="badge badge-req">REQUIRED</span></td><td>Age used for developmental context</td></tr>
+        <tr><td>Sex at birth</td><td>Select</td><td><span class="badge badge-req">REQUIRED</span></td><td>Female / Male / Intersex</td></tr>
+        <tr><td>Gender identification</td><td>Select + text</td><td><span class="badge badge-req">REQUIRED</span></td><td>Female / Male / Non-binary / [write in]. Sets pronouns throughout app.</td></tr>
+        <tr><td>Reproductive status</td><td>Select</td><td><span class="badge badge-req">REQUIRED</span></td><td>Drives branching for all hormonal questions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Menopause &amp; HRT Detail <span style="font-weight:400;text-transform:none;font-size:0.85em;color:var(--fg3)">— shown if reproductive status is peri-, post-, or surgically menopausal</span></div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Age at last period (natural menopause)</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Shown if post-menopausal (natural)</td></tr>
+        <tr><td>Hysterectomy?</td><td>Yes / No</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Shown if surgically menopausal</td></tr>
+        <tr><td>If yes: ovaries removed (oophorectomy)?</td><td>Yes / No / Partial</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Drives severity context — surgical menopause without oophorectomy differs clinically</td></tr>
+        <tr><td>Age at surgery</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td></td></tr>
+        <tr><td>Currently on HRT?</td><td>Yes / No / Previously</td><td><span class="badge badge-req">REQUIRED</span></td><td>Shown for all peri/post/surgical; drives HRT detail block</td></tr>
+        <tr><td>HRT type (if current or prior)</td><td>Select + text</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Estrogen only / Progesterone only / Combined E+P / Testosterone / Bio-identical / Synthetic / [write in]</td></tr>
+        <tr><td>HRT delivery method</td><td>Select</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Pill / patch / cream / gel / pellet / injection / other</td></tr>
+        <tr><td>How long on HRT?</td><td>Text (e.g. "3 years")</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td></td></tr>
+        <tr><td>How has HRT helped / not helped?</td><td>Text</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Rich context for bot recommendations</td></tr>
+        <tr><td>Why did you stop HRT?</td><td>Text</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Shown if previously on HRT, not currently</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Reproductive History <span style="font-weight:400;text-transform:none;font-size:0.85em;color:var(--fg3)">— shown if reproductive status is not "surgically menopausal" or "post-menopausal (natural)"</span></div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Age at first period (menarche)</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Are periods regular?</td><td>Yes / No</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Cycle frequency (days)</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Days of bleeding</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Pads/tampons on heaviest day</td><td>Number</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Contraceptive method</td><td>Select + text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Number of pregnancies / live births / miscarriages / terminations</td><td>Number × 4</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Postpartum depression history?</td><td>Yes / No</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Mother took DES during pregnancy with you?</td><td>Yes / No / Don't know</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Age mother reached menopause</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><strong>Trans male clients</strong> who identify as male but were born female may still have periods. The gender identification field is what allows the system to ask appropriately — do not suppress reproductive questions solely based on gender ID when sex at birth is female.</div>
+
+  <div class="subsection">Current Medications &amp; Hormonal Treatments</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Medications (Rx and OTC)</td><td>Repeating: name + reason</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Supplements</td><td>Repeating: name + reason</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Taking Genesis Gold?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>If yes: how long? How has it helped?</td><td>Text</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Previous hormonal treatment</td><td>Text: when + results</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Known allergies (food, inhalants, medications)</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Lifestyle</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Average nightly sleep (hours)</td><td>Number</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Sleep quality notes</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Exercise: type, duration, frequency</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Special diet / food sensitivities</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Daily food intake</td><td>Text (breakfast / lunch / dinner / fluids)</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Work schedule / stress level</td><td>Text + 1–10 scale</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Supportive partner / family / friends</td><td>Yes / No × 3</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Symptom Checklist — Female Hormonal</div>
+  <p class="body">Client checks all that apply. Each symptom has three response options: <strong>Yes</strong> · <strong>No</strong> · <strong>N/A</strong> — the N/A option is essential for post-menopausal, surgically menopausal, and trans female clients for whom certain symptoms are anatomically inapplicable. Severity scale 1–10 shown inline for pain/intensity items. All checked items feed directly into the bot's initial context.</p>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Symptom</th><th>Response</th><th>N/A applies to</th></tr></thead>
+      <tbody>
+        <tr><td>Hot flashes</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Night sweats</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Brain fog / mental fogginess</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Forgetfulness / memory issues</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Mood swings</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Irritability</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Depression</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Rage / anger outbursts</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Vaginal dryness</td><td>Yes / No / N/A</td><td>Trans female (pre-op); mark N/A</td></tr>
+        <tr><td>Poor lubrication with intercourse</td><td>Yes / No / N/A</td><td>Trans female (pre-op); mark N/A</td></tr>
+        <tr><td>Frequent urination / urgency</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Low libido / diminished sex drive</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Clamminess</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Fatigue — general</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Insomnia / sleep disturbance</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Muscle weakness</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Change in body fat patterns</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Lower exercise tolerance</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Decreased stress tolerance</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Increased susceptibility to illness</td><td>Yes / No / N/A</td><td>—</td></tr>
+        <tr><td>Menstrual cramps (rate 1–10)</td><td>Severity / N/A</td><td>Post-menopausal, surgical, trans female</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><strong>N/A suppression logic:</strong> When reproductive status = post-menopausal or surgically menopausal, OR gender identification = trans female, the system should <em>pre-set</em> anatomically inapplicable items to N/A rather than hiding them — the client can override if clinically relevant. Menstrual cramps default to N/A for all menopausal and hysterectomy statuses.</div>
+
+  <div class="subsection">Family &amp; Personal Medical History</div>
+  <p class="body">Client checks all that apply for self and for family. Both columns feed the bot's risk context.</p>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Condition</th><th>Self</th><th>Family</th></tr></thead>
+      <tbody>
+        <tr><td>Heart problems / high blood pressure / poor circulation</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Lung problems / asthma</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Liver / gallbladder</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Cancer</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Stomach or intestines</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Kidney / bladder</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Significant injuries</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Skeleton / fractures / arthritis / osteoporosis</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Reproductive system / hormonal problems</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Psychological illness / developmental disorders</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Thyroid disease / diabetes</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Neurological / headaches</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Hospitalizations or surgeries</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Other significant illness / chronic disease</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Endometriosis / fibroid uterus</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Fibrocystic breast condition</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Osteoporosis</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Alzheimer's disease</td><td>☐</td><td>☐</td></tr>
+        <tr><td>Early menopause</td><td>☐</td><td>☐</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="body">Each checked item reveals a short text field for elaboration.</p>
+</div>
+
+<!-- ═══════════════════ ADULT MALE ═══════════════════ -->
+<div id="adult-m" class="panel">
+
+  <div class="section-head">Routing Into This Profile</div>
+  <div class="tree">
+    <div class="tree-node"><div class="q">1</div><div class="tree-body"><strong>Sex at birth = Male</strong> (routed here from Health Profile step 1)</div></div>
+    <div class="tree-node"><div class="q">2</div><div class="tree-body"><strong>Gender identification?</strong><div class="route">Male / Female / Non-binary / [text] — sets pronouns app-wide</div></div></div>
+    <div class="tree-node"><div class="q branch">3</div><div class="tree-body"><strong>Fertility / reproductive concerns?</strong> Yes / No<div class="route"><span class="yes">Yes</span><span class="arrow">→</span> show fertility fields · <span class="no">No</span><span class="arrow">→</span> skip</div></div></div>
+  </div>
+
+  <div class="section-head">Core Health Profile Fields</div>
+  <div class="subsection">Identity &amp; Basics</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Date of birth</td><td>Date</td><td><span class="badge badge-req">REQUIRED</span></td><td></td></tr>
+        <tr><td>Sex at birth</td><td>Select</td><td><span class="badge badge-req">REQUIRED</span></td><td>Pre-selected from routing; confirm</td></tr>
+        <tr><td>Gender identification</td><td>Select + text</td><td><span class="badge badge-req">REQUIRED</span></td><td>Sets pronouns app-wide</td></tr>
+        <tr><td>Age at puberty</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Context for developmental timeline</td></tr>
+        <tr><td>Age stopped growing</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Reproductive (shown if fertility concern = Yes)</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Has children?</td><td>Yes / No → how many, ages</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Fertility problems?</td><td>Yes / No → male or female factor</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Contraceptive method</td><td>Select + text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Monthly self-examination of testicles?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Current Medications &amp; Supplements</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Medications (Rx and OTC)</td><td>Repeating: name + reason</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Supplements</td><td>Repeating: name + reason</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Taking Genesis Gold?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>If yes: how long? How has it helped?</td><td>Text</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Known allergies</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Lifestyle</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Wake time / sleep time</td><td>Time × 2</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Average nightly sleep (hours)</td><td>Number</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Exercise: type, duration, frequency</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Diet / daily food intake</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Work schedule / stress level</td><td>Text + 1–10 scale</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Supportive partner / family / friends</td><td>Yes / No × 3</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Symptom Checklist — Male Hormonal</div>
+  <ul class="symptom-grid">
+    <li>Hot flashes</li><li>Night sweats</li>
+    <li>Mood swings</li><li>Irritability</li>
+    <li>Depression</li><li>Rage</li>
+    <li>Mental fogginess</li><li>Forgetfulness</li>
+    <li>Clamminess</li><li>Change in body fat patterns</li>
+    <li>Muscle weakness</li><li>Fatigue — general</li>
+    <li>Lower exercise tolerance</li><li>Increased susceptibility to illness</li>
+    <li>Decreased stress tolerance</li><li>Insomnia</li>
+    <li>Diminished sex drive</li><li>Decrease in morning erections</li>
+    <li>Reduced erectile firmness</li>
+  </ul>
+
+  <div class="subsection">Family &amp; Personal Medical History</div>
+  <p class="body">Same two-column (self / family) checklist as Adult Female. Conditions list is identical. Each checked item reveals a short text field.</p>
+  <div class="note">The male profile omits reproductive-system-specific female conditions (endometriosis, fibrocystic breast, early menopause) from the history checklist.</div>
+</div>
+
+<!-- ═══════════════════ ADOLESCENT ═══════════════════ -->
+<div id="adolescent" class="panel">
+
+  <div class="section-head">Who Fills This Form</div>
+  <p class="body">Adolescents aged 13–17 who create their own account, or a dependent profile created by an adult for a teenager. The form is labeled as confidential and age-appropriate. Stars can be placed by anything the teen is concerned about.</p>
+  <div class="note red"><strong>Legal note:</strong> Terms of service acknowledge under-18 use. No hard parental consent gate, but T&amp;C language should state that users under 18 are aware their parent/guardian may be informed in certain circumstances (to be drafted by legal counsel).</div>
+
+  <div class="section-head">Profile Fields</div>
+
+  <div class="subsection">Household Context</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Date of birth</td><td>Date</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Sex at birth</td><td>Select</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Gender identification</td><td>Select + text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Parent / guardian names</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Siblings (names &amp; ages)</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Adults in home &amp; relationship</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Pets in home</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Medications, Supplements &amp; Allergies</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Medications (Rx)</td><td>Repeating: name</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Vitamins</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Natural supplements</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Allergies</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Sleep &amp; Nutrition</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Bedtime / fall asleep / wake time</td><td>Time × 3</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Breakfast / lunch / dinner / snacks</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Daily fluid intake (oz): water / milk / juice / soda / coffee-tea / alcohol</td><td>Number × 6</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Development &amp; Activity</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Age at puberty onset</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>First period (females)</td><td>Date</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Last period (females)</td><td>Date</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Concerns about development?</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Sports / extracurricular activities</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>School performance / GPA</td><td>Text / Number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Social &amp; Safety</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Trustworthy friends?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Trusted adults in life?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Concerned about recreational drugs?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Exposed to tobacco smoke?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Exercises / takes PE?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Concerned about weight?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Accidents (broken bones, sutures)?</td><td>Yes / No → text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Always wears seatbelt?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Rides with intoxicated drivers?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Wears bicycle helmet?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Drives? Drinks and drives?</td><td>Yes / No → Yes / No</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+        <tr><td>Concerns about sexuality or sexual activity?</td><td>Yes / No → text (confidential)</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>If sexually active: uses contraception?</td><td>Yes / No</td><td><span class="badge badge-cond">CONDITIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Family Medical History</div>
+  <p class="body">Same checklist as adult forms (heart, lung, thyroid/diabetes, liver, stomach, kidney, neurological, injuries, hospitalizations, skeleton, reproductive, cancer, other, psychological). Each checked item reveals text field.</p>
+</div>
+
+<!-- ═══════════════════ PEDIATRIC ═══════════════════ -->
+<div id="pediatric" class="panel">
+
+  <div class="section-head">Who Fills This Form</div>
+  <p class="body">Children under 13. Always a dependent profile created and managed by an adult account holder (parent or guardian). The parent fills the form on behalf of the child.</p>
+
+  <div class="section-head">Profile Fields</div>
+
+  <div class="subsection">Child Identity &amp; Household</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Child's date of birth</td><td>Date</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Parent / guardian names</td><td>Text</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Siblings (names &amp; ages)</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Adults in home &amp; relationship</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Pets in home</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Birth &amp; Developmental History</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Birth weight</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Problems in pregnancy or at birth</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Breast or bottle fed? Age weaned</td><td>Select + number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Age same-sex parent reached puberty</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Age same-sex parent reached adult height</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Developmental milestones: crawled / walked / spoke / potty trained / slept through night</td><td>Age (number) × 5</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>List of accidents by date</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Significant illnesses</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Sleep &amp; Nutrition</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Bedtime / wake time</td><td>Time × 2</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Sleep quality</td><td>Good / Poor</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Appetite</td><td>Good / Poor</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Breakfast / lunch / dinner / snack</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Daily fluid intake (oz): water / milk / juice / soda / other</td><td>Number × 5</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Recent weight loss or gain</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Medications &amp; Allergies</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Medications (Rx, OTC, herbs, supplements)</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Allergies</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">School, Activity &amp; Safety</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>How is child doing in school?</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Extracurricular activities?</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Peer relationships</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Family relationships</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Exposed to tobacco smoke?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Always wears seatbelt?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Always wears helmet (bike / skate / scooter)?</td><td>Yes / No</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+        <tr><td>Safety concerns at home / school / other</td><td>Yes / No × 3 → text</td><td><span class="badge badge-opt">OPTIONAL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Recent Exams</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Exam</th><th>Any problems?</th><th>Date of last exam</th></tr></thead>
+      <tbody>
+        <tr><td>Vision</td><td>Yes / No</td><td>Date</td></tr>
+        <tr><td>Hearing</td><td>Yes / No</td><td>Date</td></tr>
+        <tr><td>Dental</td><td>Yes / No</td><td>Date</td></tr>
+        <tr><td>Immunizations up to date?</td><td colspan="2">Yes / No → list immunizations needed</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsection">Family Medical History</div>
+  <p class="body">Same two-column checklist as adult forms. Parent checks for child and family history.</p>
+</div>
+
+<!-- ═══════════════════ DEPENDENT & PROXY USERS (NEW v1.1) ═══════════════════ -->
+<div id="dependent" class="panel">
+
+  <div class="note pink" style="margin-bottom:20px;"><strong>New in v1.1 — October 2026.</strong> This section was added following the Tkxel sprint meeting in which the dependent-user flow was flagged as a critical design decision. It documents the four-pathway intake flag, pathway-specific response modes, and escalation logic for proxy/dependent sessions.</div>
+
+  <div class="section-head pink">Why This Matters</div>
+  <p class="body">Many users will ask the Oracle not about themselves but about a family member — their child, an aging parent, a partner. Each proxy scenario requires a different response mode, a different set of clinical assumptions, and different escalation thresholds. Getting this wrong could mean giving adult-calibrated advice for a pediatric case, or missing a same-day-care emergency in an elderly patient with a lowered fever response.</p>
+
+  <div class="section-head pink">The Intake Flag Question</div>
+  <p class="body">Displayed at the start of every new session (after health profile, before consult context). The selected pathway is stored on the session object and governs all response logic for that conversation.</p>
+
+  <div class="flow">
+<span class="branch" style="font-size:1rem;font-weight:600;">Who are you asking about today?</span>
+<span class="arrow">↓</span>
+<span class="label">[ A ]  Myself</span>
+<span class="arrow">→</span>  <span class="step">Self pathway — standard response mode</span>
+
+<span class="label">[ B ]  My child</span>
+<span class="arrow">→</span>  <span class="step">Pediatric proxy pathway — parent fills all fields; all recommendations go to parent; age-appropriate language throughout</span>
+
+<span class="label">[ C ]  My elderly parent or family member</span>
+<span class="arrow">→</span>  <span class="step">Elderly proxy pathway — adult child or caregiver as reporter; lower escalation threshold; dementia/cognitive changes tracked as red flags</span>
+
+<span class="label">[ D ]  My partner or another adult</span>
+<span class="arrow">→</span>  <span class="step">Partner/general pathway — general health information only; no direct recommendations; explicit disclaimer that Oracle cannot assess third parties</span>
+  </div>
+
+  <div class="section-head pink">Pathway Details</div>
+
+  <div class="pathway-grid">
+    <div class="pathway-card">
+      <div class="pc-label self">Pathway A — Self</div>
+      <h4>Standard</h4>
+      <p>Default mode. Intake data comes from the user's own health profile. Oracle addresses user directly in second person ("you," their pronoun). All recommendation tiers available.</p>
+      <ul>
+        <li>Full symptom checklist active</li>
+        <li>Personalized lab recommendations</li>
+        <li>Direct lifestyle guidance</li>
+        <li>Escalation thresholds: adult standard</li>
+      </ul>
+    </div>
+    <div class="pathway-card">
+      <div class="pc-label ped">Pathway B — Pediatric Proxy</div>
+      <h4>Parent asking for child</h4>
+      <p>All responses directed to parent. Oracle addresses child in third person ("your son," "your daughter," "your child"). Pediatric health profile must be on the account.</p>
+      <ul>
+        <li>Age-appropriate clinical context enforced</li>
+        <li>Developmental norms applied automatically</li>
+        <li>No direct advice to the child</li>
+        <li>Escalation: lower threshold — children deteriorate faster</li>
+        <li>Red flags: growth delays, behavioral changes, sleep regression</li>
+      </ul>
+    </div>
+    <div class="pathway-card">
+      <div class="pc-label elder">Pathway C — Elderly Proxy</div>
+      <h4>Adult child / caregiver asking for aging parent</h4>
+      <p>Reporter is a proxy (adult child, caregiver). Oracle recognizes that all symptom reports are second-hand. Elderly patients may not accurately report or may under-report symptoms.</p>
+      <ul>
+        <li>Lowest escalation threshold of all pathways</li>
+        <li>Any acute change + confusion = sepsis screen</li>
+        <li>New incontinence in elderly = UTI until proven otherwise</li>
+        <li>Worsening dementia over days = red flag, not progression</li>
+        <li>Responses coach the proxy on what to watch, ask, and document</li>
+        <li>Oracle explicitly notes limitations of proxy reporting</li>
+      </ul>
+    </div>
+    <div class="pathway-card">
+      <div class="pc-label partner">Pathway D — Partner / Other Adult</div>
+      <h4>General information only</h4>
+      <p>Oracle cannot assess a third-party adult who has not consented to the service. Responses are general health information only — no personalized recommendations.</p>
+      <ul>
+        <li>No profile loaded for the third party</li>
+        <li>Oracle says: "I can share general information, but your partner would need their own account for personalized guidance"</li>
+        <li>Escalation: user is prompted to encourage the other person to seek care directly</li>
+        <li>No recommendations that could be acted on as if from a clinician</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-head pink">Escalation Logic by Pathway</div>
+  <p class="body">Escalation thresholds differ significantly by pathway. The table below shows how the same symptom cluster would be handled differently depending on who is being described.</p>
+
+  <div class="subsection">Escalation bands</div>
+  <div class="esc-band green"><div class="dot"></div><strong>Self-manage:</strong> lifestyle and supplement guidance; no urgency signal</div>
+  <div class="esc-band gold"><div class="dot"></div><strong>Schedule an appointment:</strong> recommend provider visit within 1–2 weeks</div>
+  <div class="esc-band orange"><div class="dot"></div><strong>See someone soon:</strong> recommend provider within 24–48 hours; may flag labs to order first</div>
+  <div class="esc-band red" style="margin-bottom:16px;"><div class="dot"></div><strong>Seek care today / call 911:</strong> same-day care trigger; in severe cases: emergency services</div>
+
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Symptom Pattern</th><th>Self (A)</th><th>Child (B)</th><th>Elderly (C)</th><th>Partner (D)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Fatigue + brain fog, no other red flags</td>
+          <td><span style="color:var(--green);font-weight:600;">Self-manage</span></td>
+          <td><span style="color:#e07b00;font-weight:600;">Schedule soon</span></td>
+          <td><span style="color:#e07b00;font-weight:600;">See provider 24–48h</span></td>
+          <td>General info only</td>
+        </tr>
+        <tr>
+          <td>New urinary incontinence (acute onset)</td>
+          <td><span style="color:var(--gold);font-weight:600;">Schedule appt</span></td>
+          <td><span style="color:#e07b00;font-weight:600;">See provider today</span></td>
+          <td><span style="color:var(--red);font-weight:600;">Seek care today — UTI/sepsis screen</span></td>
+          <td>General info only</td>
+        </tr>
+        <tr>
+          <td>Acute confusion + fever</td>
+          <td><span style="color:#e07b00;font-weight:600;">See provider today</span></td>
+          <td><span style="color:var(--red);font-weight:600;">ER or urgent care now</span></td>
+          <td><span style="color:var(--red);font-weight:600;">Call 911 / ER now</span></td>
+          <td>Encourage ER immediately</td>
+        </tr>
+        <tr>
+          <td>Worsening cognitive symptoms over days</td>
+          <td><span style="color:var(--gold);font-weight:600;">Schedule appt</span></td>
+          <td><span style="color:#e07b00;font-weight:600;">Pediatric neurology referral</span></td>
+          <td><span style="color:var(--red);font-weight:600;">Seek care today — rule out UTI, stroke, medication</span></td>
+          <td>General info only</td>
+        </tr>
+        <tr>
+          <td>Irregular periods + mood changes</td>
+          <td><span style="color:var(--green);font-weight:600;">Self-manage + lab work</span></td>
+          <td><span style="color:#e07b00;font-weight:600;">Pediatric endo referral</span></td>
+          <td>N/A — post-menopausal</td>
+          <td>General info only</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note red"><strong>Elderly UTI / Sepsis Protocol (Pathway C):</strong> In elderly patients — especially women — a urinary tract infection may present without classic symptoms (dysuria, burning). New or worsening confusion, increased falls, acute incontinence, or a subtle change in baseline behavior may be the <em>only</em> presentation. The Oracle must trigger a same-day care recommendation any time a Pathway C (elderly proxy) session includes: new incontinence, acute-onset confusion, behavioral change over 24–72 hours, or reports of "just not herself." These presentations can progress to urosepsis within hours. The Oracle explicitly names this risk to the caregiver and coaches them on what to tell the triage nurse.</div>
+
+  <div class="section-head pink">Proxy Profile Requirements</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Pathway</th><th>Profile needed?</th><th>Who fills it?</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>A — Self</td>
+          <td>Yes — own health profile</td>
+          <td>User</td>
+          <td>Standard flow</td>
+        </tr>
+        <tr>
+          <td>B — Child proxy</td>
+          <td>Yes — dependent pediatric profile on account</td>
+          <td>Parent / guardian</td>
+          <td>System must offer "add a child's profile" if none exists when this pathway is selected</td>
+        </tr>
+        <tr>
+          <td>C — Elderly proxy</td>
+          <td>Optional — can proceed with minimal info</td>
+          <td>Adult child / caregiver</td>
+          <td>Oracle can ask key questions conversationally: age, current medications, baseline cognitive status, known conditions. Full health profile not required to trigger escalation logic — escalation happens based on symptom reports alone.</td>
+        </tr>
+        <tr>
+          <td>D — Partner / adult</td>
+          <td>No — third-party adults cannot be profiled</td>
+          <td>N/A</td>
+          <td>Oracle operates from general information only. Encourage third party to create their own account.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head pink">Session Header / UI Flag</div>
+  <p class="body">When a proxy pathway is active, the chat interface should display a persistent banner or session label so the Oracle and the user both know the context throughout the conversation.</p>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Pathway</th><th>UI Label (suggested)</th><th>Banner color</th></tr></thead>
+      <tbody>
+        <tr><td>A — Self</td><td>(no banner — default)</td><td>—</td></tr>
+        <tr><td>B — Child</td><td>Asking about: [child's name], age [X]</td><td>Green</td></tr>
+        <tr><td>C — Elderly parent</td><td>Asking about: [parent's name] · Proxy session</td><td>Gold</td></tr>
+        <tr><td>D — Partner / adult</td><td>General information mode — not a personalized consultation</td><td>Grey</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head pink">Oracle Response Tone by Pathway</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Pathway</th><th>Voice / Tone</th><th>Example opening</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>A — Self</td>
+          <td>Direct, second person. Clinical warmth. Empowering.</td>
+          <td>"What you're describing sounds like classic perimenopause…"</td>
+        </tr>
+        <tr>
+          <td>B — Child proxy</td>
+          <td>Warm, parent-to-parent. Reassuring but precise. Third person for child.</td>
+          <td>"Thank you for bringing this up. At eight years old, the symptoms you're describing in your son…"</td>
+        </tr>
+        <tr>
+          <td>C — Elderly proxy</td>
+          <td>Calm, direct, coaching. Explicit about limitations of second-hand reporting. Actionable immediately.</td>
+          <td>"I want to be straightforward with you — in someone your mother's age, new incontinence combined with increased confusion needs to be evaluated today, not tomorrow…"</td>
+        </tr>
+        <tr>
+          <td>D — Partner / adult</td>
+          <td>Informational, non-clinical. Clear disclaimer. Redirects to self-care.</td>
+          <td>"I can share some general information about what might be behind those symptoms, but for anything personalized, your partner would need their own account…"</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note purple"><strong>Implementation note for Tkxel:</strong> The pathway flag (A/B/C/D) must be passed as a system-level context variable to the LangGraph agent at the start of every session — not inferred from conversation. It determines which escalation logic tree the agent runs, which response tone profile is loaded, and whether a dependent profile is looked up from the account. Do not allow the agent to override or reinterpret the pathway flag mid-session.</div>
+
+</div>
+
+<!-- ═══════════════════ GENDER & SEX VARIATIONS (v1.2) ═══════════════════ -->
+<div id="gender-sex" class="panel">
+
+  <div class="section-head pink">Approach <span class="badge badge-new">NEW v1.2</span></div>
+  <p class="body">There is no separate intake for intersex or transgender clients. Everyone answers the same short, inclusive core questions, and follow-up questions appear only when they apply. This keeps intake short, avoids gatekeeping anyone into a separate clinical pathway, and gives the agent accurate context for hormone guidance. The AI then gathers deeper history conversationally, as it does for all clients.</p>
+  <div class="note pink"><strong>Replaces:</strong> the "Sex at birth" and "Gender identification" fields on the Adult Female, Adult Male and Adolescent forms. Use the expanded wording and options below on every form.</div>
+
+  <div class="section-head">Core Questions — Every Adult Profile</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Question wording</th><th>Options</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Gender identity</td><td>"How do you describe your gender?"</td><td>Woman · Man · Non-binary · Agender · Not listed (write in) · Prefer not to say</td><td><span class="badge badge-req">REQUIRED</span><br><span style="font-size:0.8em">"Prefer not to say" counts as an answer</span></td></tr>
+        <tr><td>Pronouns</td><td>"What pronouns should I use for you?"</td><td>she/her · he/him · they/them · Write in</td><td><span class="badge badge-req">REQUIRED</span><br><span style="font-size:0.8em">Editable anytime</span></td></tr>
+        <tr><td>Sex assigned at birth</td><td>"What sex were you assigned at birth?"</td><td>Female · Male · Intersex · Prefer not to say</td><td><span class="badge badge-req">REQUIRED</span></td></tr>
+        <tr><td>Organ inventory</td><td>"Which of these do you currently have? Choose all that apply." Helper text: "This helps me give hormone guidance that fits your body."</td><td>Uterus · Cervix · Ovaries · Testes · Prostate · Breast tissue · None of these · Prefer not to say</td><td><span class="badge badge-opt">OPTIONAL</span><br><span style="font-size:0.8em">Strongly encouraged</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note purple"><strong>Why organ inventory for everyone:</strong> hormone guidance depends on anatomy, not on gender identity or sex at birth alone. It also helps clients who have had a hysterectomy, oophorectomy or prostatectomy, so it is useful well beyond trans and intersex clients.</div>
+
+  <div class="section-head">Conditional Follow-ups</div>
+  <div class="tree">
+    <div class="tree-node"><div class="q branch">A</div><div class="tree-body"><strong>Intersex detail</strong> <span class="badge badge-cond">CONDITIONAL</span><br>Shown when sex assigned at birth = Intersex.<br>"If you know the name of your variation, you can add it here." (free text, optional)<div class="route">Do not show the long list of medical variations. The agent asks conversationally when relevant.</div></div></div>
+    <div class="tree-node"><div class="q branch">B</div><div class="tree-body"><strong>Hormone history</strong> <span class="badge badge-cond">CONDITIONAL</span><br>Shown when gender identity differs from sex assigned at birth, when sex at birth = Intersex, or when gender identity = Non-binary, Agender or Not listed.<br>"Are you taking, or have you ever taken, gender-affirming hormones?" Currently · In the past · Never · Prefer not to say<br>If currently or in the past: which ones (testosterone · estrogen · progesterone · anti-androgen, e.g. spironolactone · puberty blockers · other), and "Is a healthcare provider overseeing this?" Yes · No<div class="route">Essential for safe guidance on progesterone, testosterone and Gen-Pro.</div></div></div>
+    <div class="tree-node"><div class="q branch">C</div><div class="tree-body"><strong>Surgical history</strong> <span class="badge badge-opt">OPTIONAL</span><br>Same trigger as B.<br>"Have you had any gender-affirming or intersex-related surgeries?" Yes · No · Prefer not to say<br>If yes: chest surgery · hysterectomy · removal of ovaries or testes · vaginoplasty · phalloplasty or metoidioplasty · other (write in)</div></div>
+  </div>
+
+  <div class="section-head">Branching Rules for the Existing Forms</div>
+  <ul class="plain">
+    <li><strong>Route clinical question sets by anatomy:</strong> organ inventory + sex at birth + reproductive status decide which questions appear. Uterus or ovaries present → menstrual and reproductive questions (with N/A options). Prostate or testes present → male reproductive questions. Intersex or mixed anatomy → show each relevant set.</li>
+    <li><strong>Never route by gender identity alone.</strong> A trans man may still have periods; a trans woman may still need prostate questions.</li>
+    <li><strong>Language:</strong> the agent always uses the client's gender identity and pronouns, and uses neutral anatomical terms ("your uterus," "your prostate") rather than gendered ones.</li>
+    <li><strong>Provider-ready notes:</strong> include gender identity, pronouns, sex assigned at birth, organ inventory and current hormones, so the provider has accurate context. The client can choose which of these appear before downloading.</li>
+    <li><strong>"Prefer not to say"</strong> is always available and never blocks the client from continuing.</li>
+  </ul>
+
+  <div class="section-head">Adolescents (13–17)</div>
+  <ul class="plain">
+    <li>Same core questions: gender identity, pronouns, sex assigned at birth. Organ inventory and hormone history are optional.</li>
+    <li>Hormone history for teens asks about puberty blockers or hormones and whether a provider is overseeing them.</li>
+    <li>Intersex question uses simpler wording: "Some people are born with bodies that are a little different from typical male or female bodies. This is called being intersex. Are you intersex?" Yes · No · I'm not sure · I don't understand the question</li>
+  </ul>
+  <div class="note red"><strong>Not in teen intake:</strong> sexual activity, contraception and fertility preservation questions. A parent or advocate may manage the teen's profile, so confidentiality cannot be guaranteed. These topics belong with the teen's provider.<br><br><strong>Legal review required:</strong> laws on gender-affirming care for minors vary by state and country across the launch markets (US, UK, Canada, Australia). Mark the agent's scope for teen hormone questions as <em>legal/pending</em> in the Agent Intent Matrix until the attorney confirms.</div>
+
+  <div class="section-head">Pediatric (Under 13)</div>
+  <p class="body">No change beyond adding Intersex to the sex-at-birth options. The parent can share anything else about the child's body or development in conversation.</p>
+
+  <div class="section-head">Privacy</div>
+  <ul class="plain">
+    <li>Gender identity, pronouns, sex assigned at birth, organ inventory, and hormone and surgical history are highly sensitive data.</li>
+    <li>Never send these fields to analytics, ad pixels, Shopify or any third party. Encrypt at rest and in transit.</li>
+    <li>Admin dashboards show these only in aggregate, never tied to an identifiable client.</li>
+    <li>Clients can edit or delete these answers at any time.</li>
+    <li>Attorney to confirm treatment under state consumer health data laws (e.g., Washington's My Health My Data Act), UK GDPR special category data, PIPEDA and the Australia Privacy Act.</li>
+  </ul>
+
+  <div class="note"><strong>Source note:</strong> question wording is adapted from published inclusive-intake guidance Deborah collected. The full list of intersex variations was intentionally left out of intake; it includes PCOS, which would confuse clients with PCOS who are not intersex.</div>
+
+</div>
+
+<!-- ═══════════════════ CONSULT CONTEXT ═══════════════════ -->
+<div id="consult" class="panel">
+
+  <div class="section-head">Purpose</div>
+  <p class="body">The Consult Context is collected at the start of each new conversation with the Oracle — it provides the session-specific chief complaint and any new information not already in the health profile. It is short, focused, and does not repeat fields already in the profile.</p>
+  <div class="note green"><strong>Display pattern:</strong> Show the client a read-only summary of their saved health profile (medications, known conditions, last update date) before asking the consult questions. Let them confirm or flag anything that has changed. This replaces re-entering the same data.</div>
+
+  <div class="section-head">Consult Fields</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Field</th><th>Type</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Main health concern today</td><td>Text (narrative OK)</td><td><span class="badge badge-req">REQUIRED</span></td><td>This is the chief complaint. Free text — the bot handles narrative.</td></tr>
+        <tr><td>Other health issues to mention</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td><td></td></tr>
+        <tr><td>One health goal for this year</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>From the original consult form — powerful for longitudinal context</td></tr>
+        <tr><td>Why haven't you achieved this yet?</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Self-reflection field — rich context for the bot</td></tr>
+        <tr><td>How many providers have you consulted for this problem?</td><td>Number</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Signals medical complexity and prior care</td></tr>
+        <tr><td>New medications since last visit?</td><td>Yes / No → list</td><td><span class="badge badge-cond">CONDITIONAL</span></td><td>Only asks if returning user; profile auto-loads existing meds</td></tr>
+        <tr><td>Anything else to share?</td><td>Text</td><td><span class="badge badge-opt">OPTIONAL</span></td><td>Catch-all; often where the most important thing surfaces</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Printable Advocacy Summary</div>
+  <p class="body">After each session, the app generates a printable summary for the client to bring to their own healthcare provider. This was confirmed as a core feature in Session 1.</p>
+  <ul class="plain">
+    <li><strong>Contents:</strong> chief complaint, relevant history, the Oracle's recommended lab tests with insurance coding rationale, lifestyle interventions, and any emergency protocol flags</li>
+    <li><strong>Tone:</strong> professional, provider-facing — uses clinical language matching Deborah's lab coat persona</li>
+    <li><strong>Format:</strong> PDF generation from session output (not the intake form itself)</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════ TECH NOTES ═══════════════════ -->
+<div id="tech" class="panel">
+
+  <div class="section-head">Knowledge Base Ingestion Pipeline</div>
+  <ul class="plain">
+    <li><strong>Books (PDF):</strong> Hypothalamus Handbook, Hormones in Harmony, Menopause Action Plan — static upload to RAG store. Ask Tayyab about graphics extraction from PDFs (clinical diagrams carry diagnostic meaning).</li>
+    <li><strong>Courses (PDF with embedded graphics):</strong> Same as books. Confirm whether the vector store indexes surrounding text only, or whether images are also processed (OCR / multimodal).</li>
+    <li><strong>Website:</strong> Full crawl of deborahmaragopoulos.com and genesishealth.com. All YouTube content is already transcribed as blog posts — crawl captures both.</li>
+    <li><strong>Live article doc:</strong> Deborah authors new articles continuously (40+ ahead of publish queue as of Oct 2026). <strong>This cannot be a one-time Dropbox upload.</strong> Needs Google Drive sync or webhook for ongoing ingestion. Raise with Tayyab for architecture decision.</li>
+    <li><strong>Q&amp;A corpus:</strong> Gaby's transcripts of live Q&amp;A sessions. Requires de-identification pass (remove participant names — "Emma asks…" → "A member asks…") before ingestion. Deborah will run this through Claude before sending to Tkxel.</li>
+  </ul>
+
+  <div class="section-head">Decision Tree Implementation Notes</div>
+  <ul class="plain">
+    <li><strong>Profile routing:</strong> sex at birth + gender identification + reproductive status together determine which question sets appear. These three fields should be collected early in the health profile flow before branching.</li>
+    <li><strong>No repeated fields:</strong> medications, supplements, and known conditions entered in the health profile must pre-populate the consult context screen as a reviewable summary — never ask for re-entry.</li>
+    <li><strong>Pronoun logic:</strong> gender identification field maps to pronouns (Female → she/her, Male → he/him, Non-binary / other → they/them). Pronouns used throughout app UI and in generated summaries.</li>
+    <li><strong>Menstruation branching:</strong> do not suppress menstrual questions based on gender ID alone when sex at birth is female. Trans men may still have periods. Use sex at birth + reproductive status together for the branch decision.</li>
+    <li><strong>Age-gated content:</strong> adolescent and pediatric profiles receive age-appropriate language. Emergency protocol language, drug interaction warnings, and certain clinical recommendations may differ.</li>
+    <li><strong>Proxy pathway flag:</strong> the A/B/C/D pathway selection (see Dependent &amp; Proxy tab) must be passed as a context variable to LangGraph at session start. It is not inferred — it is explicit. The agent's escalation tree, response tone, and profile loading behavior all branch from this flag.</li>
+  </ul>
+
+  <div class="section-head">Accounts Required</div>
+  <div class="field-table-wrap">
+    <table class="fields">
+      <thead><tr><th>Account</th><th>Purpose</th><th>Owner</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>GitHub</td><td>Source code repository under Genesis Health</td><td>Genesis Health</td><td><span class="badge badge-cond">Setup with Tayyab</span></td></tr>
+        <tr><td>Azure</td><td>HIPAA-eligible cloud hosting</td><td>Genesis Health</td><td><span class="badge badge-cond">Setup with Tayyab</span></td></tr>
+        <tr><td>Anthropic API</td><td>Production AI engine (claude-sonnet-4-20250514)</td><td>Genesis Health</td><td><span class="badge badge-cond">Setup with Tayyab</span></td></tr>
+        <tr><td>Stripe</td><td>App subscription payments</td><td>Genesis Health</td><td><span class="badge badge-sys">Existing account</span></td></tr>
+        <tr><td>Shopify</td><td>Nutraceutical sales / in-app product links</td><td>Genesis Health</td><td><span class="badge badge-sys">Existing account</span></td></tr>
+        <tr><td>OpenAI API</td><td>Tkxel internal dev tooling only — NOT production</td><td>Tkxel</td><td><span class="badge badge-sys">Tkxel's cost (confirmed)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Compliance</div>
+  <ul class="plain">
+    <li><strong>HIPAA:</strong> Azure HIPAA-eligible infrastructure; BAA in place with Tkxel</li>
+    <li><strong>CCPA / CPRA:</strong> California privacy compliance required</li>
+    <li><strong>GDPR:</strong> International users expected</li>
+    <li><strong>Under-13 data:</strong> No direct account creation for under-13. Data collected under dependent profiles managed by adult account holder. COPPA implications should be reviewed by legal counsel.</li>
+    <li><strong>Proxy sessions:</strong> When a user submits health information about a third party (especially a minor or an elderly dependent), the data handling and consent framework must account for the fact that the data subject and the account holder are different people. Legal review recommended before launch.</li>
+  </ul>
+
+  <div class="note purple"><strong>For Tayyab:</strong> The live article doc (Google Drive) needs an ingestion pipeline decision before the knowledge base architecture is finalized. This is a moving target — static Dropbox upload is not sufficient. Also confirm: how does LangGraph receive and persist the pathway flag (A/B/C/D) across a multi-turn session?</div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+</script>
+
+</body></html>

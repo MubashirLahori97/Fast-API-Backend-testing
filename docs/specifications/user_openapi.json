@@ -1,0 +1,3644 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Genesis Health API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signup/check": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Check Sign Up Details",
+        "description": "Story 1.1, after step 2: checks the date of birth and state, and stops anyone\nunder the age of majority before they give an email or password. Saves nothing.",
+        "operationId": "check_sign_up_details_api_v1_auth_signup_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpCheck"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signup": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign Up",
+        "description": "Story 1.1. Emails a code to verify the address. The account is created when the code\nis verified (POST /auth/verify).",
+        "operationId": "sign_up_api_v1_auth_signup_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRequired"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signin": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign In",
+        "description": "Story 1.2. Signs in directly on a trusted device; otherwise emails a code.",
+        "operationId": "sign_in_api_v1_auth_signin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SignedIn"
+                    },
+                    {
+                      "$ref": "#/components/schemas/VerificationRequired"
+                    }
+                  ],
+                  "title": "Response Sign In Api V1 Auth Signin Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify",
+        "description": "Checks the emailed code (after sign-up or sign-in) and signs the client in. A\nsign-up's code creates the account.",
+        "operationId": "verify_api_v1_auth_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedIn"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/verify/resend": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Resend Code",
+        "operationId": "resend_code_api_v1_auth_verify_resend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendCodeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerificationRequired"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/signout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign Out",
+        "description": "Story 1.4. Signs out this device only. Send the device_token too, so the device is\nforgotten even if the session already timed out. Always answers 204.",
+        "operationId": "sign_out_api_v1_auth_signout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/SignOutRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/password/forgot": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Forgot Password",
+        "description": "Story 1.3. Same answer whether or not the email is registered.",
+        "operationId": "forgot_password_api_v1_auth_password_forgot_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/password/reset/check": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Check Reset Link",
+        "description": "Lets the app show an expired or used link before the client types a new password.",
+        "operationId": "check_reset_link_api_v1_auth_password_reset_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/password/reset": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Reset Password",
+        "operationId": "reset_password_api_v1_auth_password_reset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/policies/current": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Current Policies",
+        "description": "The policies a new client accepts at sign-up. No sign-in needed.",
+        "operationId": "current_policies_api_v1_policies_current_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PolicyOut"
+                  },
+                  "type": "array",
+                  "title": "Response Current Policies Api V1 Policies Current Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Me",
+        "operationId": "me_api_v1_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/entitlements": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Get Entitlements",
+        "description": "What the plan allows: the app uses it for the trial banner and the Add Family Member\nupgrade prompt (stories 4.1, 9.1, 10.1).",
+        "operationId": "get_entitlements_api_v1_me_entitlements_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntitlementsOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/next-step": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Next Step",
+        "description": "Story 1.2: the first screen to show after sign-in.",
+        "operationId": "next_step_api_v1_me_next_step_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NextStepOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/pending-consents": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Pending Consents",
+        "description": "Story 13.2: updated policies the client still has to accept.",
+        "operationId": "pending_consents_api_v1_me_pending_consents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PolicyOut"
+                  },
+                  "type": "array",
+                  "title": "Response Pending Consents Api V1 Me Pending Consents Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/policy-acceptances": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Accept Policies",
+        "operationId": "accept_policies_api_v1_me_policy_acceptances_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PolicyAcceptanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/me/password": {
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "Change Password",
+        "description": "Story 12.2. Keeps this device signed in and signs out every other device.",
+        "operationId": "change_password_api_v1_me_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/profiles": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "List Profiles",
+        "description": "Story 4.2's profile panel: the profiles this account can switch to, its own first.\nTurned-off family members are left out; a member whose deletion was requested is listed\nwith that status until it's done.",
+        "operationId": "list_profiles_api_v1_profiles_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProfileOut"
+                  },
+                  "type": "array",
+                  "title": "Response List Profiles Api V1 Profiles Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/profiles/family": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Family Overview",
+        "description": "Story 9.2's Manage Family screen: places in use and a card for each family member.",
+        "operationId": "family_overview_api_v1_profiles_family_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyOverview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Start Family Intake",
+        "description": "Story 2.2: \"For a family member\" or Add Family Member. Needs room on the client's plan.\nAnswers 200 with the unfinished family draft if there is one.",
+        "operationId": "start_family_intake_api_v1_profiles_family_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/profiles/self": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Start Self Intake",
+        "description": "Story 2.1, step 1 \"For myself\". Answers 200 with the existing profile if there is one.",
+        "operationId": "start_self_intake_api_v1_profiles_self_post",
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/profiles/{profile_id}": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Get Profile",
+        "description": "A profile's details, for View & edit (story 9.2).",
+        "operationId": "get_profile_api_v1_profiles__profile_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Update Family Member",
+        "description": "Story 9.2 View & edit: first name, relationship, gender identity and pronouns.",
+        "operationId": "update_family_member_api_v1_profiles__profile_id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileEdit"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileUpdated"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Cancel Intake",
+        "description": "Cancels an unfinished intake: no profile is left behind (story 2.2).",
+        "operationId": "cancel_intake_api_v1_profiles__profile_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/turn-off": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Turn Off Family Member",
+        "description": "Story 9.2: the member's information is kept and their place is freed. If they were the\nactive profile, the app switches to `default_profile_id`.",
+        "operationId": "turn_off_family_member_api_v1_profiles__profile_id__turn_off_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyMemberResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/turn-on": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Turn On Family Member",
+        "description": "Story 9.2: needs a free place on the plan (403 family_limit_reached otherwise).",
+        "operationId": "turn_on_family_member_api_v1_profiles__profile_id__turn_on_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyMemberResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/deletion-request": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Request Family Member Deletion",
+        "description": "Story 9.2 Remove: records a deletion request for The Oracle's team to review. The\nmember keeps their place until it's done, but can't be changed or used.",
+        "operationId": "request_family_member_deletion_api_v1_profiles__profile_id__deletion_request_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletionRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyMemberResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/intake": {
+      "get": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Get Intake",
+        "description": "The answers so far and the question to show next.",
+        "operationId": "get_intake_api_v1_profiles__profile_id__intake_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Save Intake",
+        "description": "Saves one step. Earlier steps can be changed until the intake is complete.",
+        "operationId": "save_intake_api_v1_profiles__profile_id__intake_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeAnswers"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/intake/complete": {
+      "post": {
+        "tags": [
+          "profiles"
+        ],
+        "summary": "Complete Intake",
+        "operationId": "complete_intake_api_v1_profiles__profile_id__intake_complete_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IntakeCompleted"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/conversations": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "List Conversations",
+        "description": "Story 3.1: the profile's conversations, most recent first.",
+        "operationId": "list_conversations_api_v1_profiles__profile_id__conversations_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationSummary"
+                  },
+                  "title": "Response List Conversations Api V1 Profiles  Profile Id  Conversations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Start Conversation",
+        "description": "Story 3.1: starts a conversation with the client's first message. Answers 200 with the\nsaved message when it's a resend.",
+        "operationId": "start_conversation_api_v1_profiles__profile_id__conversations_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/conversations/new": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "New Conversation",
+        "description": "Story 3.1: the New Conversation screen's opening question and starter questions.",
+        "operationId": "new_conversation_api_v1_profiles__profile_id__conversations_new_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewConversation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/profiles/{profile_id}/health-consent": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Get Health Consent",
+        "description": "Story 3.1: whether the current Health Consent is accepted for this profile.",
+        "operationId": "get_health_consent_api_v1_profiles__profile_id__health_consent_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthConsentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Accept Health Consent",
+        "description": "Story 3.1 \"Agree and continue\": accepts the current Health Consent for this profile.",
+        "operationId": "accept_health_consent_api_v1_profiles__profile_id__health_consent_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "profile_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Profile Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptHealthConsent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthConsentOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversation_id}": {
+      "get": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Get Conversation",
+        "description": "Story 3.1: a conversation with its full history.",
+        "operationId": "get_conversation_api_v1_conversations__conversation_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Delete Conversation",
+        "description": "Not in the 4 Nov stories (docs/PLAN.md): removes the conversation from the client's\nlists straight away. After that it answers 404, like any unknown conversation.",
+        "operationId": "delete_conversation_api_v1_conversations__conversation_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversation_id}/messages/{message_id}/feedback": {
+      "put": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Give Feedback",
+        "description": "Not in the 4 Nov stories (docs/PLAN.md): a thumbs up or down on one of the Oracle's\nreplies, with an optional comment. Sending it again replaces it.",
+        "operationId": "give_feedback_api_v1_conversations__conversation_id__messages__message_id__feedback_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Message Id"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GiveFeedback"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Remove Feedback",
+        "description": "Takes a thumbs up or down back. Answers 204 whether or not there was one.",
+        "operationId": "remove_feedback_api_v1_conversations__conversation_id__messages__message_id__feedback_delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Message Id"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversation_id}/messages": {
+      "post": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Send Message",
+        "description": "Story 3.1: adds the client's message. Answers 200 with the saved message when it's a\nresend.",
+        "operationId": "send_message_api_v1_conversations__conversation_id__messages_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageSent"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/conversations/{conversation_id}/reply": {
+      "post": {
+        "tags": [
+          "conversations"
+        ],
+        "summary": "Reply",
+        "description": "Story 3.1: streams the Oracle's reply to the last client message as server-sent\nevents: \"delta\" pieces of text and \"widget\" parts, then \"done\" or \"error\". Ask again after\na lost connection.",
+        "operationId": "reply_api_v1_conversations__conversation_id__reply_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Conversation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/event-stream": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcceptHealthConsent": {
+        "properties": {
+          "policy_version_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Version Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "AcceptHealthConsent",
+        "description": "The Health Consent version the client was shown and accepted."
+      },
+      "ChangePasswordRequest": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Current Password",
+            "default": ""
+          },
+          "new_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "New Password",
+            "default": ""
+          },
+          "confirm_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Confirm Password",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ChangePasswordRequest"
+      },
+      "ConversationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_message_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Message At"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MessageOut"
+            },
+            "type": "array",
+            "title": "Messages"
+          },
+          "awaiting_reply": {
+            "type": "boolean",
+            "title": "Awaiting Reply"
+          },
+          "welcome_back": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Welcome Back"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "profile_id",
+          "topic",
+          "created_at",
+          "last_message_at",
+          "messages",
+          "awaiting_reply",
+          "welcome_back"
+        ],
+        "title": "ConversationOut"
+      },
+      "ConversationSummary": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "topic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Topic"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "last_message_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Last Message At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "topic",
+          "created_at",
+          "last_message_at"
+        ],
+        "title": "ConversationSummary",
+        "description": "A row in the conversation list: \"Waking at 3am \u00b7 3 days ago\"."
+      },
+      "DeletionRequestBody": {
+        "properties": {
+          "confirm_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confirm Name"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "DeletionRequestBody",
+        "description": "Story 9.2: the client types the family member's first name to confirm."
+      },
+      "EntitlementsOut": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "trial",
+              "basic"
+            ],
+            "title": "Plan"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          },
+          "trial_ended": {
+            "type": "boolean",
+            "title": "Trial Ended"
+          },
+          "family_members_included": {
+            "type": "integer",
+            "title": "Family Members Included"
+          },
+          "family_members_used": {
+            "type": "integer",
+            "title": "Family Members Used"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "trial_ends_at",
+          "trial_ended",
+          "family_members_included",
+          "family_members_used"
+        ],
+        "title": "EntitlementsOut"
+      },
+      "FamilyMemberOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "relationship": {
+            "type": "string",
+            "enum": [
+              "parent",
+              "child",
+              "partner",
+              "someone_else"
+            ],
+            "title": "Relationship"
+          },
+          "age": {
+            "type": "integer",
+            "title": "Age"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "turned_off",
+              "deletion_requested"
+            ],
+            "title": "Status"
+          },
+          "health_profile_completion": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Health Profile Completion"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "relationship",
+          "age",
+          "status",
+          "health_profile_completion"
+        ],
+        "title": "FamilyMemberOut",
+        "description": "A card on the Manage Family screen (story 9.2)."
+      },
+      "FamilyMemberResult": {
+        "properties": {
+          "member": {
+            "$ref": "#/components/schemas/FamilyMemberOut"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "default_profile_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Profile Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "member",
+          "message",
+          "default_profile_id"
+        ],
+        "title": "FamilyMemberResult"
+      },
+      "FamilyOverview": {
+        "properties": {
+          "family_members_used": {
+            "type": "integer",
+            "title": "Family Members Used"
+          },
+          "family_members_included": {
+            "type": "integer",
+            "title": "Family Members Included"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyMemberOut"
+            },
+            "type": "array",
+            "title": "Members"
+          }
+        },
+        "type": "object",
+        "required": [
+          "family_members_used",
+          "family_members_included",
+          "members"
+        ],
+        "title": "FamilyOverview",
+        "description": "The Manage Family screen: \"2 of 3 active family members\" and a card for each member,\nturned-off ones included. Unfinished drafts aren't listed; Add family member resumes one."
+      },
+      "FeedbackOut": {
+        "properties": {
+          "message_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Message Id"
+          },
+          "rating": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down"
+            ],
+            "title": "Rating"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message_id",
+          "rating",
+          "comment"
+        ],
+        "title": "FeedbackOut"
+      },
+      "ForgotPasswordRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Email",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ForgotPasswordRequest"
+      },
+      "GiveFeedback": {
+        "properties": {
+          "rating": {
+            "type": "string",
+            "enum": [
+              "up",
+              "down"
+            ],
+            "title": "Rating"
+          },
+          "comment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rating"
+        ],
+        "title": "GiveFeedback",
+        "description": "A thumbs up or down on one of the Oracle's replies, with an optional comment. Giving\nit again replaces the earlier one."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthConsentOut": {
+        "properties": {
+          "accepted": {
+            "type": "boolean",
+            "title": "Accepted"
+          },
+          "policy": {
+            "$ref": "#/components/schemas/PolicyOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accepted",
+          "policy"
+        ],
+        "title": "HealthConsentOut"
+      },
+      "IntakeAnswers": {
+        "properties": {
+          "family_relationship": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child",
+                  "partner",
+                  "someone_else"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Relationship"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "advocate_consent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "agreed",
+                  "parent_or_guardian",
+                  "authorised_to_act"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advocate Consent"
+          },
+          "sex_at_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "male",
+                  "female",
+                  "intersex"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex At Birth"
+          },
+          "gender_identity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "man",
+                  "woman",
+                  "trans_woman",
+                  "trans_man",
+                  "intersex",
+                  "non_binary",
+                  "agender",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity"
+          },
+          "gender_identity_other": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity Other"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "he_him",
+                  "she_her",
+                  "they_them",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "pronouns_other": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns Other"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "IntakeAnswers",
+        "description": "The answer to one intake step. Send only that step's fields. The Back button changes\nan earlier answer by sending it again. Family-only fields are refused on the client's own\nprofile."
+      },
+      "IntakeCompleted": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "message"
+        ],
+        "title": "IntakeCompleted"
+      },
+      "IntakeOut": {
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Profile Id"
+          },
+          "is_self": {
+            "type": "boolean",
+            "title": "Is Self"
+          },
+          "family_relationship": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child",
+                  "partner",
+                  "someone_else"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Relationship"
+          },
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "advocate_consent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "agreed",
+                  "parent_or_guardian",
+                  "authorised_to_act"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advocate Consent"
+          },
+          "sex_at_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "male",
+                  "female",
+                  "intersex"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex At Birth"
+          },
+          "gender_identity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "man",
+                  "woman",
+                  "trans_woman",
+                  "trans_man",
+                  "intersex",
+                  "non_binary",
+                  "agender",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity"
+          },
+          "gender_identity_other": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity Other"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "he_him",
+                  "she_her",
+                  "they_them",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "pronouns_other": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns Other"
+          },
+          "next_question": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "family_relationship",
+                  "first_name",
+                  "date_of_birth",
+                  "advocate_consent",
+                  "sex_at_birth",
+                  "gender_identity",
+                  "pronouns"
+                ]
+              },
+              {
+                "type": "string",
+                "const": "done"
+              }
+            ],
+            "title": "Next Question"
+          },
+          "completed": {
+            "type": "boolean",
+            "title": "Completed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile_id",
+          "is_self",
+          "family_relationship",
+          "first_name",
+          "date_of_birth",
+          "advocate_consent",
+          "sex_at_birth",
+          "gender_identity",
+          "gender_identity_other",
+          "pronouns",
+          "pronouns_other",
+          "next_question",
+          "completed"
+        ],
+        "title": "IntakeOut"
+      },
+      "MeOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "trial_ends_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Trial Ends At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "first_name",
+          "last_name",
+          "trial_ends_at"
+        ],
+        "title": "MeOut",
+        "description": "What the app needs before the policy gate (/me answers before updated policies are\naccepted). The date of birth and state are personal data, so they're left out\nhere; story 11.1 will show them behind the gate."
+      },
+      "MessageOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "client",
+              "oracle"
+            ],
+            "title": "Role"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "client_msg_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Msg Id"
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          },
+          "widgets": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Widgets"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "up",
+                  "down"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "role",
+          "text",
+          "client_msg_id",
+          "answer",
+          "widgets",
+          "created_at"
+        ],
+        "title": "MessageOut"
+      },
+      "MessageResponse": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "title": "MessageResponse"
+      },
+      "MessageSent": {
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Conversation Id"
+          },
+          "message": {
+            "$ref": "#/components/schemas/MessageOut"
+          },
+          "next": {
+            "type": "string",
+            "enum": [
+              "reply",
+              "health_consent",
+              "send_again"
+            ],
+            "title": "Next"
+          }
+        },
+        "type": "object",
+        "required": [
+          "conversation_id",
+          "message",
+          "next"
+        ],
+        "title": "MessageSent"
+      },
+      "NewConversation": {
+        "properties": {
+          "opening": {
+            "type": "string",
+            "title": "Opening"
+          },
+          "starters": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Starters"
+          }
+        },
+        "type": "object",
+        "required": [
+          "opening",
+          "starters"
+        ],
+        "title": "NewConversation",
+        "description": "The New Conversation screen (story 3.1)."
+      },
+      "NextStepOut": {
+        "properties": {
+          "next_step": {
+            "type": "string",
+            "enum": [
+              "policy_update",
+              "intake",
+              "upgrade",
+              "dashboard"
+            ],
+            "title": "Next Step"
+          },
+          "profile_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "next_step"
+        ],
+        "title": "NextStepOut"
+      },
+      "PolicyAcceptanceRequest": {
+        "properties": {
+          "policy_version_ids": {
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "type": "array",
+            "title": "Policy Version Ids",
+            "default": []
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "PolicyAcceptanceRequest"
+      },
+      "PolicyOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Published At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "version",
+          "title",
+          "url",
+          "published_at"
+        ],
+        "title": "PolicyOut"
+      },
+      "ProfileDetails": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "is_self": {
+            "type": "boolean",
+            "title": "Is Self"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "family_relationship": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child",
+                  "partner",
+                  "someone_else"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Relationship"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "sex_at_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "male",
+                  "female",
+                  "intersex"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex At Birth"
+          },
+          "gender_identity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "man",
+                  "woman",
+                  "trans_woman",
+                  "trans_man",
+                  "intersex",
+                  "non_binary",
+                  "agender",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity"
+          },
+          "gender_identity_other": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity Other"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "he_him",
+                  "she_her",
+                  "they_them",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "pronouns_other": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns Other"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "turned_off",
+              "deletion_requested"
+            ],
+            "title": "Status"
+          },
+          "intake_completed": {
+            "type": "boolean",
+            "title": "Intake Completed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "is_self",
+          "first_name",
+          "family_relationship",
+          "date_of_birth",
+          "age",
+          "sex_at_birth",
+          "gender_identity",
+          "gender_identity_other",
+          "pronouns",
+          "pronouns_other",
+          "status",
+          "intake_completed"
+        ],
+        "title": "ProfileDetails",
+        "description": "A profile's details for View & edit (story 9.2)."
+      },
+      "ProfileEdit": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "family_relationship": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child",
+                  "partner",
+                  "someone_else"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Relationship"
+          },
+          "advocate_consent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "agreed",
+                  "parent_or_guardian",
+                  "authorised_to_act"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advocate Consent"
+          },
+          "gender_identity": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "man",
+                  "woman",
+                  "trans_woman",
+                  "trans_man",
+                  "intersex",
+                  "non_binary",
+                  "agender",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity"
+          },
+          "gender_identity_other": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gender Identity Other"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "he_him",
+                  "she_her",
+                  "they_them",
+                  "other"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns"
+          },
+          "pronouns_other": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronouns Other"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "sex_at_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "male",
+                  "female",
+                  "intersex"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex At Birth"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ProfileEdit",
+        "description": "View & edit a family member (story 9.2). Send the fields to change; the app may also send\nthe whole form.\n\n- A write-in can be sent on its own while the saved choice is \"Other\".\n- Changing the relationship needs the advocate consent again, in the same request (story\n  2.2's step 4), so the consent always matches who the member is to the client.\n- Date of birth and sex at birth are read-only: accepted unchanged, refused if different."
+      },
+      "ProfileOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "is_self": {
+            "type": "boolean",
+            "title": "Is Self"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "relationship": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child",
+                  "partner",
+                  "someone_else"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relationship"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "intake_completed": {
+            "type": "boolean",
+            "title": "Intake Completed"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "turned_off",
+              "deletion_requested"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "is_self",
+          "first_name",
+          "relationship",
+          "age",
+          "intake_completed",
+          "status"
+        ],
+        "title": "ProfileOut"
+      },
+      "ProfileUpdated": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/ProfileDetails"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "profile",
+          "message"
+        ],
+        "title": "ProfileUpdated"
+      },
+      "ResendCodeRequest": {
+        "properties": {
+          "challenge_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Challenge Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challenge_id"
+        ],
+        "title": "ResendCodeRequest"
+      },
+      "ResetPasswordRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Token"
+          },
+          "new_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "New Password",
+            "default": ""
+          },
+          "confirm_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Confirm Password",
+            "default": ""
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ResetPasswordRequest"
+      },
+      "ResetTokenRequest": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "ResetTokenRequest"
+      },
+      "SendMessage": {
+        "properties": {
+          "client_msg_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Client Msg Id"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 8000,
+            "title": "Text",
+            "default": ""
+          },
+          "answer": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "propertyNames": {
+                  "maxLength": 1000
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "client_msg_id"
+        ],
+        "title": "SendMessage",
+        "description": "A client message. The app makes `client_msg_id` (a UUID) once per message and sends it\nagain with any retry, so a message is never saved twice. Symptoms ticked in the symptom\ncheck arrive as part of the text. A tapped answer sends its label as the text, and what\nwas tapped as `answer` (see Answer in app/oracle/contract.py)."
+      },
+      "SignInRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Email",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Password",
+            "default": ""
+          },
+          "device_token": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Token"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "web",
+              "mobile"
+            ],
+            "title": "Platform",
+            "default": "web"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SignInRequest"
+      },
+      "SignOutRequest": {
+        "properties": {
+          "device_token": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Token"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SignOutRequest"
+      },
+      "SignUpCheck": {
+        "properties": {
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "country": {
+            "type": "string",
+            "const": "US",
+            "title": "Country",
+            "default": "US"
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "State",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "SignUpCheck",
+        "description": "The body of POST /auth/signup/check. Other sign-up fields the app sends with it (the\nfirst name from step 1, say) are ignored, so the app can send the form as it stands."
+      },
+      "SignUpRequest": {
+        "properties": {
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "country": {
+            "type": "string",
+            "const": "US",
+            "title": "Country",
+            "default": "US"
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "State",
+            "default": ""
+          },
+          "first_name": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "First Name",
+            "default": ""
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Email",
+            "default": ""
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Password",
+            "default": ""
+          },
+          "confirm_password": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Confirm Password",
+            "default": ""
+          },
+          "accept_terms": {
+            "type": "boolean",
+            "title": "Accept Terms",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SignUpRequest"
+      },
+      "SignedIn": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "signed_in",
+            "title": "Status",
+            "default": "signed_in"
+          },
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "const": "bearer",
+            "title": "Token Type",
+            "default": "bearer"
+          },
+          "device_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "SignedIn"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerificationRequired": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "const": "verification_required",
+            "title": "Status",
+            "default": "verification_required"
+          },
+          "challenge_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Challenge Id"
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "verify_email",
+              "sign_in"
+            ],
+            "title": "Purpose"
+          },
+          "expires_in_seconds": {
+            "type": "integer",
+            "title": "Expires In Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "challenge_id",
+          "purpose",
+          "expires_in_seconds"
+        ],
+        "title": "VerificationRequired",
+        "description": "The next screen is the Verification screen: a code was emailed."
+      },
+      "VerifyRequest": {
+        "properties": {
+          "challenge_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Challenge Id"
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 1000,
+            "title": "Code",
+            "default": ""
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "web",
+              "mobile"
+            ],
+            "title": "Platform",
+            "default": "web"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "challenge_id"
+        ],
+        "title": "VerifyRequest"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

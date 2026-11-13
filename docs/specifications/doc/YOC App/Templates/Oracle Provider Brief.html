@@ -1,0 +1,709 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Oracle Provider Brief</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap">
+
+<style>
+/* ── Layout: pre-visit brief, Oracle-generated, read-mostly ── */
+:root {
+  --purple:    #613977;
+  --purple-lt: #f0eaf5;
+  --gold:      #c9a94e;
+  --gold-lt:   #fdf6e3;
+  --pink:      #cd497f;
+  --pink-lt:   #fce4ee;
+  --bg:        #faf9f7;
+  --bg2:       #f2eff9;
+  --fg:        #1e1624;
+  --fg2:       #4a3d56;
+  --fg3:       #7a6a87;
+  --border:    #ddd6e8;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'EB Garamond', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --purple-lt: #2a1f3d;
+    --gold-lt:   #2a2310;
+    --pink-lt:   #2d1220;
+    --bg:        #16101e;
+    --bg2:       #1f1730;
+    --fg:        #ede8f5;
+    --fg2:       #c5b8d4;
+    --fg3:       #8b7a9a;
+    --border:    #352844;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --purple-lt: #2a1f3d;
+  --gold-lt:   #2a2310;
+  --pink-lt:   #2d1220;
+  --bg:        #16101e;
+  --bg2:       #1f1730;
+  --fg:        #ede8f5;
+  --fg2:       #c5b8d4;
+  --fg3:       #8b7a9a;
+  --border:    #352844;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin: 0;
+  padding-inline: 20px;
+  padding-block: 32px 48px;
+}
+
+.page-wrap { max-width: 720px; margin: 0 auto; }
+
+/* ── Doc header ── */
+.doc-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.doc-header h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--purple);
+  margin: 0 0 3px;
+  text-wrap: balance;
+  letter-spacing: 0.01em;
+}
+.doc-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+.oracle-badge {
+  flex-shrink: 0;
+  background: var(--purple);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border-radius: 3px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ── Intent bar ── */
+.intent-bar {
+  background: var(--gold-lt);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 4px 4px 0;
+  padding: 11px 14px;
+  margin: 16px 0 24px;
+  font-size: 0.93rem;
+  color: var(--fg2);
+}
+.intent-bar strong { color: var(--fg); }
+
+/* ── Patient meta row ── */
+.meta-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 8px 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 13px 16px;
+  margin-bottom: 26px;
+}
+.meta-item label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  margin-bottom: 3px;
+}
+.meta-value {
+  font-family: var(--font-body);
+  font-size: 0.97rem;
+  color: var(--fg);
+  min-height: 1.4em;
+}
+.meta-value.placeholder { color: var(--fg3); font-style: italic; }
+
+/* ── Section ── */
+.section {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.section-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple);
+  min-width: 22px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+.section-body { padding: 14px 16px; }
+
+/* ── Chief complaint block ── */
+.cc-block {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--fg);
+  font-style: italic;
+}
+.cc-duration {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--fg3);
+  font-style: normal;
+}
+
+/* ── Clinical context ── */
+.context-text {
+  font-size: 1rem;
+  line-height: 1.72;
+  color: var(--fg2);
+}
+.context-text p { margin: 0 0 10px; }
+.context-text p:last-child { margin: 0; }
+
+/* ── Lab list ── */
+.lab-list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.lab-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 7px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.97rem;
+}
+.lab-item .lab-name { flex: 1; color: var(--fg); min-width: 0; }
+.lab-item .lab-note { font-size: 0.82rem; color: var(--fg3); flex-shrink: 0; }
+.lab-priority {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.lp-primary { background: var(--purple-lt); color: var(--purple); }
+.lp-secondary { background: var(--bg2); color: var(--fg3); }
+
+/* ── Questions list ── */
+.q-list { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.q-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 9px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.q-num {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--purple);
+  min-width: 20px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+.q-text { font-size: 0.97rem; line-height: 1.6; color: var(--fg); }
+.q-context { font-size: 0.85rem; color: var(--fg3); margin-top: 3px; font-style: italic; }
+
+/* ── Rx/supplement current list ── */
+.rx-current-list { display: flex; flex-direction: column; gap: 6px; }
+.rx-item {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  flex-wrap: wrap;
+}
+.rx-name { flex: 1; color: var(--fg); min-width: 120px; }
+.rx-dose { color: var(--fg3); font-size: 0.88rem; }
+.rx-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+.rt-current  { background: var(--purple-lt); color: var(--purple); }
+.rt-new      { background: rgba(201,169,78,0.2); color: #7a5a0a; }
+.rt-discuss  { background: var(--pink-lt); color: var(--pink); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .rt-new { color: var(--gold); } }
+:root[data-theme="dark"] .rt-new { color: var(--gold); }
+
+/* ── Genesis Gold callout ── */
+.gg-callout {
+  background: var(--gold-lt);
+  border: 1px solid rgba(201,169,78,0.4);
+  border-radius: 5px;
+  padding: 13px 15px;
+  margin-top: 10px;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: var(--fg2);
+}
+.gg-callout strong { color: var(--fg); }
+
+/* ── Red flags ── */
+.no-flags {
+  font-size: 0.92rem;
+  color: var(--fg3);
+  font-style: italic;
+  padding: 6px 0;
+}
+.flag-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  background: var(--pink-lt);
+  border: 1px solid rgba(205,73,127,0.25);
+  border-radius: 4px;
+  margin-bottom: 7px;
+  font-size: 0.93rem;
+  color: var(--fg);
+}
+.flag-dot { color: var(--pink); font-size: 1rem; flex-shrink: 0; line-height: 1.5; }
+
+/* ── Disclaimer ── */
+.disclaimer {
+  margin-top: 28px;
+  padding: 12px 15px;
+  background: var(--bg2);
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
+  color: var(--fg3);
+}
+
+/* ── Actions ── */
+.doc-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.btn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 10px 22px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.98); }
+.btn-primary { background: var(--purple); color: #fff; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-secondary { background: none; border: 1.5px solid var(--border); color: var(--fg2); }
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+.copy-toast {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.copy-toast.show { opacity: 1; }
+
+/* ── Editable placeholders for Oracle pre-fill ── */
+.editable {
+  border-bottom: 1px dashed var(--border);
+  min-height: 1.4em;
+  outline: none;
+  transition: border-color 0.15s;
+  cursor: text;
+}
+.editable:focus { border-color: var(--purple); }
+.editable:empty::before { content: attr(data-placeholder); color: var(--fg3); font-style: italic; }
+</style>
+
+<div class="page-wrap">
+
+  <!-- ── Header ── -->
+  <div class="doc-header">
+    <div>
+      <div class="doc-eyebrow">Your Oracle Clinician · pre-visit brief</div>
+      <h1>For My Provider</h1>
+    </div>
+    <div class="oracle-badge">Oracle</div>
+  </div>
+
+  <div class="intent-bar">
+    <strong>What this is:</strong> A summary prepared by Your Oracle Clinician based on my symptoms, history, and our conversation. I am bringing this to help my provider understand the full picture and to make the most of our time together.
+  </div>
+
+  <!-- ── Patient meta ── -->
+  <div class="meta-row">
+    <div class="meta-item">
+      <label>Patient</label>
+      <div class="meta-value editable" contenteditable="true" data-placeholder="Full name"></div>
+    </div>
+    <div class="meta-item">
+      <label>Date of birth</label>
+      <div class="meta-value editable" contenteditable="true" data-placeholder="MM/DD/YYYY"></div>
+    </div>
+    <div class="meta-item">
+      <label>Appointment date</label>
+      <div class="meta-value editable" contenteditable="true" data-placeholder="MM/DD/YYYY"></div>
+    </div>
+    <div class="meta-item">
+      <label>Provider</label>
+      <div class="meta-value editable" contenteditable="true" data-placeholder="Name / specialty"></div>
+    </div>
+  </div>
+
+  <!-- ── 1. Chief Complaint ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">1</div>
+      <div class="section-title">Chief Complaint</div>
+    </div>
+    <div class="section-body">
+      <div class="cc-block editable" contenteditable="true"
+           data-placeholder="Oracle pre-fills: the patient's primary concern in their own words, as stated during the Oracle session…">
+      </div>
+      <div class="cc-duration editable" contenteditable="true"
+           data-placeholder="Duration: e.g., 8–12 months, worsening since last spring"></div>
+    </div>
+  </div>
+
+  <!-- ── 2. Clinical Context ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">2</div>
+      <div class="section-title">Clinical Context — What Oracle Identified</div>
+    </div>
+    <div class="section-body">
+      <div class="context-text editable" contenteditable="true"
+           data-placeholder="Oracle pre-fills: a concise clinical summary — the pattern identified, the hypothalamic framework, and why the symptoms form a coherent picture. Written in plain language for a clinical reader. Example: 'Based on our conversation, the symptom cluster — fatigue, 2–3 AM waking, weight gain around the middle, and brain fog — is consistent with hypothalamic-pituitary-adrenal axis dysregulation during perimenopause. The hypothalamus is under transition stress, which is disrupting the HPA axis balance, cortisol timing, and downstream thyroid and metabolic signaling. I am supporting the hypothalamus directly with Genesis Gold® as a first-line approach while seeking a more complete baseline evaluation.'">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Labs I Am Requesting ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">3</div>
+      <div class="section-title">Labs I Am Requesting</div>
+    </div>
+    <div class="section-body">
+      <ul class="lab-list" id="lab-list">
+        <li class="lab-item">
+          <span class="lab-priority lp-primary">Primary</span>
+          <span class="lab-name editable" contenteditable="true" data-placeholder="Lab name, e.g.: FSH — Day 3–5 of cycle (perimenopausal staging)"></span>
+          <span class="lab-note editable" contenteditable="true" data-placeholder="Reason / timing note"></span>
+        </li>
+        <li class="lab-item">
+          <span class="lab-priority lp-primary">Primary</span>
+          <span class="lab-name editable" contenteditable="true" data-placeholder="e.g.: Free T3 + Free T4 + TSH (full thyroid panel, not TSH alone)"></span>
+          <span class="lab-note editable" contenteditable="true" data-placeholder=""></span>
+        </li>
+        <li class="lab-item">
+          <span class="lab-priority lp-primary">Primary</span>
+          <span class="lab-name editable" contenteditable="true" data-placeholder="e.g.: Morning cortisol + DHEA-S (8–9 AM draw)"></span>
+          <span class="lab-note editable" contenteditable="true" data-placeholder=""></span>
+        </li>
+        <li class="lab-item">
+          <span class="lab-priority lp-secondary">Also request</span>
+          <span class="lab-name editable" contenteditable="true" data-placeholder="e.g.: Fasting insulin + HbA1c"></span>
+          <span class="lab-note editable" contenteditable="true" data-placeholder=""></span>
+        </li>
+        <li class="lab-item">
+          <span class="lab-priority lp-secondary">Also request</span>
+          <span class="lab-name editable" contenteditable="true" data-placeholder="e.g.: Vitamin D3 + hs-CRP"></span>
+          <span class="lab-note editable" contenteditable="true" data-placeholder=""></span>
+        </li>
+      </ul>
+      <button class="btn btn-secondary" onclick="addLab()" style="margin-top:10px;font-size:0.88rem;padding:7px 14px;">+ Add lab</button>
+    </div>
+  </div>
+
+  <!-- ── 4. Questions for My Provider ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">4</div>
+      <div class="section-title">Questions for My Provider</div>
+    </div>
+    <div class="section-body">
+      <ul class="q-list" id="q-list">
+        <li class="q-item">
+          <div class="q-num">1</div>
+          <div>
+            <div class="q-text editable" contenteditable="true" data-placeholder="Oracle pre-fills: e.g., My TSH is 3.1 but I have cold intolerance, fatigue, and brain fog. Would you be willing to add Free T3 and thyroid antibodies to my panel?"></div>
+            <div class="q-context editable" contenteditable="true" data-placeholder="Why I'm asking (Oracle context)…"></div>
+          </div>
+        </li>
+        <li class="q-item">
+          <div class="q-num">2</div>
+          <div>
+            <div class="q-text editable" contenteditable="true" data-placeholder="e.g., I'm in perimenopause. Can we stage where I am using FSH on Day 3–5 of my cycle rather than estradiol alone?"></div>
+            <div class="q-context editable" contenteditable="true" data-placeholder="Why I'm asking (Oracle context)…"></div>
+          </div>
+        </li>
+        <li class="q-item">
+          <div class="q-num">3</div>
+          <div>
+            <div class="q-text editable" contenteditable="true" data-placeholder="e.g., I am starting Genesis Gold®, a nutraceutical that supports hypothalamic function. Are there any interactions with my current medications I should be aware of?"></div>
+            <div class="q-context editable" contenteditable="true" data-placeholder="Why I'm asking (Oracle context)…"></div>
+          </div>
+        </li>
+      </ul>
+      <button class="btn btn-secondary" onclick="addQuestion()" style="margin-top:10px;font-size:0.88rem;padding:7px 14px;">+ Add question</button>
+    </div>
+  </div>
+
+  <!-- ── 5. Current Medications & Supplements ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon">5</div>
+      <div class="section-title">Current Medications &amp; Supplements</div>
+    </div>
+    <div class="section-body">
+      <div class="rx-current-list" id="rx-list">
+        <div class="rx-item">
+          <span class="rx-name editable" contenteditable="true" data-placeholder="Medication / supplement name"></span>
+          <span class="rx-dose editable" contenteditable="true" data-placeholder="Dose / frequency"></span>
+          <span class="rx-tag rt-current">Current</span>
+        </div>
+        <div class="rx-item">
+          <span class="rx-name editable" contenteditable="true" data-placeholder="Medication / supplement name"></span>
+          <span class="rx-dose editable" contenteditable="true" data-placeholder="Dose / frequency"></span>
+          <span class="rx-tag rt-current">Current</span>
+        </div>
+      </div>
+      <div class="gg-callout" id="gg-callout">
+        <strong>Genesis Gold®</strong> — I am beginning a 60–90 day trial of Genesis Gold®, a nutraceutical formulation designed to support hypothalamic function. It contains no hormones. I would like your awareness and any guidance on monitoring my response over this period. <span class="editable" contenteditable="true" data-placeholder="Add starting dose / any notes…"></span>
+      </div>
+      <button class="btn btn-secondary" onclick="addRx()" style="margin-top:10px;font-size:0.88rem;padding:7px 14px;">+ Add medication</button>
+    </div>
+  </div>
+
+  <!-- ── 6. Red Flags Screened ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon" style="color:var(--pink);">!</div>
+      <div class="section-title">Red Flags — Screened by Oracle</div>
+    </div>
+    <div class="section-body" id="flags-body">
+      <div class="no-flags" id="no-flags-msg">No urgent red flags identified in this session. Symptoms are consistent with a non-emergent hormonal imbalance pattern.</div>
+      <!-- flag items injected here if needed -->
+    </div>
+  </div>
+
+  <!-- ── 7. Oracle's Recommendation ── -->
+  <div class="section">
+    <div class="section-head">
+      <div class="section-icon" style="color:var(--gold);">Or</div>
+      <div class="section-title">Oracle's Recommendation to Patient</div>
+    </div>
+    <div class="section-body">
+      <div class="context-text editable" contenteditable="true"
+           data-placeholder="Oracle pre-fills: the full recommendation as delivered in the session — first-line approach, 60–90 day trial framing, what to revisit at follow-up, and the role of the provider in this plan. Example: 'Oracle has recommended Genesis Gold® as first-line upstream hypothalamic support, with labs above ordered concurrently as a baseline. At the 60–90 day mark, if symptoms have not resolved, Oracle recommends revisiting the lab results with the provider and discussing BHRT options if indicated. The provider's role in this plan is primarily to order and interpret the baseline labs and to evaluate for any conditions requiring prescription intervention.'">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Disclaimer ── -->
+  <div class="disclaimer">
+    This document was prepared by Your Oracle Clinician, an AI-powered patient advocacy tool developed by Genesis Health Products Inc. It is not a diagnosis, a prescription, or a substitute for professional medical judgment. It is provided to support informed conversation between the patient and their licensed healthcare provider. Genesis Gold® contains no hormones and is not a pharmaceutical product. Your Oracle Clinician is not a licensed prescriber.
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="doc-footer">
+    <button class="btn btn-primary" onclick="copyBrief()">Copy brief to clipboard</button>
+    <div class="copy-toast" id="copy-toast">Copied to clipboard</div>
+  </div>
+
+</div>
+
+<script>
+function addLab() {
+  const list = document.getElementById('lab-list');
+  const li = document.createElement('li');
+  li.className = 'lab-item';
+  li.innerHTML = `
+    <span class="lab-priority lp-secondary">Also request</span>
+    <span class="lab-name editable" contenteditable="true" data-placeholder="Lab name"></span>
+    <span class="lab-note editable" contenteditable="true" data-placeholder="Note"></span>
+    <button onclick="this.closest('li').remove()" style="background:none;border:none;color:var(--fg3);cursor:pointer;font-size:1rem;padding:0 2px;" title="Remove">×</button>`;
+  list.appendChild(li);
+  li.querySelector('[contenteditable]').focus();
+}
+
+function addQuestion() {
+  const list = document.getElementById('q-list');
+  const n = list.children.length + 1;
+  const li = document.createElement('li');
+  li.className = 'q-item';
+  li.innerHTML = `
+    <div class="q-num">${n}</div>
+    <div style="flex:1;min-width:0">
+      <div class="q-text editable" contenteditable="true" data-placeholder="Question for provider…"></div>
+      <div class="q-context editable" contenteditable="true" data-placeholder="Why I'm asking (Oracle context)…"></div>
+    </div>
+    <button onclick="this.closest('li').remove()" style="background:none;border:none;color:var(--fg3);cursor:pointer;font-size:1rem;padding:0 2px;align-self:flex-start;" title="Remove">×</button>`;
+  list.appendChild(li);
+  li.querySelector('[contenteditable]').focus();
+}
+
+function addRx() {
+  const list = document.getElementById('rx-list');
+  const div = document.createElement('div');
+  div.className = 'rx-item';
+  div.innerHTML = `
+    <span class="rx-name editable" contenteditable="true" data-placeholder="Medication / supplement name"></span>
+    <span class="rx-dose editable" contenteditable="true" data-placeholder="Dose / frequency"></span>
+    <span class="rx-tag rt-current">Current</span>
+    <button onclick="this.closest('.rx-item').remove()" style="background:none;border:none;color:var(--fg3);cursor:pointer;font-size:1rem;padding:0 2px;" title="Remove">×</button>`;
+  list.appendChild(div);
+  div.querySelector('[contenteditable]').focus();
+}
+
+function getEditable(el) {
+  return el.textContent.trim() || (el.getAttribute('data-placeholder') || '');
+}
+
+function copyBrief() {
+  const lines = [];
+  lines.push('FOR MY PROVIDER — PRE-VISIT BRIEF');
+  lines.push('Prepared by Your Oracle Clinician · Genesis Health Products Inc.');
+  lines.push('');
+
+  // meta
+  const metas = document.querySelectorAll('.meta-value');
+  const metaLabels = document.querySelectorAll('.meta-item label');
+  metaLabels.forEach((lbl, i) => {
+    const val = metas[i]?.textContent?.trim();
+    if (val) lines.push(`${lbl.textContent.trim()}: ${val}`);
+  });
+  lines.push('');
+
+  lines.push('── CHIEF COMPLAINT ──');
+  const cc = document.querySelector('.cc-block');
+  if (cc) lines.push(cc.textContent.trim());
+  const dur = document.querySelector('.cc-duration');
+  if (dur?.textContent?.trim()) lines.push(dur.textContent.trim());
+  lines.push('');
+
+  lines.push('── CLINICAL CONTEXT ──');
+  const ctx = document.querySelector('.context-text');
+  if (ctx) lines.push(ctx.textContent.trim());
+  lines.push('');
+
+  lines.push('── LABS I AM REQUESTING ──');
+  document.querySelectorAll('#lab-list .lab-item').forEach(item => {
+    const pri = item.querySelector('.lab-priority')?.textContent?.trim() || '';
+    const name = item.querySelector('.lab-name')?.textContent?.trim() || '';
+    const note = item.querySelector('.lab-note')?.textContent?.trim() || '';
+    if (name) lines.push(`[${pri}] ${name}${note ? ' — ' + note : ''}`);
+  });
+  lines.push('');
+
+  lines.push('── QUESTIONS FOR MY PROVIDER ──');
+  document.querySelectorAll('#q-list .q-item').forEach((item, i) => {
+    const q = item.querySelector('.q-text')?.textContent?.trim();
+    const ctx = item.querySelector('.q-context')?.textContent?.trim();
+    if (q) {
+      lines.push(`${i + 1}. ${q}`);
+      if (ctx) lines.push(`   Context: ${ctx}`);
+    }
+  });
+  lines.push('');
+
+  lines.push('── CURRENT MEDICATIONS & SUPPLEMENTS ──');
+  document.querySelectorAll('#rx-list .rx-item').forEach(item => {
+    const name = item.querySelector('.rx-name')?.textContent?.trim();
+    const dose = item.querySelector('.rx-dose')?.textContent?.trim();
+    if (name) lines.push(`• ${name}${dose ? ' — ' + dose : ''}`);
+  });
+  const gg = document.getElementById('gg-callout')?.textContent?.trim();
+  if (gg) lines.push(`\nGenesis Gold® note: ${gg}`);
+  lines.push('');
+
+  lines.push('── ORACLE\'S RECOMMENDATION ──');
+  const rec = document.querySelectorAll('.context-text')[1]?.textContent?.trim();
+  if (rec) lines.push(rec);
+  lines.push('');
+
+  lines.push('─────────────────────────────────────');
+  lines.push('This document was prepared by Your Oracle Clinician, an AI-powered patient advocacy tool (Genesis Health Products Inc.). It is not a diagnosis or prescription. Genesis Gold® contains no hormones and is not a pharmaceutical. Your Oracle Clinician is not a licensed prescriber.');
+
+  const text = lines.join('\n');
+  const toast = document.getElementById('copy-toast');
+
+  try {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2400);
+    }).catch(() => fallback(text));
+  } catch(e) { fallback(text); }
+}
+
+function fallback(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;opacity:0;top:-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  const toast = document.getElementById('copy-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+}
+</script>
+
+</body></html>
