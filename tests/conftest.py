@@ -6,8 +6,15 @@ Each test runs inside a transaction that's rolled back afterwards, even when the
 test commits, so tests never see each other's data.
 """
 
+import os
 import re
 from collections.abc import Callable, Iterator
+
+# Tests never call Stripe, even when .env holds a test key: with no key, get_payment_provider
+# gives the fake (app/billing/dependencies.py). Set before `settings` is first imported;
+# environment variables win over .env.
+os.environ["STRIPE_SECRET_KEY"] = ""
+os.environ["STRIPE_WEBHOOK_SECRET"] = ""
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 

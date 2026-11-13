@@ -125,7 +125,9 @@ def _failing_with(db: Session, code: str, message: str) -> Iterator[None]:
 
 
 def _adult(profile: Profile) -> bool:
-    return is_adult(profile.date_of_birth) if profile.date_of_birth else True
+    return (
+        is_adult(profile.date_of_birth, profile.majority_state) if profile.date_of_birth else True
+    )
 
 
 def _first_name(profile: Profile, account: User) -> str:

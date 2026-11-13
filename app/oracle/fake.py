@@ -193,7 +193,12 @@ class FakeOracle:
         return self.safety
 
     def stream_reply(
-        self, context: ProfileContext, history: list[Turn], earlier: list[EarlierConversation]
+        self,
+        context: ProfileContext,
+        history: list[Turn],
+        earlier: list[EarlierConversation],
+        *,
+        conversation_id: str | None = None,  # unused: the fake keeps no threads
     ) -> Iterator[str | Widget]:
         self.calls.append("stream_reply")
         self.last_context, self.last_history, self.last_earlier = context, history, earlier
@@ -201,6 +206,8 @@ class FakeOracle:
         reply = next(
             (text for phrase, text in REPLY_TEST_PHRASES if phrase in last.lower()), self.reply
         )
+        if HEALTH_ROUTE_PHRASE in last.lower():
+            reply = _route_reply(context)
         for sent, word in enumerate(reply.split(" ")):
             if self.fail_after is not None and sent == self.fail_after:
                 raise OracleError("The fake Oracle stopped part-way, as asked.")
@@ -314,6 +321,24 @@ class FakeOracle:
             if _comparable(candidate.question) == wanted:
                 return KnowledgeGapMatch(gap_id=candidate.gap_id, topic=candidate.topic)
         return KnowledgeGapMatch(gap_id=None, topic=self.gap_topic)
+
+
+# The Health Intake Routing document in development: a client message containing this phrase
+# gets a reply naming the profile's routing and the next question the real Oracle would ask
+# ("Your body" and the other follow-ups first, then "Asked first" ones; never "onboarding").
+HEALTH_ROUTE_PHRASE = "test health route"
+_ASK_ORDER = {"conversation": 0, "asked_first": 1, "asked_later": 2}
+
+
+def _route_reply(context: ProfileContext) -> str:
+    health = context.health
+    askable = [q for q in health.unanswered if q.when_asked in _ASK_ORDER]
+    askable.sort(key=lambda q: _ASK_ORDER[q.when_asked])  # stable: keeps the bank's order
+    parts = [f"Path {health.follow_up_path}, body route {health.body_route}."]
+    if health.opening_line and askable and askable[0].when_asked == "conversation":
+        parts.append(health.opening_line)
+    parts.append(askable[0].question if askable else "Nothing left to ask.")
+    return " ".join(parts)
 
 
 def _comparable(question: str) -> str:

@@ -138,7 +138,7 @@ def _source(
     db: Session, profile: Profile, trigger: str, source_id: uuid.UUID | None, payload: dict
 ) -> tuple[bool, contract.GuidanceSummary | None, contract.LoggedVisit | None]:
     """(still there, summary, visit) for the job's item."""
-    adult = is_adult(profile.date_of_birth)
+    adult = is_adult(profile.date_of_birth, profile.majority_state)
     if trigger == "guidance_summary":
         summary = db.get(GuidanceSummary, source_id) if source_id else None
         if summary is None or summary.content is None or summary.profile_id != profile.id:
@@ -188,7 +188,7 @@ def _prepare(db: Session, payload: dict[str, Any]) -> _Prepared | None:
         version=plan.version,
         profile=profile,
         account=account,
-        adult=is_adult(profile.date_of_birth),
+        adult=is_adult(profile.date_of_birth, profile.majority_state),
         trigger=trigger,
         source_id=source_id,
         context=oracle_context(db, profile, account),

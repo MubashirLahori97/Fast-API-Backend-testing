@@ -79,7 +79,7 @@ NAME_TOO_LONG = "Please keep this to 100 characters or fewer."
 @pytest.fixture
 def user(make_user):
     """Sarah, on the Basic plan so she can add family members, with her own profile done."""
-    return make_user(subscription_plan="basic")
+    return make_user(subscription_plan="individual")
 
 
 @pytest.fixture

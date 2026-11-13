@@ -12,6 +12,7 @@ from app.admin.plans.schemas import (
     PlanSaved,
     PublishBody,
 )
+from app.billing.dependencies import PaymentProviderDep
 from app.core.database import DbSession
 
 # Super Admin only (8.1 and 8.2): Admins get 403 super_admin_only, clients the usual 404.
@@ -27,10 +28,14 @@ def list_plans(session: SuperAdminSession, db: DbSession) -> PlanList:
 
 @router.post("", status_code=201)
 def create_plan(
-    body: PlanNew, session: SuperAdminSession, request: Request, db: DbSession
+    body: PlanNew,
+    session: SuperAdminSession,
+    provider: PaymentProviderDep,
+    request: Request,
+    db: DbSession,
 ) -> PlanSaved:
     """8.2's + Add plan: action "draft", or "publish" with confirmed: true."""
-    return service.create_plan(db, session.user, body, request)
+    return service.create_plan(db, session.user, body, request, provider)
 
 
 @router.get("/{plan_id}")
@@ -44,13 +49,14 @@ def update_plan(
     plan_id: uuid.UUID,
     body: PlanEdit,
     session: SuperAdminSession,
+    provider: PaymentProviderDep,
     request: Request,
     db: DbSession,
 ) -> PlanSaved:
     """8.1's Edit, and setting a plan Active or Inactive. A price change or Inactive needs
     confirmed: true; without it the answer is 409 confirmation_required with the story's
     confirmation text."""
-    return service.update_plan(db, session.user, plan_id, body, request)
+    return service.update_plan(db, session.user, plan_id, body, request, provider)
 
 
 @router.post("/{plan_id}/publish")
@@ -58,10 +64,11 @@ def publish_plan(
     plan_id: uuid.UUID,
     body: PublishBody,
     session: SuperAdminSession,
+    provider: PaymentProviderDep,
     request: Request,
     db: DbSession,
 ) -> PlanSaved:
     """8.2's Publish for a draft plan, with confirmed: true."""
     return service.publish_plan(
-        db, session.user, plan_id, confirmed=body.confirmed, request=request
+        db, session.user, plan_id, confirmed=body.confirmed, request=request, provider=provider
     )

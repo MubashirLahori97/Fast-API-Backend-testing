@@ -173,28 +173,48 @@ class HealthAnswer:
 
 @dataclass(frozen=True)
 class HealthQuestion:
-    """A question that applies to the profile and isn't answered yet. The Oracle asks it only
-    when it helps the current concern (story 3.1's "Asked later"), and saves the answer as a
-    health_fact widget with these codes."""
+    """A question that applies to the profile, isn't answered yet, and may be asked in
+    conversation. The Oracle asks it as `when_asked` says (the Health Intake Routing document's
+    Part 3), and saves the answer as a health_fact widget with these codes."""
 
     key: str
     section: str
     question: str  # worded for the profile
-    kind: str  # choice | multi_choice | checklist | text | number | scale | date | named_list
-    choices: tuple[tuple[str, str], ...]  # (code, label), for the choice kinds
+    # choice | multi_choice | checklist | text | number | scale | date | time | named_list |
+    # history (app/health/values.py has each kind's value)
+    kind: str
+    choices: tuple[tuple[str, str], ...]  # (code, label), only those shown to the profile
     write_in_choice: str | None  # the choice whose write-in goes in `other`
     optional: bool
     sensitive: bool  # skippable, like every follow-up body question (3.1)
+    # asked_first: the first time it's relevant to the concern; asked_later: only when it helps
+    # the current concern; conversation: the follow-up body questions, after the privacy notice
+    # ("Your body" first); onboarding: never asked by the Oracle.
+    when_asked: str = "asked_later"
 
 
 @dataclass(frozen=True)
 class HealthContext:
     """The profile's health profile (story 6.1), as it is when the reply starts. Removed
     answers, and answers to questions that no longer apply, aren't in it, so the Oracle stops
-    using them (6.1). Empty when the caller doesn't fill it in."""
+    using them (6.1). Empty when the caller doesn't fill it in.
+
+    The routing (routing document, Part 1) comes with it, so the Oracle words and orders the
+    body questions. Health data, like everything else here."""
 
     answered: tuple[HealthAnswer, ...] = ()
     unanswered: tuple[HealthQuestion, ...] = ()
+    # a: sex at birth Intersex or Prefer not to say; b: gender differs from sex at birth;
+    # gender_prefer_not_to_say: "Your body", then the standard body questions; none: no
+    # follow-up questions.
+    follow_up_path: str = "none"
+    # Which body questions apply: female (uterus or ovaries), male (testes or prostate),
+    # intersex (both) or general (none known: general questions only, ask gently if needed).
+    body_route: str = "general"
+    organs: tuple[str, ...] = ()  # "Your body" codes, ticked or assumed from sex at birth
+    body_from_your_body: bool = False  # False: "Your body" skipped, so sex at birth decides
+    # Path B only: say this before the gender-affirming questions (decision 33).
+    opening_line: str | None = None
 
 
 @dataclass(frozen=True)
@@ -203,7 +223,7 @@ class ProfileContext:
 
     Each field is picked on purpose. The date of birth is only sent as an age group, and the
     advocate consent option is never sent. Visits and the Wellness Plan join this in Phases 6
-    and 7. Under 18, every reply is education only, with no products (3.1)."""
+    and 7. Under the age of majority, every reply is education only, with no products (3.1)."""
 
     is_self: bool  # False: a family member, and the client is their advocate
     first_name: str  # the profile's own first name
@@ -719,11 +739,20 @@ class Oracle(Protocol):
         ...
 
     def stream_reply(
-        self, context: ProfileContext, history: list[Turn], earlier: list[EarlierConversation]
+        self,
+        context: ProfileContext,
+        history: list[Turn],
+        earlier: list[EarlierConversation],
+        *,
+        conversation_id: str | None = None,
     ) -> Iterator[str | Widget]:
         """The reply to the last client turn: pieces of text in the order they're generated,
         and any widgets (dicts) for the apps to show with it. The text pieces, joined, are the
         reply's whole text.
+
+        `conversation_id` is our conversation's id, for a service that keeps the thread's
+        history itself (the clinician streaming chat API uses it as its thread id).
+        It's an id, never health data.
 
         `context.health` is the health profile: never ask again for what's in `answered`
         (story 3.1's "Never repeat"), and save anything lasting (symptoms, medicines) as a

@@ -828,8 +828,9 @@ def create_adult_account(
     )
 
 
-def _reminder_day(date_of_birth: date) -> date:
-    return access.adult_on(date_of_birth) - timedelta(days=settings.teen_age_reminder_days)
+def _reminder_day(date_of_birth: date, state: str | None) -> date:
+    """Two weeks before the age of majority in the teen's own state."""
+    return access.adult_on(date_of_birth, state) - timedelta(days=settings.teen_age_reminder_days)
 
 
 def run_age_check(db: Session, now: datetime) -> None:
@@ -843,8 +844,11 @@ def run_age_check(db: Session, now: datetime) -> None:
 
     Only teens within the reminder window are read. Commits."""
     day = us_today()
+    # The youngest age of majority in any state, so this rough filter misses nobody; each teen
+    # is then checked against their own state's age.
+    youngest_majority = min([settings.age_of_majority, *settings.age_of_majority_by_state.values()])
     soon_adult = years_before(
-        day + timedelta(days=settings.teen_age_reminder_days), settings.age_of_majority
+        day + timedelta(days=settings.teen_age_reminder_days), youngest_majority
     )
     rows = db.execute(
         select(User, TeenAccount)
@@ -865,7 +869,7 @@ def run_age_check(db: Session, now: datetime) -> None:
             continue
         if details.reminder_scheduled_at is not None:
             continue
-        first_day = _reminder_day(teen.date_of_birth)
+        first_day = _reminder_day(teen.date_of_birth, teen.state)
         last_day = first_day + timedelta(days=settings.reminder_catch_up_days)
         if not first_day <= day <= last_day:
             continue

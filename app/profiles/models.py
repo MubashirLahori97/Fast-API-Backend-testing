@@ -2,8 +2,9 @@ import uuid
 from datetime import date, datetime
 
 from sqlalchemy import CheckConstraint, ForeignKey, Index, func, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, object_session
 
+from app.auth.models import User
 from app.core.database import Base
 
 
@@ -64,8 +65,9 @@ class Profile(Base):
     # The client's own is copied from users.date_of_birth (sign-up) when the profile is created,
     # and can't be changed here. A family member's is asked in their intake (story 2.2).
     date_of_birth: Mapped[date | None]
-    # Family members aged 13 to 17 only (story 2.2's Teen Profile Choice): "managed" (the
-    # client manages the profile). "own_account" (an invited teen) comes with Phase 3b.
+    # Family members aged 13 up to the age of majority only (story 2.2's Teen Profile Choice):
+    # "managed" (the client manages the profile). "own_account" (an invited teen) comes with
+    # Phase 3b.
     teen_profile_choice: Mapped[str | None]
     # Family members only: how the client may act for them (story 2.2 step 4), and when they
     # confirmed it. Never shown to the support team.
@@ -88,3 +90,15 @@ class Profile(Base):
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+
+    @property
+    def majority_state(self) -> str | None:
+        """The state whose age of majority counts for this profile (app/core/ages.py): the
+        account's state. For the client's own profile and a teen's own account that's their
+        own; for a family member it's the account holder's, an assumption (the stories don't
+        say: docs/decisions/state-age-of-majority.md). The account comes from the session's
+        identity map when it's already loaded (the signed-in user usually is). None (so 18)
+        for a profile outside a session."""
+        session = object_session(self)
+        account = session.get(User, self.account_id) if session is not None else None
+        return account.state if account is not None else None

@@ -11,10 +11,22 @@ subscription events (Super Admin 7.2).
 import csv
 import io
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from fastapi import Request
-from sqlalchemy import ColumnElement, String, and_, cast, exists, func, not_, or_, select
+from sqlalchemy import (
+    ColumnElement,
+    String,
+    and_,
+    case,
+    cast,
+    exists,
+    func,
+    literal,
+    not_,
+    or_,
+    select,
+)
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -39,7 +51,7 @@ from app.admin.audit.schemas import (
 from app.admin.auth.models import AdminInvitation
 from app.auth.models import User
 from app.core import audit
-from app.core.ages import is_adult, us_today, years_before
+from app.core.ages import age_of_majority, is_adult, us_today, years_before
 from app.core.audit import AuditEvent
 from app.core.config import settings
 from app.core.errors import AppError
@@ -103,12 +115,24 @@ def _system() -> ColumnElement[bool]:
     return and_(AuditEvent.actor_id.is_(None), AuditEvent.ip_address.is_(None))
 
 
+def _adult_by() -> ColumnElement[date]:
+    """SQL: the latest date of birth that has reached the age of majority today, in the
+    account's own state (19 in Alabama and Nebraska, 21 in Mississippi, 18 elsewhere)."""
+    day = us_today()
+    default = years_before(day, age_of_majority(None))
+    whens = [
+        (User.state == state, years_before(day, age_of_majority(state)))
+        for state in settings.age_of_majority_by_state
+    ]
+    return case(*whens, else_=default) if whens else literal(default)
+
+
 def _role_condition(role: str) -> ColumnElement[bool]:
     def actors(*conditions: ColumnElement[bool]) -> ColumnElement[bool]:
         return AuditEvent.actor_id.in_(select(User.id).where(*conditions))
 
     # Teens are account holders under the age of majority (invited teens, Phase 3b).
-    adult_by = years_before(us_today(), settings.age_of_majority)
+    adult_by = _adult_by()
     if role == "client":
         return actors(
             User.role == "client",
@@ -155,7 +179,7 @@ def _role(user: User | None, event: AuditEvent) -> str:
     if user is None:
         return "system" if event.actor_id is None and event.ip_address is None else "anonymous"
     if user.role == "client" and user.date_of_birth is not None:
-        return "client" if is_adult(user.date_of_birth) else "teen"
+        return "client" if is_adult(user.date_of_birth, user.state) else "teen"
     return user.role if user.role in ROLE_LABELS else "client"
 
 

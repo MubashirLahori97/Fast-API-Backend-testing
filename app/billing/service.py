@@ -35,6 +35,7 @@ from app.billing.provider import (
     STORES,
     Charge,
     CheckoutRequest,
+    IgnoredEvent,
     InvalidEvent,
     InvalidSignature,
     PaymentCancelled,
@@ -236,6 +237,15 @@ def _schedule_check(db: Session, sub: Subscription, at: datetime | None) -> None
         jobs.enqueue(db, CHECK_JOB, {"subscription_id": str(sub.id)}, run_at=at)
 
 
+def _schedule_period_end(db: Session, sub: Subscription) -> None:
+    """CHECK_JOB at the next billing date, and shortly before it, when add-ons no longer used
+    are taken off the provider's subscription so its renewal invoice doesn't charge them
+    (11.3)."""
+    lead = timedelta(minutes=settings.billing_pre_renewal_minutes)
+    _schedule_check(db, sub, sub.current_period_end - lead)
+    _schedule_check(db, sub, sub.current_period_end)
+
+
 def _audit(
     db: Session,
     action: str,
@@ -379,7 +389,7 @@ def _activate(
         by_client=by_client,
         details={"plan": plan, "add_on_members": sub.add_on_members, "provider": provider_name},
     )
-    _schedule_check(db, sub, sub.current_period_end)
+    _schedule_period_end(db, sub)
     family.queue_sync(db, account)  # family members turned off by an earlier end come back
     return sub, invoice
 
@@ -448,7 +458,7 @@ def _renew(
     sub.plan_price_cents = catalog.offer(sub.plan).monthly_price_cents
     sub.add_on_price_cents = catalog.add_on_price_cents()
     _audit(db, "billing.subscription.renewed", account, sub, details={"plan": sub.plan})
-    _schedule_check(db, sub, end)
+    _schedule_period_end(db, sub)
 
 
 def _end(db: Session, account: User, sub: Subscription, reason: str) -> None:
@@ -1145,6 +1155,12 @@ def handle_webhook(
         raise AppError(400, "invalid_signature", INVALID_SIGNATURE) from None
     except InvalidEvent:
         raise AppError(400, "invalid_event", INVALID_EVENT) from None
+    except IgnoredEvent:
+        return  # an event billing doesn't follow: answered 200, so it isn't sent again
+    except ProviderError as error:
+        # Reading the event needed the provider, which couldn't be reached: it sends it again.
+        logger.warning("Payment provider call failed (webhook): %s", type(error).__name__)
+        raise AppError(503, "provider_unavailable", ACTION_FAILED) from None
 
     receipts: list[tuple[User, Invoice | None]] = []
     with database_errors_retryable(db):
@@ -1190,3 +1206,23 @@ def check_subscription(db: Session, provider: PaymentProvider, subscription_id: 
         _end(db, account, sub, reason)
     elif sub.status in ("active", "past_due") and sub.current_period_end <= now:
         _settle_period(db, provider, account, sub)
+    elif sub.status in ("active", "past_due") and now >= sub.current_period_end - timedelta(
+        minutes=settings.billing_pre_renewal_minutes
+    ):
+        _release_add_ons_before_renewal(db, provider, account, sub)
+
+
+def _release_add_ons_before_renewal(
+    db: Session, provider: PaymentProvider, account: User, sub: Subscription
+) -> None:
+    """Shortly before the next billing date: add-ons the client no longer uses come off the
+    provider's subscription with no proration, so the renewal invoice doesn't charge them (11.3:
+    "The add-on charge stops from the next billing date"). The places stay here until the period
+    ends, when _settle_period drops them. A pending downgrade took the add-ons off already."""
+    if sub.plan != "family" or sub.pending_plan is not None or sub.provider != provider.name:
+        return
+    needed = _add_ons_needed(db, account)
+    if needed < sub.add_on_members:
+        provider.set_add_on_members(
+            sub.provider_subscription_id, needed, price_cents=sub.add_on_price_cents, prorate=False
+        )

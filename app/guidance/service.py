@@ -466,7 +466,9 @@ def share_summary(
         context = conversations.profile_context(profile, account, db)
         db.commit()  # no transaction is held while the Oracle runs
         result = oracle.summarize(context, _history(messages), previous)
-        content = _clean_summary(result, adult=is_adult(profile.date_of_birth))
+        content = _clean_summary(
+            result, adult=is_adult(profile.date_of_birth, profile.majority_state)
+        )
     except Exception as error:  # the AI service failed, or answered something unusable
         logger.warning(
             "Guidance summary failed: %s (conversation %s)", type(error).__name__, conversation.id
@@ -508,7 +510,10 @@ def share_summary(
 
 def _shown_products(db: Session, summary: GuidanceSummary, profile: Profile) -> bool:
     """Products for adults only, and never during an emergency or crisis hold (3.3)."""
-    return is_adult(profile.date_of_birth) and safety.open_hold(db, summary.conversation_id) is None
+    return (
+        is_adult(profile.date_of_birth, profile.majority_state)
+        and safety.open_hold(db, summary.conversation_id) is None
+    )
 
 
 def summary_out(db: Session, summary: GuidanceSummary, account: User) -> GuidanceSummaryOut:
@@ -516,7 +521,7 @@ def summary_out(db: Session, summary: GuidanceSummary, account: User) -> Guidanc
     content = summary.content
     show_products = _shown_products(db, summary, profile)
     unlocked = _downloads_unlocked(account)
-    adult = is_adult(profile.date_of_birth)
+    adult = is_adult(profile.date_of_birth, profile.majority_state)
     library = protocols.load(db)
     protocols_shown = frozenset(
         key for key in protocols.SECTIONS if library.allowed(key, adult=adult)
@@ -706,7 +711,11 @@ def _ask_for_notes(
                 raise OracleError("Only an Other specialty can be unclear.")
             text = specialties.UNCLEAR_SPECIALTY.format(text=specialty_other)
             return "clarify_specialty", None, text
-        return "ready", _clean_notes(result, adult=is_adult(profile.date_of_birth)), None
+        return (
+            "ready",
+            _clean_notes(result, adult=is_adult(profile.date_of_birth, profile.majority_state)),
+            None,
+        )
     except Exception as error:  # the AI service failed, or answered something unusable
         logger.warning("Provider notes failed: %s (profile %s)", type(error).__name__, profile.id)
         raise AppError(503, "notes_failed", NOTES_FAILED) from None

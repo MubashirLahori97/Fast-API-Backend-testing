@@ -7,7 +7,7 @@ draft, so at most one unfinished intake exists to resume (story 1.2).
 
 The client's own intake asks sex at birth, gender and pronouns; the date of birth comes from
 sign-up. A family member's also asks who they are, their first name and date of birth, the
-Teen Profile Choice (13 to 17 only) and the advocate consent.
+Teen Profile Choice (13 up to the age of majority only) and the advocate consent.
 
 A finished family member can be edited, turned off and on, or removed (8.2). Removing starts a
 deletion request's 10-day grace period with full use (app/privacy/service.py); then the profile
@@ -17,7 +17,17 @@ is locked (`deletion_requested_at`) and the support team deletes it.
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import asdict
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
+
+
+def _add_business_days(start: datetime, days: int) -> datetime:
+    current = start
+    added = 0
+    while added < days:
+        current += timedelta(days=1)
+        if current.weekday() < 5:
+            added += 1
+    return current
 
 from fastapi import Request
 from sqlalchemy import delete, select
@@ -29,8 +39,7 @@ from app.auth.models import User
 from app.auth.schemas import OLDEST_AGE
 from app.billing import entitlements
 from app.core import audit
-from app.core.ages import TEEN_FROM_AGE, age_group, age_on, today, years_before
-from app.core.config import settings
+from app.core.ages import TEEN_FROM_AGE, age_group, age_of_majority, age_on, today, years_before
 from app.core.errors import AppError, database_errors_retryable
 from app.profiles import options
 from app.profiles.models import Profile
@@ -71,10 +80,11 @@ def _today() -> date:
     return today()
 
 
-def is_teen(date_of_birth: date | None) -> bool:
-    """13 up to the age of majority (story 2.2's age groups): they get the Teen Profile
-    Choice. Counted on Hawaii's date, like the age of majority at sign-up (app/core/ages.py)."""
-    return date_of_birth is not None and age_group(date_of_birth) == "teen"
+def is_teen(date_of_birth: date | None, state: str | None) -> bool:
+    """13 up to the age of majority in `state` (story 2.2's age groups): they get the Teen
+    Profile Choice. For a family member the state is the account holder's (Profile.
+    majority_state). Counted on Hawaii's date, like the age of majority at sign-up."""
+    return date_of_birth is not None and age_group(date_of_birth, state) == "teen"
 
 
 def is_under_13(profile: Profile) -> bool:
@@ -82,7 +92,7 @@ def is_under_13(profile: Profile) -> bool:
     own profile never is: account holders are adults (story 1.1)."""
     if profile.is_self or profile.date_of_birth is None:
         return False
-    return age_group(profile.date_of_birth) == "under_13"
+    return age_group(profile.date_of_birth, profile.majority_state) == "under_13"
 
 
 @contextmanager
@@ -114,7 +124,9 @@ def next_question(profile: Profile) -> str:
     if profile.intake_completed_at is not None:
         return "done"
     for question in _questions(profile):
-        if question == "teen_profile_choice" and not is_teen(profile.date_of_birth):
+        if question == "teen_profile_choice" and not is_teen(
+            profile.date_of_birth, profile.majority_state
+        ):
             continue
         if getattr(profile, question) is None:
             return question
@@ -176,12 +188,12 @@ def _check_teen_profile_choice(
 ) -> None:
     """Only a teen gets the choice. Their own account (an invite, story 1.5) needs the Family
     plan: 1.5's upgrade prompt otherwise. The free place is checked when the invite is sent."""
-    if not is_teen(date_of_birth):
+    if not is_teen(date_of_birth, account.state):
         raise AppError(
             422,
             "teen_only",
             f"This question is only for family members aged {TEEN_FROM_AGE} to "
-            f"{settings.age_of_majority - 1}.",
+            f"{age_of_majority(account.state) - 1}.",
             "teen_profile_choice",
         )
     if choice == "own_account":
@@ -456,7 +468,10 @@ def save_intake_answers(
             )
             for field, value in given.items():
                 setattr(profile, field, value)
-            if not is_teen(profile.date_of_birth) and profile.teen_profile_choice is not None:
+            if (
+                not is_teen(profile.date_of_birth, account.state)
+                and profile.teen_profile_choice is not None
+            ):
                 # A new date of birth made them a child or an adult: the choice was for a teen.
                 profile.teen_profile_choice = None
             if "advocate_consent" in given:

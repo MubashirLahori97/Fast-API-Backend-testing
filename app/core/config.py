@@ -53,8 +53,22 @@ class Settings(BaseSettings):
     payment_grace_days: int = 7
     # Where the provider's hosted pages (checkout, payment method) send the client back.
     billing_return_url: str = "http://localhost:5173/billing"
-    # Signs the payment provider's webhooks. The real provider needs its own secret in .env.
+    # Signs the fake payment provider's webhooks (Stripe uses stripe_webhook_secret).
     payment_webhook_secret: str = "dev-only-payment-webhook-secret"
+    # Stripe (docs/decisions/stripe-billing.md). With a secret key set, billing uses Stripe;
+    # without one, development and tests use the fake provider, and production refuses to run.
+    # Never commit real keys: they go in .env only.
+    stripe_secret_key: str = ""
+    # From the Stripe dashboard's webhook endpoint, or `stripe listen` in development.
+    stripe_webhook_secret: str = ""
+    # The launch plans' Stripe prices, printed by scripts/create_stripe_prices.py. Once the
+    # Super Admin changes a price, the billing_plans row holds the new price's id instead.
+    stripe_individual_price_id: str = ""
+    stripe_family_price_id: str = ""
+    stripe_family_add_on_price_id: str = ""
+    # How long before the next billing date unused add-ons are taken off the provider's
+    # subscription, so its renewal invoice doesn't charge them (11.3).
+    billing_pre_renewal_minutes: int = 60
     # A signed webhook older than this is refused, so a captured one can't be replayed later.
     payment_webhook_tolerance_seconds: int = 300
     # The app emails a receipt for each payment. Turn off if the provider sends its own.
@@ -110,6 +124,18 @@ class Settings(BaseSettings):
     oracle_history_messages: int = 60
     oracle_earlier_conversations: int = 3
     oracle_earlier_messages: int = 20
+    # Which Oracle answers replies (app/oracle/dependencies.py): "fake" (FakeOracle) or
+    # "clinician" (the clinician streaming chat API, app/oracle/clinician_chat.py).
+    # "senior" is supported as an alias for backwards compatibility.
+    oracle_backend: Literal["fake", "clinician", "senior"] = "clinician"
+    clinician_chat_base_url: str = (
+        "https://oracle-clinician-dev-west-us.bravesea-f749ef56.westcentralus.azurecontainerapps.io"
+    )
+    senior_chat_base_url: str = (
+        "https://oracle-clinician-dev-west-us.bravesea-f749ef56.westcentralus.azurecontainerapps.io"
+    )
+    clinician_chat_timeout_seconds: float = 30
+    senior_chat_timeout_seconds: float = 30
     # Health details (health_fact widgets, stories 3.1 and 6.1) saved from one reply; any more
     # are dropped. Each is a database write, and the Oracle's output is untrusted
     # (docs/decisions/conversations-health-1922.md).
@@ -168,9 +194,13 @@ class Settings(BaseSettings):
     # Per account: every request emails the team.
     max_support_requests_per_hour: int = 10
 
-    # Story 1.1: below this age, sign-up stops and no account is created. One age for every
-    # state (docs/PLAN.md, question 22); the stories also name 19 and 21 for three states.
+    # Story 1.1: below the selected state's age of majority, sign-up stops and no account is
+    # created. 18 in most states and DC, and for an unknown or missing state; the exceptions
+    # (USPS codes) are 1.1's table, also in the BA's routing document. "The age-of-majority
+    # table can be updated without an app release": set AGE_OF_MAJORITY_BY_STATE as JSON.
+    # Read through app/core/ages.age_of_majority (docs/decisions/state-age-of-majority.md).
     age_of_majority: int = 18
+    age_of_majority_by_state: dict[str, int] = {"AL": 19, "NE": 19, "MS": 21}
 
     # Sign-in rules. Most are assumed values until the BA confirms them (docs/PLAN.md).
     trial_days: int = 14

@@ -34,8 +34,7 @@ from sqlalchemy.orm import Session
 from app.accounts.models import OPEN_DELETION_STATUSES, DeletionRequest, PolicyVersion
 from app.auth.models import User
 from app.billing import entitlements
-from app.core.ages import age_on, us_today
-from app.core.config import settings
+from app.core import ages
 from app.teens.models import TeenLink
 
 # The gate's messages (ACCESS_PAUSED, AGE_OF_MAJORITY_REACHED) are in app/privacy/teens.py, next
@@ -54,25 +53,17 @@ def is_teen_account(account: User) -> bool:
     return account.account_type == "teen"
 
 
-def adult_on(date_of_birth: date) -> date:
-    """The day the age of majority is reached, the same way age_on counts it: someone born on
-    29 February turns 18 on 1 March in a year without one (docs/PLAN.md, question 39)."""
-    year = date_of_birth.year + settings.age_of_majority
-    try:
-        return date_of_birth.replace(year=year)
-    except ValueError:
-        return date(year, 3, 1)
+def adult_on(date_of_birth: date, state: str | None) -> date:
+    """The day the age of majority in the teen's own state is reached (ages.adult_on)."""
+    return ages.adult_on(date_of_birth, state)
 
 
 def reached_majority(account: User) -> bool:
-    """Story 1.6, on Hawaii's date and the account's state, like 11.1's age rules. The age is
-    18 in every state for now (question 22); accounts.service.age_of_majority_in is where a
-    per-state table would go."""
-    from app.accounts import service as accounts  # accounts.service imports this package
-
+    """Story 1.6, on Hawaii's date and the teen's own state (19 in Alabama and Nebraska, 21 in
+    Mississippi, 18 elsewhere), like 11.1's age rules."""
     if account.date_of_birth is None:
         return False
-    return age_on(account.date_of_birth, us_today()) >= accounts.age_of_majority_in(account.state)
+    return ages.is_adult(account.date_of_birth, account.state)
 
 
 def current_health_consent_id(db: Session) -> uuid.UUID | None:

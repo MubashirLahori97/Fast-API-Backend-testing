@@ -40,7 +40,7 @@ SELF_QUESTIONS: tuple[IntakeQuestion, ...] = (
     "gender_identity",
     "pronouns",
 )
-# teen_profile_choice is only asked for a member aged 13 to 17 (story 2.2).
+# teen_profile_choice is only asked for a member aged 13 up to the age of majority (story 2.2).
 FAMILY_QUESTIONS: tuple[IntakeQuestion, ...] = (
     "family_relationship",
     "first_name",
@@ -105,8 +105,8 @@ class IntakeAnswers(RequestBody):
     family_relationship: FamilyRelationship | None = None
     first_name: str | None = None
     date_of_birth: date | None = None
-    # Story 2.2, for a member aged 13 to 17 only. "own_account" needs the Family plan (1.5), and
-    # then the invite (next_question "teen_invite") instead of steps 4 to 7.
+    # Story 2.2, for a member aged 13 up to the age of majority only. "own_account" needs the
+    # Family plan (1.5), and then the invite (next_question "teen_invite") instead of steps 4 to 7.
     teen_profile_choice: TeenProfileChoice | None = None
     advocate_consent: AdvocateConsent | None = None
     sex_at_birth: SexAtBirth | None = None

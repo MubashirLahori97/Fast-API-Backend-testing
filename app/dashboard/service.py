@@ -155,7 +155,7 @@ def _build(db: Session, profile: Profile, account: User, now: datetime) -> HomeD
         profile_id=profile.id,
         is_self=profile.is_self,
         teen_account=teen_account,
-        education_only=teen_account or not is_adult(profile.date_of_birth),
+        education_only=teen_account or not is_adult(profile.date_of_birth, account.state),
         top_bar=TopBar(
             greeting=_greeting(profile, name, now),
             unread_notifications=notifications.unread_count(db, account),

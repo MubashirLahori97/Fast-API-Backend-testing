@@ -59,12 +59,12 @@ Removed: `deletion_business_days`, `transfer_invite_url`, `transfer_invite_days`
 ## Open questions for the BA (contradictions recorded; newest text followed)
 
 1. **1.2 grace-period routing:** "No new routing... the Client signs in as normal" versus the first check "Account in its deletion notice period: ... with a message". Built: normal routing plus `deletion_notice` (banner, and the teen messages).
-2. **8.2 alternate "Invited teen removed — the teen loses access, and their data is kept"** and "the teen emails the support team" contradict the new removal flow (full use 10 days, then deleted). Built: the new flow.
+2. **8.2 alternate "Invited teen removed — the teen loses access, and their data is kept"** and "the teen emails the support team" contradict the new removal flow (full use 10 days, then deleted). Built: the new flow. **Decided by the user on 10 Nov: follow the new text.**
 3. **8.2 Advocate-Only Clients** still describe clients who deleted their own data; 11.4 defers "stay as advocate only". Built: the last-member rule applies to clients without an own profile (2.2).
 4. **Cancelling a deletion during the grace period:** no story says the client can. Built: no; the team's existing Decline stays (a declined teen removal doesn't relink the teen).
 5. **Revoking consent during the grace period:** built as before (refused while a deletion is open).
 6. **A removed teen who joins another family during the grace period** keeps the removal request and is still deleted. Should joining cancel it?
-7. **Subscription:** an Account Deletion should stop billing; app/billing is parked, so `purge.end_subscription` is still empty (and nothing stops renewals during the grace period).
+7. **Subscription:** an Account Deletion should stop billing; **built on 11 Nov with Stripe:** `purge.end_subscription` ends the subscription at once, with no refund (`docs/decisions/stripe-billing.md`). Renewals still aren't stopped during the grace period, since no story says so (open question in the Stripe decisions).
 8. **Who is "the Client" for an Invited Teen Removal** in the listing and the completion email? Built: the listing shows the teen's account; both the teen and the parent are emailed.
 9. **Invited teens locked through the parent's deletion** show their own status in the admin client list (not "Being deleted"). Should they?
 10. **Backups:** "including from backups" within 45 days depends on backup retention.

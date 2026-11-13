@@ -12,8 +12,12 @@ router uses SuperAdminSession, and these functions check the role again.
     - a new trial length applies to new trials only, since each account stores when its trial
       ends.
 - **Inactive** plans aren't offered to new clients (catalog.offers); clients on them keep them.
+- **Stripe** (docs/decisions/stripe-billing.md): a price change on a published Individual or
+  Family plan creates the new Stripe price and archives the old one before it's saved; if
+  Stripe can't be reached, nothing is saved (8.1's "Action fails"). Existing subscribers are
+  moved to the new price, from their next billing date, as they're emailed about it.
 - **New plans** (8.2) are saved as drafts. Publishing needs the payment providers to sell them
-  (PAYMENT PROVIDERS below); until billing supports plans beyond Individual and Family, it
+  (`_set_up_with_providers`); until billing supports plans beyond Individual and Family, it
   answers 8.2's "We couldn’t set up this plan..." and the plan stays a draft.
 """
 
@@ -44,12 +48,14 @@ from app.admin.plans.schemas import (
 from app.auth.models import User
 from app.billing import catalog
 from app.billing.catalog import LAUNCH_CODES, PAID_PLANS, BillingPlan, PlanPriceChange
+from app.billing.dependencies import get_payment_provider
 from app.billing.models import Subscription
+from app.billing.provider import PaymentProvider, PlanSetup, ProviderError
 from app.billing.schemas import Price
 from app.core import audit, jobs
 from app.core.config import settings
 from app.core.email import SendEmail
-from app.core.errors import AppError, database_errors_retryable
+from app.core.errors import ACTION_FAILED, AppError, database_errors_retryable
 
 PRICE_CHANGE_JOB = "admin_plans.price_change_emails"  # see app/admin/jobs.py
 PRICE_CHANGE_EMAIL_JOB = "admin_plans.price_change_email"
@@ -271,7 +277,12 @@ def _confirm(confirmed: bool, message: str) -> None:
 
 
 def update_plan(
-    db: Session, admin: User, plan_id: uuid.UUID, body: PlanEdit, request: Request | None = None
+    db: Session,
+    admin: User,
+    plan_id: uuid.UUID,
+    body: PlanEdit,
+    request: Request | None = None,
+    provider: PaymentProvider | None = None,
 ) -> PlanSaved:
     _check_super_admin(admin)
     sent = body.model_fields_set - {"confirmed"}
@@ -338,10 +349,12 @@ def update_plan(
                 ),
             },
         )
-        # PAYMENT PROVIDERS: update the plan's prices with Stripe, the App Store and Google Play
-        # (app/billing/provider.py has no call for it yet). 8.1's "Store update pending" message
-        # belongs here once store prices exist.
+        # 8.1: "Prices are kept in step with Stripe". The App Store and Google Play aren't sold
+        # yet, so 8.1's "Store update pending" message isn't used.
         if price_changed and plan.status != "draft" and plan.code in PAID_PLANS:
+            if not _set_up_with_providers(plan, provider or get_payment_provider()):
+                db.rollback()
+                raise AppError(503, "provider_unavailable", ACTION_FAILED)
             jobs.enqueue(
                 db,
                 PRICE_CHANGE_JOB,
@@ -365,15 +378,43 @@ def _code_for(db: Session, name: str) -> str:
     return code
 
 
-def _set_up_with_providers(plan: BillingPlan) -> bool:
-    """PAYMENT PROVIDERS: sets the plan up with Stripe, the App Store and Google Play (8.2).
-    Billing sells only the Individual and Family plans today (subscriptions.plan, PaidPlan), so
-    a new plan can't be set up yet and stays a draft. Returns True once it's set up."""
-    return plan.code in PAID_PLANS
+def _set_up_with_providers(plan: BillingPlan, provider: PaymentProvider) -> bool:
+    """Sets the plan up with the payment provider at its current prices (8.1, 8.2): with
+    Stripe, a product and monthly prices the first time, and a new price (the old one
+    archived) when a price has changed. The Stripe ids are saved on the row, in the caller's
+    transaction. Returns False if it couldn't be done.
+
+    Billing sells only the Individual and Family plans (subscriptions.plan, PaidPlan), so any
+    other plan can't be set up yet and stays a draft. The App Store and Google Play aren't
+    sold yet."""
+    if plan.code not in PAID_PLANS:
+        return False
+    current = catalog.default_values(plan.code)  # the settings' ids, for a row with none
+    setup = PlanSetup(
+        code=plan.code,
+        name=plan.name,
+        monthly_price_cents=plan.monthly_price_cents,
+        currency=settings.billing_currency,
+        add_on_price_cents=plan.add_on_price_cents,
+        price_id=plan.stripe_price_id or current.stripe_price_id,
+        add_on_price_id=plan.stripe_add_on_price_id or current.stripe_add_on_price_id,
+    )
+    try:
+        done = provider.set_up_plan(setup)
+    except ProviderError:
+        return False  # logged by the provider, by class name
+    if provider.name == "stripe":
+        plan.stripe_price_id = done.price_id
+        plan.stripe_add_on_price_id = done.add_on_price_id
+    return True
 
 
 def create_plan(
-    db: Session, admin: User, body: PlanNew, request: Request | None = None
+    db: Session,
+    admin: User,
+    body: PlanNew,
+    request: Request | None = None,
+    provider: PaymentProvider | None = None,
 ) -> PlanSaved:
     """8.2's + Add plan. Save as draft, or Publish (with `confirmed`), which first saves the
     draft and then tries the payment providers."""
@@ -409,7 +450,7 @@ def create_plan(
         )
         db.commit()
     if body.action == "publish":
-        return publish_plan(db, admin, plan.id, confirmed=True, request=request)
+        return publish_plan(db, admin, plan.id, confirmed=True, request=request, provider=provider)
     return PlanSaved(plan=_detail(db, plan), message=DRAFT_SAVED)
 
 
@@ -420,6 +461,7 @@ def publish_plan(
     *,
     confirmed: bool,
     request: Request | None = None,
+    provider: PaymentProvider | None = None,
 ) -> PlanSaved:
     """8.2's Publish: set up with the payment providers, then shown to clients as Active. If
     the setup fails, the plan stays a draft and can be published again."""
@@ -429,7 +471,7 @@ def publish_plan(
         if plan.status != "draft":
             raise AppError(409, "already_published", ALREADY_PUBLISHED)
         _confirm(confirmed, PUBLISH_CONFIRMATION.format(name=plan.name))
-        if not _set_up_with_providers(plan):
+        if not _set_up_with_providers(plan, provider or get_payment_provider()):
             audit.record(
                 db,
                 "billing.plan_setup_failed",
@@ -500,6 +542,14 @@ def send_price_change_email(db: Session, payload: dict, send: SendEmail) -> None
     sub = db.scalar(select(Subscription).where(Subscription.account_id == account.id))
     if sub is None or sub.plan != payload["plan_code"] or sub.cancel_at_period_end:
         return
+    # 8.1: they pay the new price from their next billing date. Stripe keeps a subscription on
+    # the price it was started with, so it's moved now, with nothing charged until then. This
+    # comes before the email: if Stripe can't be reached, the job is retried and nothing has
+    # been sent yet.
+    provider = get_payment_provider()
+    if sub.provider == provider.name:
+        catalog.refresh(db)  # this process may still have the old price ids cached
+        provider.use_current_prices(sub.provider_subscription_id, sub.pending_plan or sub.plan)
     plan = db.get(BillingPlan, change.plan_id)
     send(
         emails.price_change(

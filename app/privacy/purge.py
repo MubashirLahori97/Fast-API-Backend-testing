@@ -36,6 +36,9 @@ from sqlalchemy.orm import Session
 
 from app.accounts.models import OPEN_DELETION_STATUSES, DeletionRequest
 from app.auth.models import User
+from app.billing.dependencies import get_payment_provider
+from app.billing.models import Subscription
+from app.billing.provider import STORES
 from app.conversations.models import Conversation, Message, MessageFeedback
 from app.core import audit, jobs
 from app.core.config import settings
@@ -83,10 +86,31 @@ def _purge_family_member(db: Session, deletion: DeletionRequest) -> None:
 
 
 def end_subscription(db: Session, account: User) -> None:
-    """BILLING (parked): end the account's subscription with the payment provider straight
-    away, so a deleted account isn't charged again. The subscription row itself goes with the
-    account (ON DELETE CASCADE), but the provider's side doesn't. app/billing has no call for
-    this yet (its cancel() keeps access to the end of the period and commits)."""
+    """Ends the account's subscription with the payment provider straight away, so a deleted
+    account isn't charged again (docs/decisions/stripe-billing.md). The subscription row goes
+    with the account (ON DELETE CASCADE), but the provider's side doesn't. Nothing is refunded.
+
+    Only here, when the deletion is carried out: 11.4 says nothing about the subscription, and
+    the grace period keeps "full use of the account", so renewals carry on until then. If the
+    provider can't be reached, ProviderError fails the purge job, which is retried, so the
+    account isn't deleted while the provider still bills it. App Store and Google Play
+    subscriptions can only be cancelled by the client in the store."""
+    sub = db.scalar(
+        select(Subscription).where(Subscription.account_id == account.id).with_for_update()
+    )
+    if sub is None or sub.status == "ended" or sub.provider in STORES:
+        return
+    provider = get_payment_provider()
+    if sub.provider != provider.name:
+        return  # e.g. a fake subscription left in a development database now on Stripe
+    provider.cancel(sub.provider_subscription_id, at_period_end=False)
+    audit.record(
+        db,
+        "billing.subscription.ended_for_deletion",
+        target_type="subscription",
+        target_id=sub.id,
+        details={"account_id": str(account.id)},
+    )
 
 
 def _close_covered_requests(db: Session, account_id: uuid.UUID, deletion: DeletionRequest) -> None:

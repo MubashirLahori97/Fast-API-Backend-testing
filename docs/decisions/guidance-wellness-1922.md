@@ -51,7 +51,7 @@ Client stories "View Personalised Guidance Summary" (3.3), "Generate Provider-Re
 5. **Linking protocols to library sections:** the knowledge base has no field saying which library section a Protocol item is, so items are matched by title, and renaming an item unlinks it. Should Add New Content have a "Wellness Protocols section" field, or a list of the protocols that make up the library? Also: should Protocol items that aren't one of 7.1's sections, such as a new protocol, appear in the library (built: no)?
 6. **Uploaded-only protocols:** a Protocol published as a file with no typed text shows the section with no content, because clients can't download knowledge base files. Should the library offer the file, or require text for protocols?
 7. **Gen-Pro® notice:** 7.1's message says "2 pumps, twice daily", fixed in the story. If the label changes in the knowledge base, should the notice follow it (the Oracle's directions) instead of the fixed text?
-8. **3.1 contradiction (noted, not built here):** 3.1 still has an acceptance criterion where the Oracle asks before saving to the health profile. Followed the newer automatic saving.
+8. **3.1 contradiction (noted, not built here):** 3.1 still has an acceptance criterion where the Oracle asks before saving to the health profile. Followed the newer automatic saving. **Decided by the user on 10 Nov: follow the new text.**
 
 ## For the migration
 

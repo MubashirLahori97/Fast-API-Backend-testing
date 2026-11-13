@@ -1,7 +1,7 @@
 {
-  "version": "placeholder-2026-11-10",
+  "version": "placeholder-2026-11-11",
   "status": "placeholder",
-  "note": "PLACEHOLDER. Not Deborah's map. Story 6.1's Hypothalamus Circle Map is Deborah's predefined map, which we don't have yet. These areas, labels and symptom links were made up by the backend team from the symptom checklists in questions.json so the endpoint can be built and tried. Replace this whole file (or point settings.health_circle_map_path at Deborah's version) once her map is in. Each symptom's 'matches' are 'question_key.choice_code' from questions.json; a symptom is highlighted when any of them is ticked.",
+  "note": "PLACEHOLDER. Not Deborah's map. Story 6.1's Hypothalamus Circle Map is Deborah's predefined map, which we don't have yet. These areas, labels and symptom links were made up by the backend team from the symptom checklists in questions.json (updated on 11 Nov to the routing document's Hypothalamus Symptom Check and hormonal checklists; 'Breast tenderness' was dropped because no checklist has it any more) so the endpoint can be built and tried. Replace this whole file (or point settings.health_circle_map_path at Deborah's version) once her map is in. Each symptom's 'matches' are 'question_key.choice_code' from questions.json; a symptom is highlighted when any of them is ticked.",
   "title": "Hypothalamus Circle Map",
   "centre": "Hypothalamus",
   "areas": [
@@ -9,67 +9,243 @@
       "key": "sleep",
       "label": "Sleep",
       "symptoms": [
-        {"key": "trouble_falling_asleep", "label": "Trouble falling asleep", "matches": ["symptoms_general.trouble_falling_asleep"]},
-        {"key": "waking_at_night", "label": "Waking in the night", "matches": ["symptoms_general.waking_at_night"]},
-        {"key": "daytime_sleepiness", "label": "Daytime sleepiness", "matches": ["symptoms_general.daytime_sleepiness"]}
+        {
+          "key": "trouble_falling_asleep",
+          "label": "Trouble falling asleep",
+          "matches": [
+            "symptom_check.trouble_falling_asleep",
+            "symptoms_female.insomnia",
+            "symptoms_male.insomnia"
+          ]
+        },
+        {
+          "key": "waking_at_night",
+          "label": "Waking in the night",
+          "matches": [
+            "symptom_check.waking_at_night"
+          ]
+        },
+        {
+          "key": "daytime_sleepiness",
+          "label": "Daytime sleepiness",
+          "matches": [
+            "symptom_check.daytime_sleepiness"
+          ]
+        }
       ]
     },
     {
       "key": "energy",
       "label": "Energy and metabolism",
       "symptoms": [
-        {"key": "fatigue", "label": "Fatigue", "matches": ["symptoms_general.fatigue"]},
-        {"key": "weight_gain", "label": "Weight gain", "matches": ["symptoms_general.weight_gain"]},
-        {"key": "weight_loss", "label": "Weight loss", "matches": ["symptoms_general.weight_loss"]},
-        {"key": "muscle_weakness", "label": "Muscle weakness or loss", "matches": ["symptoms_general.muscle_weakness", "symptoms_male.muscle_loss"]}
+        {
+          "key": "fatigue",
+          "label": "Fatigue",
+          "matches": [
+            "symptom_check.fatigue",
+            "symptoms_female.fatigue",
+            "symptoms_male.fatigue"
+          ]
+        },
+        {
+          "key": "weight_gain",
+          "label": "Weight gain",
+          "matches": [
+            "symptom_check.weight_gain",
+            "symptoms_female.body_fat_change",
+            "symptoms_male.body_fat_change"
+          ]
+        },
+        {
+          "key": "weight_loss",
+          "label": "Weight loss",
+          "matches": [
+            "symptom_check.weight_loss"
+          ]
+        },
+        {
+          "key": "muscle_weakness",
+          "label": "Muscle weakness or loss",
+          "matches": [
+            "symptom_check.muscle_weakness",
+            "symptoms_female.muscle_weakness",
+            "symptoms_male.muscle_weakness"
+          ]
+        }
       ]
     },
     {
       "key": "temperature",
       "label": "Temperature",
       "symptoms": [
-        {"key": "hot_flashes", "label": "Hot flashes", "matches": ["symptoms_general.hot_flashes"]},
-        {"key": "night_sweats", "label": "Night sweats", "matches": ["symptoms_general.night_sweats"]},
-        {"key": "always_cold", "label": "Always cold", "matches": ["symptoms_general.always_cold"]}
+        {
+          "key": "hot_flashes",
+          "label": "Hot flashes",
+          "matches": [
+            "symptom_check.hot_flashes",
+            "symptoms_female.hot_flashes",
+            "symptoms_male.hot_flashes"
+          ]
+        },
+        {
+          "key": "night_sweats",
+          "label": "Night sweats",
+          "matches": [
+            "symptom_check.night_sweats",
+            "symptoms_female.night_sweats",
+            "symptoms_male.night_sweats"
+          ]
+        },
+        {
+          "key": "always_cold",
+          "label": "Always cold",
+          "matches": [
+            "symptom_check.always_cold"
+          ]
+        }
       ]
     },
     {
       "key": "mood",
       "label": "Mood and stress",
       "symptoms": [
-        {"key": "anxiety", "label": "Anxiety", "matches": ["symptoms_general.anxiety"]},
-        {"key": "low_mood", "label": "Low mood", "matches": ["symptoms_general.low_mood"]},
-        {"key": "low_motivation", "label": "Low motivation", "matches": ["symptoms_general.low_motivation"]},
-        {"key": "brain_fog", "label": "Brain fog", "matches": ["symptoms_general.brain_fog"]},
-        {"key": "palpitations", "label": "Palpitations", "matches": ["symptoms_general.palpitations"]}
+        {
+          "key": "anxiety",
+          "label": "Anxiety",
+          "matches": [
+            "symptom_check.anxiety",
+            "symptom_check.panic_attacks"
+          ]
+        },
+        {
+          "key": "low_mood",
+          "label": "Low mood",
+          "matches": [
+            "symptom_check.depression",
+            "symptoms_female.depression",
+            "symptoms_male.depression",
+            "symptoms_female.mood_swings",
+            "symptoms_male.mood_swings"
+          ]
+        },
+        {
+          "key": "low_motivation",
+          "label": "Low motivation",
+          "matches": [
+            "symptom_check.low_motivation"
+          ]
+        },
+        {
+          "key": "brain_fog",
+          "label": "Brain fog",
+          "matches": [
+            "symptom_check.brain_fog",
+            "symptoms_female.brain_fog",
+            "symptoms_female.forgetfulness",
+            "symptoms_male.mental_fogginess",
+            "symptoms_male.forgetfulness"
+          ]
+        },
+        {
+          "key": "palpitations",
+          "label": "Palpitations",
+          "matches": [
+            "symptom_check.racing_heart",
+            "symptom_check.arrhythmia",
+            "symptom_check.panic_attacks"
+          ]
+        }
       ]
     },
     {
       "key": "appetite",
       "label": "Appetite, thirst and digestion",
       "symptoms": [
-        {"key": "constant_hunger", "label": "Constant hunger", "matches": ["symptoms_general.constant_hunger"]},
-        {"key": "thirst", "label": "Thirst", "matches": ["symptoms_general.thirst"]},
-        {"key": "bloating", "label": "Bloating", "matches": ["symptoms_general.bloating"]},
-        {"key": "digestion", "label": "Digestion changes", "matches": ["symptoms_general.digestion"]}
+        {
+          "key": "constant_hunger",
+          "label": "Constant hunger",
+          "matches": [
+            "symptom_check.constant_hunger",
+            "symptom_check.appetite_loss"
+          ]
+        },
+        {
+          "key": "thirst",
+          "label": "Thirst",
+          "matches": [
+            "symptom_check.thirst"
+          ]
+        },
+        {
+          "key": "bloating",
+          "label": "Bloating",
+          "matches": [
+            "symptom_check.bloating",
+            "symptom_check.swelling"
+          ]
+        },
+        {
+          "key": "digestion",
+          "label": "Digestion changes",
+          "matches": [
+            "symptom_check.digestion",
+            "symptom_check.malabsorption",
+            "symptom_check.delayed_digestion"
+          ]
+        }
       ]
     },
     {
       "key": "hormones",
       "label": "Hormones and reproduction",
       "symptoms": [
-        {"key": "cycle_changes", "label": "Period changes", "matches": ["symptoms_cycle.irregular_periods", "symptoms_cycle.heavy_periods", "symptoms_cycle.painful_periods", "symptoms_cycle.pms"]},
-        {"key": "breast_tenderness", "label": "Breast tenderness", "matches": ["symptoms_cycle.breast_tenderness"]},
-        {"key": "low_libido", "label": "Low libido", "matches": ["symptoms_female.low_libido", "symptoms_male.low_libido"]},
-        {"key": "fertility", "label": "Fertility concerns", "matches": ["symptoms_female.trouble_conceiving", "symptoms_male.fertility"]}
+        {
+          "key": "cycle_changes",
+          "label": "Period changes",
+          "matches": [
+            "symptom_check.irregular_periods",
+            "symptoms_female.menstrual_cramps"
+          ]
+        },
+        {
+          "key": "low_libido",
+          "label": "Low libido",
+          "matches": [
+            "symptom_check.low_libido",
+            "symptoms_female.low_libido",
+            "symptoms_male.low_sex_drive",
+            "symptoms_male.fewer_morning_erections",
+            "symptoms_male.reduced_erectile_firmness"
+          ]
+        },
+        {
+          "key": "fertility",
+          "label": "Fertility concerns",
+          "matches": [
+            "symptom_check.infertility"
+          ]
+        }
       ]
     },
     {
       "key": "body",
       "label": "Skin, aches and body",
       "symptoms": [
-        {"key": "aches", "label": "Aches and pains", "matches": ["symptoms_general.aches"]},
-        {"key": "skin", "label": "Skin changes", "matches": ["symptoms_general.skin"]}
+        {
+          "key": "aches",
+          "label": "Aches and pains",
+          "matches": [
+            "symptom_check.trigger_points",
+            "symptom_check.bone_loss"
+          ]
+        },
+        {
+          "key": "skin",
+          "label": "Skin changes",
+          "matches": [
+            "symptom_check.skin"
+          ]
+        }
       ]
     }
   ]

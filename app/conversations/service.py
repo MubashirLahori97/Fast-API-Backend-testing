@@ -34,7 +34,7 @@ import time
 import uuid
 from collections.abc import Iterator
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import get_args
 
 from fastapi import Request
@@ -68,6 +68,19 @@ from app.conversations.widgets import (
 )
 from app.core import audit, jobs
 from app.core.ages import age_group, is_adult
+
+
+def age_band(born: date, on: date) -> str:
+    """Helper for testing age band boundaries."""
+    age = on.year - born.year - ((on.month, on.day) < (born.month, born.day))
+    if age < 13:
+        return "under_13"
+    if age < 18:
+        return "13_17"
+    if age < 60:
+        return "18_59"
+    return "60_plus"
+
 from app.core.config import settings
 from app.core.errors import ACTION_FAILED, AppError, database_errors_retryable
 from app.core.schemas import clean_line
@@ -139,7 +152,7 @@ def profile_context(profile: Profile, account: User, db: Session | None = None) 
         first_name=clean_line(first_name),
         advocate_first_name=clean_line(account.first_name),
         relationship=profile.family_relationship,
-        age_group=age_group(profile.date_of_birth),
+        age_group=age_group(profile.date_of_birth, account.state),
         sex_at_birth=profile.sex_at_birth,
         gender_identity=profile.gender_identity,
         gender_identity_other=_clean_or_none(profile.gender_identity_other),
@@ -159,8 +172,10 @@ def _clean_or_none(value: str | None) -> str | None:
 
 def health_context(db: Session, profile: Profile, account: User) -> HealthContext:
     """Story 6.1's health profile for the Oracle: the answered questions that apply (story 3.1's
-    "Never repeat") and the ones still open, with the codes a health_fact widget uses. Copied
-    field by field into the contract's types. Health data: never logged."""
+    "Never repeat") and the ones still open, with the codes a health_fact widget uses, and the
+    routing (follow-up path, body route, Path B's opening line). Copied field by field into the
+    contract's types. Health data: never logged."""
+    view = health_service.oracle_view(db, profile, account)
     answered = tuple(
         HealthAnswer(
             key=known.key,
@@ -173,7 +188,7 @@ def health_context(db: Session, profile: Profile, account: User) -> HealthContex
             from_conversation=known.from_conversation,
             updated_at=known.updated_at,
         )
-        for known in health_service.health_context(db, profile, account)
+        for known in view.known
     )
     unanswered = tuple(
         HealthQuestion(
@@ -185,10 +200,20 @@ def health_context(db: Session, profile: Profile, account: User) -> HealthContex
             write_in_choice=question.write_in_choice,
             optional=question.optional,
             sensitive=question.sensitive,
+            when_asked=question.when_asked,
         )
-        for question in health_service.open_questions(db, profile, account)
+        for question in view.open
     )
-    return HealthContext(answered=answered, unanswered=unanswered)
+    routing = view.routing
+    return HealthContext(
+        answered=answered,
+        unanswered=unanswered,
+        follow_up_path=routing.follow_up_path,
+        body_route=routing.body_route,
+        organs=routing.organs,
+        body_from_your_body=routing.body_from_your_body,
+        opening_line=routing.opening_line,
+    )
 
 
 def _turn(message: Message) -> Turn:
@@ -503,7 +528,10 @@ def check_message_safety(
     (a resend and a reply, say) can't overwrite each other. The check that stores an urgent,
     emergency or crisis level also adds the advice and the escalation, in the same transaction
     (safety.record_escalation), so each message gets them exactly once."""
-    context = SafetyContext(is_self=profile.is_self, age_group=age_group(profile.date_of_birth))
+    context = SafetyContext(
+        is_self=profile.is_self,
+        age_group=age_group(profile.date_of_birth, profile.majority_state),
+    )
     try:
         result = oracle.check_safety(context, message.text)
         if result.level not in SAFETY_LEVELS:
@@ -855,7 +883,7 @@ def _generate_reply(
         # With the health profile (story 6.1), so nothing already answered is asked again.
         context = profile_context(profile, account, db)
         # Product links are for adults only (story 3.1), enforced here whatever the reply says.
-        adult = is_adult(profile.date_of_birth)
+        adult = is_adult(profile.date_of_birth, account.state)
         # Story 10.1: a teen with their own account doesn't see the consult card, and only a
         # message the safety check found safe can go to the support team (3.2 otherwise).
         teen_account = support_service.is_teen_account(account)
@@ -865,7 +893,9 @@ def _generate_reply(
         db.commit()  # no transaction is held while the Oracle generates
 
         deadline = time.monotonic() + settings.reply_timeout_seconds
-        stream = oracle.stream_reply(context, history, earlier)
+        stream = oracle.stream_reply(
+            context, history, earlier, conversation_id=str(conversation.id)
+        )
         for piece in stream:
             if time.monotonic() > deadline:
                 raise OracleError("The reply took too long.")

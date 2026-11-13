@@ -1,9 +1,10 @@
 """Payments, behind one interface (stories 9.1 and 11.3).
 
-It isn't decided yet whether the apps pay through Stripe or through the App Store and Google
-Play (docs/PLAN.md, question 2), so code depends on the PaymentProvider protocol, as it does for
-email and the Oracle. FakePaymentProvider (fake.py) stands in for development and tests; the
-real provider plugs in at get_payment_provider (dependencies.py).
+Card payments go through Stripe (chosen 11 Nov, docs/decisions/stripe-billing.md):
+StripeProvider (stripe_provider.py). FakePaymentProvider (fake.py) stands in for development and
+tests when no Stripe key is set. get_payment_provider (dependencies.py) picks one. Code depends on
+the PaymentProvider protocol, as it does for email and the Oracle. Apple and Google store
+subscriptions (STORES) aren't sold yet.
 
 The app never sees card details: checkout and the payment method page are the provider's own
 hosted pages, and the provider's events (POST /billing/webhook) say what happened. The provider
@@ -49,6 +50,11 @@ class InvalidSignature(Exception):
 
 class InvalidEvent(Exception):
     """A signed webhook the provider sent in a shape we can't read."""
+
+
+class IgnoredEvent(Exception):
+    """A signed webhook about something billing doesn't follow (another event type, a one-off
+    invoice). It's answered 200 so the provider doesn't send it again."""
 
 
 @dataclass(frozen=True)
@@ -122,6 +128,20 @@ class ProviderEvent:
     payment_method: PaymentMethod | None = None
 
 
+@dataclass(frozen=True)
+class PlanSetup:
+    """A plan as the provider sells it (Super Admin 8.1 and 8.2): its prices, and the provider's
+    ids for them once it's been set up."""
+
+    code: str  # billing_plans.code
+    name: str
+    monthly_price_cents: int
+    currency: str
+    add_on_price_cents: int | None = None  # Family plans: each extra family member
+    price_id: str | None = None
+    add_on_price_id: str | None = None
+
+
 class PaymentProvider(Protocol):
     name: ProviderName
 
@@ -132,7 +152,7 @@ class PaymentProvider(Protocol):
 
     def cancel(self, subscription_id: str, *, at_period_end: bool) -> None:
         """Stops renewing: at the end of the period paid for, or at once (a grace period that
-        ran out)."""
+        ran out, or a deleted account, 11.4). Ending one that has already ended does nothing."""
         ...
 
     def resume(self, subscription_id: str) -> None:
@@ -163,7 +183,20 @@ class PaymentProvider(Protocol):
         """A link to the provider's page where the client changes their payment method."""
         ...
 
+    def use_current_prices(self, subscription_id: str, plan: PaidPlan) -> None:
+        """After a price change (Super Admin 8.1): from the next billing date, the subscription
+        is billed at the catalogue's current prices for `plan`, with nothing charged now."""
+        ...
+
+    def set_up_plan(self, plan: PlanSetup) -> PlanSetup:
+        """Super Admin 8.1 and 8.2: makes the provider sell the plan at its prices. The first
+        time, it creates the product and prices; a changed price becomes a new price, and the
+        old one is archived (subscriptions on it keep it until use_current_prices moves them).
+        Returns the plan with the provider's ids. Raises ProviderError."""
+        ...
+
     def parse_event(self, body: bytes, headers: Mapping[str, str]) -> ProviderEvent:
-        """Checks the webhook's signature and reads it. Raises InvalidSignature or
-        InvalidEvent."""
+        """Checks the webhook's signature and reads it. Raises InvalidSignature, InvalidEvent,
+        IgnoredEvent, or ProviderError when the provider must be asked for more and can't be
+        reached."""
         ...

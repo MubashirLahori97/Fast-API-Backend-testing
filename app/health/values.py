@@ -7,7 +7,10 @@ value by kind:
 - choice: a code; multi_choice: a list of codes, in the bank's order;
 - checklist: {"selected": [codes], "not_applicable": [codes]};
 - text: a cleaned line; number: an int or a float; scale: an int; date: "YYYY-MM-DD";
-- named_list: [{"name": ..., "detail": ...}], where [] means "None".
+- time: "HH:MM" (24-hour);
+- named_list: [{"name": ..., "detail": ...}], where [] means "None";
+- history: {"self": {code: detail | null}, "family": {code: detail | null}}, only the
+  question's columns for the profile (teens and children: family only).
 
 "other" holds the write-in, only with the choice that takes one.
 """
@@ -21,17 +24,19 @@ from app.core.ages import age_on, today, us_today
 from app.core.config import settings
 from app.core.schemas import clean_line
 from app.health.bank import Question
-from app.health.routing import Basics
+from app.health.routing import Basics, base_values, columns, variant
 from app.profiles.schemas import CHOOSE_AN_OPTION
 
 # Story 6.1's "Invalid number" message, for numbers and scales.
 INVALID_NUMBER = "That number doesn’t look quite right. Could you check it for me?"
 # Not in the stories (docs/decisions/phase-4-health-profile.md).
 INVALID_DATE = "That date doesn’t look quite right. Could you check it for me?"
+INVALID_TIME = "That time doesn’t look quite right. Could you check it for me?"
 INVALID_ANSWER = "Please check this answer and try again."
 WRITE_IN_MISSING = "Tell me a little more in your own words."
 
 _NAME = re.compile(r"\[Name\]")
+_TIME = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
 POSSESSIVE = {"he_him": "his", "she_her": "her"}  # anything else: "their"
 OBJECT = {"he_him": "him", "she_her": "her"}  # anything else: "them"
 
@@ -55,7 +60,17 @@ def fill(text: str | None, basics: Basics) -> str | None:
 
 
 def title(question: Question, basics: Basics) -> str:
-    template = question.title if basics.is_self else question.title_family or question.title
+    """The question worded for the profile: its variant's wording if one matches (for example
+    the under-13 medicines question), then the family member's wording for a family member."""
+    found = variant(question, base_values(basics))
+    if basics.is_self:
+        template = (found and found.title) or question.title
+    else:
+        template = (
+            (found and (found.title_family or found.title))
+            or question.title_family
+            or question.title
+        )
     return fill(template, basics)
 
 
@@ -117,6 +132,30 @@ def _date(value: Any, basics: Basics) -> str:
     return day.isoformat()
 
 
+def _time(value: Any) -> str:
+    if not isinstance(value, str) or not _TIME.match(value.strip()):
+        raise AnswerProblem("invalid_time", INVALID_TIME)
+    return value.strip()
+
+
+def _history(question: Question, value: Any, basics: Basics) -> dict[str, dict[str, str | None]]:
+    """Ticked items per column, each with an optional short text, in the bank's order."""
+    allowed = columns(question, base_values(basics))
+    if not isinstance(value, dict) or not set(value) <= set(allowed):
+        raise AnswerProblem("invalid_choice", CHOOSE_AN_OPTION)
+    stored: dict[str, dict[str, str | None]] = {}
+    for column in allowed:
+        ticked = value.get(column) or {}
+        if not isinstance(ticked, dict) or not set(ticked) <= set(question.codes):
+            raise AnswerProblem("invalid_choice", CHOOSE_AN_OPTION)
+        stored[column] = {
+            code: (_clean(ticked[code]) or None) if ticked[code] is not None else None
+            for code in question.codes
+            if code in ticked
+        }
+    return stored
+
+
 def _named_list(question: Question, value: Any) -> list[dict[str, str | None]]:
     if not isinstance(value, list) or not all(isinstance(item, dict) for item in value):
         raise AnswerProblem("invalid_answer", INVALID_ANSWER)
@@ -174,8 +213,12 @@ def normalize(question: Question, value: Any, other: Any, basics: Basics) -> dic
         stored["value"] = _number(question, value, basics, integer=True)
     elif kind == "date":
         stored["value"] = _date(value, basics)
+    elif kind == "time":
+        stored["value"] = _time(value)
     elif kind == "named_list":
         stored["value"] = _named_list(question, value)
+    elif kind == "history":
+        stored["value"] = _history(question, value, basics)
     return stored
 
 
@@ -200,6 +243,17 @@ def describe(question: Question, answer: dict[str, Any], basics: Basics) -> str:
             for item in value
         ]
         text = "; ".join(items) or "None"
+    elif question.kind == "history":
+        parts = []
+        for column, ticked in value.items():
+            items = [
+                f"{fill(question.label(code), basics)} ({detail})"
+                if detail
+                else fill(question.label(code), basics)
+                for code, detail in ticked.items()
+            ]
+            parts.append(f"{column.capitalize()}: {', '.join(items) or 'None of these'}")
+        text = "; ".join(parts)
     elif question.kind == "scale":
         text = f"{value} out of {int(question.max)}"
     elif question.kind == "number" and question.unit:

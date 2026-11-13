@@ -23,7 +23,7 @@ def _read_only(question: QuestionOut) -> QuestionOut:
     answer = question.answer
     if answer is not None:
         answer = answer.model_copy(update={"conversation_id": None})
-    return question.model_copy(update={"answer": answer, "prefill": None})
+    return question.model_copy(update={"answer": answer, "prefill": None, "prefill_note": None})
 
 
 def health_profile(db: Session, account: User) -> HealthProfileView | None:

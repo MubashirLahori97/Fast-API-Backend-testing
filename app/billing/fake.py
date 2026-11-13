@@ -23,6 +23,7 @@ from app.billing.provider import (
     PaymentCancelled,
     PaymentDeclined,
     PaymentMethod,
+    PlanSetup,
     ProviderError,
     ProviderEvent,
     Started,
@@ -175,6 +176,14 @@ class FakePaymentProvider:
     def payment_method_link(self, customer_id: str, return_url: str) -> str:
         self._call("payment_method_link")
         return f"{return_url}?payment_method=updated"
+
+    def use_current_prices(self, subscription_id: str, plan: PaidPlan) -> None:
+        self._call("use_current_prices")
+
+    def set_up_plan(self, plan: PlanSetup) -> PlanSetup:
+        """The fake sells any plan at any price, so there's nothing to set up or store."""
+        self._call("set_up_plan")
+        return plan
 
     def parse_event(self, body: bytes, headers: Mapping[str, str]) -> ProviderEvent:
         parts = dict(

@@ -60,7 +60,10 @@ class BillingPlan(Base):
       family (a monthly price, the family members included and the price of each add-on).
     - `status`: draft (not shown to clients), active, or inactive (new clients can't choose
       it; clients already on it keep it).
-    - `features`: "what's included", one line each, as the plan screen shows them."""
+    - `features`: "what's included", one line each, as the plan screen shows them.
+    - `stripe_price_id`, `stripe_add_on_price_id`: the plan's prices in Stripe, saved when the
+      plan is set up there or a price changes (admin.plans.service._set_up_with_providers).
+      Null for a launch plan means the ids in the settings."""
 
     __tablename__ = "billing_plans"
     __table_args__ = (
@@ -111,6 +114,8 @@ class BillingPlan(Base):
     family_members_included: Mapped[int | None]
     add_on_price_cents: Mapped[int | None]
     features: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    stripe_price_id: Mapped[str | None]
+    stripe_add_on_price_id: Mapped[str | None]
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
     )
@@ -153,6 +158,9 @@ class PlanValues:
     family_members_included: int | None
     add_on_price_cents: int | None
     features: tuple[str, ...]
+    # The plan's Stripe prices (monthly, and each add-on member), when set up.
+    stripe_price_id: str | None = None
+    stripe_add_on_price_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -168,6 +176,18 @@ class Offer:
     # False once the Super Admin makes the plan inactive: new clients can't choose it, and
     # clients already on it keep it (Super Admin 8.1).
     available: bool = True
+
+
+def _stripe_ids_from_settings(code: str) -> tuple[str | None, str | None]:
+    """The launch plans' Stripe price ids from the settings (scripts/create_stripe_prices.py)."""
+    if code == "individual":
+        return settings.stripe_individual_price_id or None, None
+    if code == "family":
+        return (
+            settings.stripe_family_price_id or None,
+            settings.stripe_family_add_on_price_id or None,
+        )
+    return None, None
 
 
 def default_values(code: str) -> PlanValues:
@@ -187,6 +207,7 @@ def default_values(code: str) -> PlanValues:
                 "conversations with the Oracle",
             ),
         )
+    price_id, add_on_price_id = _stripe_ids_from_settings(code)
     if code == "individual":
         return PlanValues(
             code="individual",
@@ -206,6 +227,7 @@ def default_values(code: str) -> PlanValues:
                 "a Wellness Plan",
                 "your own profile only",
             ),
+            stripe_price_id=price_id,
         )
     if code == "family":
         included = settings.family_members_included
@@ -224,11 +246,14 @@ def default_values(code: str) -> PlanValues:
                 "each with their own Wellness Plan",
                 "inviting teens to their own account",
             ),
+            stripe_price_id=price_id,
+            stripe_add_on_price_id=add_on_price_id,
         )
     raise ValueError(f"Not a launch plan: {code}")
 
 
 def values_from_row(row: BillingPlan) -> PlanValues:
+    price_id, add_on_price_id = _stripe_ids_from_settings(row.code)
     return PlanValues(
         code=row.code,
         plan_type=row.plan_type,
@@ -239,6 +264,8 @@ def values_from_row(row: BillingPlan) -> PlanValues:
         family_members_included=row.family_members_included,
         add_on_price_cents=row.add_on_price_cents,
         features=tuple(row.features or ()),
+        stripe_price_id=row.stripe_price_id or price_id,
+        stripe_add_on_price_id=row.stripe_add_on_price_id or add_on_price_id,
     )
 
 
@@ -319,6 +346,16 @@ def is_available(plan: PaidPlan) -> bool:
 def add_on_price_cents() -> int:
     """The monthly price of each family member beyond the Family plan's places."""
     return values("family").add_on_price_cents
+
+
+def stripe_price_id(plan: PaidPlan) -> str | None:
+    """The Stripe price a new period of the plan is billed at, if it's been set up."""
+    return values(plan).stripe_price_id
+
+
+def stripe_add_on_price_id() -> str | None:
+    """The Stripe price of each extra family member, if it's been set up."""
+    return values("family").stripe_add_on_price_id
 
 
 def family_members_included() -> int:

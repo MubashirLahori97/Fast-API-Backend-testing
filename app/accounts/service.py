@@ -43,8 +43,7 @@ from app.auth.models import (
 from app.billing import entitlements
 from app.conversations.models import HealthConsent
 from app.core import audit, jobs
-from app.core.ages import HAWAII, age_on, us_today
-from app.core.config import settings
+from app.core.ages import HAWAII, age_of_majority, is_adult
 from app.core.email import SendEmail
 from app.core.errors import AppError, database_errors_retryable
 from app.core.zip_codes import zip_in_state
@@ -524,16 +523,14 @@ EMAIL_CHANGE_REQUESTED = "Email change requested"
 
 
 def age_of_majority_in(state: str | None) -> int:
-    """Story 11.1: the state decides the age of majority used for age rules. It's 18 in every
-    state (docs/PLAN.md, question 22), so every state gives `settings.age_of_majority`. A
-    per-state table (19 in Alabama and Nebraska, 21 in Mississippi) would go in
-    app/core/ages.py, used here and by is_adult and age_group alike."""
-    return settings.age_of_majority
+    """Story 11.1: the state decides the age of majority used for age rules (19 in Alabama and
+    Nebraska, 21 in Mississippi, 18 elsewhere). The table is app/core/ages.age_of_majority."""
+    return age_of_majority(state)
 
 
 def adult_in(date_of_birth: date, state: str | None) -> bool:
     """At or over the state's age of majority, counted on Hawaii's date like is_adult."""
-    return age_on(date_of_birth, us_today()) >= age_of_majority_in(state)
+    return is_adult(date_of_birth, state)
 
 
 def age_rules(account: User) -> Literal["adult", "teen"]:

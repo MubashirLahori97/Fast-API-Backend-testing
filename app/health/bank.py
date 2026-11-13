@@ -2,12 +2,14 @@
 that decide which questions apply to a profile.
 
 The bank is data, read from questions.json in this package, or from the file named by
-`settings.health_question_bank_path`. The Health Intake Routing document can replace it without
-a code change or an app release (6.1's non-functional requirements). It's checked when the app
-starts, so a broken file stops the API instead of serving the wrong questions.
+`settings.health_question_bank_path`. It follows the BA's Health Intake Routing document
+("Revised Intake Routing" tab, Part 3's appendix; docs/decisions/phase-4-routing-doc.md), and a
+new version can replace it without a code change or an app release (6.1's non-functional
+requirements). It's checked when the app starts, so a broken file stops the API instead of
+serving the wrong questions.
 
-A rule (`show_if`, on a section or a question) is a dict of `name: condition`, and every
-condition must hold. A name is one of the derived values below, or the key of an earlier
+A rule (`show_if`, on a section, a question or a choice) is a dict of `name: condition`, and
+every condition must hold. A name is one of the derived values below, or the key of an earlier
 question (its saved answer). The conditions are:
 
 - {"in": [...]} / {"not_in": [...]}: a single value is (or isn't) one of these. "not_in" also
@@ -25,11 +27,23 @@ Derived values (routing.py works them out):
 - `path`: which follow-up body questions apply (story 6.1): "a" (sex at birth Intersex or
   Prefer not to say), "b" (gender differs from sex at birth), "gender_prefer_not_to_say", or
   "none" (gender matches sex at birth);
-- after the "Your body" question only: `body`, the organs the profile has (the "Your body"
-  answer, or those assumed from sex at birth when it's skipped), and `body_route`, which body
-  questions to ask: female | male | intersex | general.
+- `teen_own_login`: "yes" for a teen's own profile on a teen account (users.account_type
+  'teen', story 1.5), "no" otherwise (routing decision 43: sexual health only for them);
+- after the "Your body" question only: `body`, the organs the profile has (the ticked ones, or
+  those assumed from sex at birth when it's skipped), `body_ticked`, only the ticked ones
+  ([] when skipped), and `body_route`, which body questions to ask: female | male | intersex |
+  general.
 
-Section rules may use only the values that don't depend on answers (BASE_NAMES).
+Section rules, variants and section intros may use only the values that don't depend on
+answers (BASE_NAMES).
+
+Each question also says when it's asked (`when_asked`, Part 3's column): "asked_first" (the
+first time it's relevant), "asked_later" (only when it helps the concern), "conversation" (the
+follow-up body questions, asked in conversation) or "onboarding". Every question can also be
+answered in My Health. `conversation_if` narrows when the Oracle may ask it in conversation
+(decision 42: "Your body" is in everyone's My Health, but asked in conversation only in Path A,
+Path B and gender Prefer not to say). `variants` change a question's wording, when it's asked
+or its columns by age group (the first that matches wins).
 
 Titles and labels may contain [Name], [their] and [them]: the service fills them in from the
 profile's first name and pronouns.
@@ -52,13 +66,21 @@ Kind = Literal[
     "number",
     "scale",  # a whole number from min to max
     "date",  # an ISO date, not in the future or before the date of birth
+    "time",  # "HH:MM", 24-hour (bedtime, wake time)
     "named_list",  # [{"name", "detail"}]: medicines with their reason; [] is "None"
+    # Medical history: {"self": {code: detail | null}, "family": {code: detail | null}}, only
+    # the question's columns; ticking an item opens a short text (Part 3).
+    "history",
 ]
-CHOICE_KINDS = ("choice", "multi_choice", "checklist")
+CHOICE_KINDS = ("choice", "multi_choice", "checklist", "history")
 NUMBER_KINDS = ("number", "scale")
+WhenAsked = Literal["onboarding", "asked_first", "asked_later", "conversation"]
+Column = Literal["self", "family"]
 
-BASE_NAMES = frozenset({"age_group", "age", "sex_at_birth", "gender_identity", "path"})
-BODY_NAMES = frozenset({"body", "body_route"})
+BASE_NAMES = frozenset(
+    {"age_group", "age", "sex_at_birth", "gender_identity", "path", "teen_own_login"}
+)
+BODY_NAMES = frozenset({"body", "body_ticked", "body_route"})
 OPERATORS = frozenset({"in", "not_in", "has", "lacks", "min", "max", "answered"})
 PLACEHOLDERS = frozenset({"Name", "their", "them"})
 ABOUT_YOU = "about_you"  # the section the service adds the profile's own fields to
@@ -74,14 +96,31 @@ class _Strict(BaseModel):
 class Choice(_Strict):
     code: str
     label: str
+    # Shown only when this holds (for example the female-body items of the medical history);
+    # an answer can't use a choice that isn't shown.
+    show_if: dict[str, Any] | None = None
 
 
 class Prefill(_Strict):
     """A suggested answer taken from another question's answer, shown until the client saves
-    their own (6.1: hormone history is pre-filled from the HRT answers)."""
+    their own (6.1 and Part 3: hormone history is pre-filled from the HRT answers)."""
 
     question: str
-    map: dict[str, str]  # the other question's code -> this question's code
+    # The other question's code -> this question's codes. For a choice question, the
+    # suggestion is used only when it comes to exactly one code.
+    map: dict[str, tuple[str, ...]]
+    note: str | None = None  # shown with the suggestion
+
+
+class Variant(_Strict):
+    """Different wording, timing or columns for some profiles, by the values that don't depend
+    on answers (for example the under-13 wording of the medicines question)."""
+
+    show_if: dict[str, Any]
+    title: str | None = None
+    title_family: str | None = None
+    when_asked: WhenAsked | None = None
+    columns: tuple[Column, ...] | None = None
 
 
 class Section(_Strict):
@@ -91,6 +130,10 @@ class Section(_Strict):
     show_if: dict[str, Any] | None = None
     # The follow-up body questions come after a privacy notice (story 6.1).
     privacy_notice: bool = False
+    # A line shown before the section's questions when intro_show_if holds (Path B's opening
+    # line, routing decision 33).
+    intro: str | None = None
+    intro_show_if: dict[str, Any] | None = None
 
 
 class Question(_Strict):
@@ -101,6 +144,13 @@ class Question(_Strict):
     title_family: str | None = None  # for a family member: "Is [Name] taking..."
     hint: str | None = None
     show_if: dict[str, Any] | None = None
+    when_asked: WhenAsked
+    # The Oracle asks it in conversation only when this holds too (My Health shows it whenever
+    # show_if holds).
+    conversation_if: dict[str, Any] | None = None
+    variants: tuple[Variant, ...] = ()
+    # history: the columns offered (teens and children: family only, through a variant).
+    columns: tuple[Column, ...] = ("self", "family")
 
     # Choice kinds.
     choices: tuple[Choice, ...] = ()
@@ -144,15 +194,17 @@ class Question(_Strict):
 
 
 class BodyRules(_Strict):
-    """How the "Your body" answer routes the body questions (stories 3.1 and 6.1): uterus,
-    cervix or ovaries mean the female questions, testes or a prostate the male ones, both the
-    intersex ones. When it's skipped (or answered with a code in `not_given`), the organs in
-    `default` for the sex at birth are assumed, so body questions follow sex at birth."""
+    """How the "Your body" answer routes the body questions (routing document, Part 1): a
+    uterus or ovaries mean the female questions, testes or a prostate the male ones, both the
+    intersex ones, and none of them (including "None of these") general questions only. When
+    it's skipped (or answered with a code in `not_given`), the organs in `default` for the sex
+    at birth are assumed, so body questions follow sex at birth."""
 
     question: str
     female: tuple[str, ...]
     male: tuple[str, ...]
-    not_given: tuple[str, ...] = ()
+    none: tuple[str, ...] = ()  # "None of these": answered, with no organs
+    not_given: tuple[str, ...] = ()  # "Prefer not to say": as if skipped
     default: dict[str, tuple[str, ...]] = {}
 
 
@@ -230,9 +282,16 @@ def _check_question(question: Question) -> None:
     if question.key in BASE_NAMES | BODY_NAMES or question.key == "any":
         _fail(where, "the key is a derived value's name")
     _check_text(where, question.title, question.title_family, question.hint)
+    for variant in question.variants:
+        _check_rule(variant.show_if, BASE_NAMES, where)
+        _check_text(where, variant.title, variant.title_family)
+        if variant.columns is not None and (question.kind != "history" or not variant.columns):
+            _fail(where, "only a history question's variants set columns")
+    if question.kind == "history" and not question.columns:
+        _fail(where, "a history question needs columns")
     codes = question.codes
     if question.kind in CHOICE_KINDS:
-        if len(codes) < (1 if question.kind == "checklist" else 2):
+        if len(codes) < (1 if question.kind in ("checklist", "history") else 2):
             _fail(where, "needs more choices")
         if len(set(codes)) != len(codes):
             _fail(where, "choice codes repeat")
@@ -265,8 +324,9 @@ def _check_bank(bank: Bank) -> None:
     if ABOUT_YOU not in section_keys:
         _fail("sections", f"the {ABOUT_YOU!r} section is required")
     for section in bank.sections:
-        _check_text(f"section {section.key!r}", section.title, section.title_family)
+        _check_text(f"section {section.key!r}", section.title, section.title_family, section.intro)
         _check_rule(section.show_if, BASE_NAMES, f"section {section.key!r}")
+        _check_rule(section.intro_show_if, BASE_NAMES, f"section {section.key!r}")
 
     question_keys = [question.key for question in bank.questions]
     if len(set(question_keys)) != len(question_keys):
@@ -279,6 +339,7 @@ def _check_bank(bank: Bank) -> None:
     for codes in (
         bank.body.female,
         bank.body.male,
+        bank.body.none,
         bank.body.not_given,
         *bank.body.default.values(),
     ):
@@ -293,18 +354,24 @@ def _check_bank(bank: Bank) -> None:
         _check_question(question)
         if question.section not in section_keys:
             _fail(f"question {question.key!r}", f"unknown section {question.section!r}")
-        known = BASE_NAMES | earlier | (BODY_NAMES if body_seen else frozenset())
-        _check_rule(question.show_if, frozenset(known), f"question {question.key!r}")
+        known = frozenset(BASE_NAMES | earlier | (BODY_NAMES if body_seen else frozenset()))
+        where = f"question {question.key!r}"
+        _check_rule(question.show_if, known, where)
+        _check_rule(question.conversation_if, known, where)
+        for choice in question.choices:
+            _check_rule(choice.show_if, known, where)
         if question.prefill is not None:
             source = by_key.get(question.prefill.question)
+            mapped = {code for codes in question.prefill.map.values() for code in codes}
             if (
-                question.kind != "choice"
+                question.kind not in ("choice", "multi_choice")
                 or source is None
-                or source.kind != "choice"
+                or source.kind not in ("choice", "multi_choice")
                 or not set(question.prefill.map) <= set(source.codes)
-                or not set(question.prefill.map.values()) <= set(question.codes)
+                or not mapped <= set(question.codes)
             ):
-                _fail(f"question {question.key!r}", "prefill must map choice codes to codes")
+                _fail(where, "prefill must map choice codes to codes")
+            _check_text(where, question.prefill.note)
         earlier.add(question.key)
         if question.key == bank.body.question:
             body_seen = True

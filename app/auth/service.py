@@ -386,9 +386,10 @@ def _forget_devices(db: Session, user: User, keep_id: uuid.UUID | None = None) -
 
 
 def check_age(data: SignUpDetails) -> None:
-    """Story 1.1: below the age of majority, sign-up stops and nothing is saved. A teen joins
-    through a parent's invite instead (story 1.5)."""
-    if not is_adult(data.date_of_birth):
+    """Story 1.1: below the age of majority for the selected state (19 in Alabama and Nebraska,
+    21 in Mississippi, 18 elsewhere), sign-up stops and nothing is saved. A teen joins through a
+    parent's invite instead (story 1.5)."""
+    if not is_adult(data.date_of_birth, data.state):
         raise AppError(422, "under_age", UNDER_AGE, "date_of_birth")
 
 

@@ -47,9 +47,9 @@ FAMILY_RELATIONSHIP = Question(
     )
 )
 
-# Story 2.2's Teen Profile Choice, asked after the date of birth for a member aged 13 to 17.
-# "own_account" skips steps 4 to 7: the privacy disclaimer and the teen's email come next, and
-# the invite (story 1.5, POST /profiles/{id}/teen-invite) replaces the draft.
+# Story 2.2's Teen Profile Choice, asked after the date of birth for a member aged 13 up to the
+# age of majority. "own_account" skips steps 4 to 7: the privacy disclaimer and the teen's email
+# come next, and the invite (story 1.5, POST /profiles/{id}/teen-invite) replaces the draft.
 TEEN_PROFILE_CHOICE = Question(
     choices=(
         Choice(

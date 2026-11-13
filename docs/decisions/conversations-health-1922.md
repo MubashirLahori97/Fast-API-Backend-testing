@@ -71,7 +71,7 @@ Not in the stories:
 
 ## New open questions for the BA
 
-1. **Contradiction in 3.1:** the acceptance criterion "Saving: ... when it wants to save it, then it asks the Client first" is still there, but the 19:22 text says the Oracle saves automatically (3.1's "Saving to the profile", 3.3, 6.1). We followed the newer text. Please remove or reword the old criterion.
+1. **Contradiction in 3.1:** the acceptance criterion "Saving: ... when it wants to save it, then it asks the Client first" is still there, but the 19:22 text says the Oracle saves automatically (3.1's "Saving to the profile", 3.3, 6.1). We followed the newer text. Please remove or reword the old criterion. **Decided by the user on 10 Nov: follow the new text.**
 2. **Lists:** we add the Oracle's medicines and symptoms to what's saved and never remove any (only the client removes, in My Health). If the client says in chat "I stopped taking X", should the Oracle take it off the list itself?
 3. **Removed details coming back:** if the client removes a detail in My Health, an older message in the same conversation still says it. We ask the Oracle to save only from the latest message. Is that enough, or should a removed detail never be saved again from that conversation?
 4. **Label directions word for word:** the backend can't check the directions against the label (the knowledge base is the AI team's). Should the Super Admin keep each product's label directions as their own field, so the backend can fill them in?

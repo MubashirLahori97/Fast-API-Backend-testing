@@ -8,7 +8,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ValidationError, field_validator
 
 from app.core.schemas import RequestBody, clean_name
-from app.health.bank import Kind
+from app.health.bank import Column, Kind, WhenAsked
 from app.profiles.options import GenderIdentity, Pronouns, SexAtBirth
 from app.profiles.schemas import CHOOSE_AN_OPTION, INVALID_DATE_OF_BIRTH
 
@@ -98,7 +98,12 @@ class QuestionOut(BaseModel):
     kind: Kind
     title: str  # with the family member's name and pronouns filled in
     hint: str | None
-    choices: list[ChoiceOut]  # choice, multi_choice and checklist
+    # The routing document's "When asked": asked_first (the first time it's relevant),
+    # asked_later (only when it helps the concern), conversation (the follow-up body questions)
+    # or onboarding. Every question can be answered here in My Health too.
+    when_asked: WhenAsked
+    # choice, multi_choice, checklist and history: only the choices shown to this profile.
+    choices: list[ChoiceOut]
     exclusive: list[str]  # multi_choice codes that can't go with others ("None of these")
     write_in_choice: str | None  # the code that takes a typed answer in `other`
     write_in_label: str | None
@@ -111,14 +116,18 @@ class QuestionOut(BaseModel):
     max_label: str | None
     name_label: str | None  # named_list: each item has a name and a detail
     detail_label: str | None
+    # history: the columns offered, "self" and "family" (teens and children: family only).
+    columns: list[Column]
     optional: bool
     # Sensitive answers are never sent to analytics, ad pixels or Shopify (6.1).
     sensitive: bool
     counted: bool  # counts toward the completion percentage
     answer: AnswerOut | None  # null: "Not answered yet" or Add
     # A suggested value while it's unanswered (hormone history from the HRT answers). Not saved
-    # until the client saves it.
+    # until the client saves it. prefill_note is shown with it: "We’ve filled this in from your
+    # HRT answers. Edit if needed."
     prefill: Any | None
+    prefill_note: str | None = None
 
 
 class SectionOut(BaseModel):
@@ -127,6 +136,9 @@ class SectionOut(BaseModel):
     # Shown before the section's questions (the follow-up body questions, 6.1).
     privacy_notice: str | None
     questions: list[QuestionOut]
+    # Path B's opening line (routing decision 33), shown after the privacy notice: "A few
+    # optional questions help me give guidance that fits your body. Skip anything you like."
+    intro: str | None = None
 
 
 class AboutYouOut(BaseModel):

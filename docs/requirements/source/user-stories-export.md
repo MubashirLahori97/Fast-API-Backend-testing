@@ -21,8 +21,6 @@
   
   
   
-  
-  
 
 ***User Story Document***
 
@@ -57,9 +55,9 @@ Principal Business Analyst
 |  |  |  |  |  |
 | :-: | :-: | :-: | :-: | :-: |
 | \*\*Sr. No\*\* | \*\*System User\*\* | \*\*Persona\*\* | \*\*Context\*\* | \*\*Design Link\*\* |
-| 1\\. | \*\*Super Admin\*\* | Genesis Health Admin (Deborah Maragopoulos) | Platform owner with full control over Your Oracle. Manages clients, escalations, support and data deletion requests, admin users, the Oracle’s knowledge base (including approving content), and the Terms of Service, Privacy Policy and Health Consent versions. Sets configurable pricing for subscription plans and family member add-ons. Oversees analytics, audit logs and compliance across all clients and their family members. | \\- |
-| 2\\. | \*\*Admin\*\* | Genesis Support Team | The Oracle’s support team, who handle the platform’s day-to-day operations. Responsible for managing client accounts, reviewing escalations, responding to support and consultation requests, processing data deletion requests, adding content to the knowledge base for approval, and monitoring platform analytics. Has the same access as the Super Admin, except for managing admin users, subscriptions and pricing, approving knowledge base content, Consent Management and audit logs. | \\- |
-| 3\\. | \*\*Client\*\* | Client / Medical Advocate | Individuals, primarily women, who use the Oracle to understand their health through Deborah’s hypothalamus-first approach and become their own best advocate. Starts with a 14-day free trial, then an Individual or Family plan unlocks personalised guidance, provider-ready notes, visit logging and a running Wellness Plan. One-on-one consultations with Deborah’s team can be requested through the support team, and are booked and paid outside the app. On the Family plan, clients can act as medical advocates for up to three family members (more as paid add-ons), and invite teens to their own account. An advocate-only role will be added in a later release. | \\- |
+| 1\\. | \*\*Super Admin\*\* | Genesis Health Admin (Deborah Maragopoulos) | Platform owner with full control over Your Oracle. Manages clients, escalations, support, and data deletion requests, admin users, the Oracle’s knowledge base (including adding content), and the Terms of Service, Privacy Policy, and Health Consent & Data Deletion Request Management. Sets configurable pricing for subscription plans and family member add-ons. Oversees analytics, audit logs, and compliance across all clients and their family members. | \\- |
+| 2\\. | \*\*Admin\*\* | Genesis Support Team | The Oracle support team handles the platform’s day-to-day operations. Manages client accounts, reviews escalations, responds to support and consultation requests, processes data deletion requests, adds content to the knowledge base for approval, and monitors platform analytics. Has the same access as the Super Admin, except for managing admin users, subscriptions and pricing, approving knowledge base content, Consent Management, and audit logs. | \\- |
+| 3\\. | \*\*Client\*\* | Client / Medical Advocate | Individuals who use the Oracle to understand their health through Deborah’s hypothalamus-first approach and become their own best advocate. Starts with a 14-day free trial, then an Individual or Family plan unlocks personalised guidance, provider-ready notes, visit logging and a running Wellness Plan. One-on-one consultations with Deborah’s team can be requested through the support team and are booked and paid outside the app. On the Family plan, clients can act as medical advocates for up to three family members (more as paid add-ons), and invite teens to their own account. An advocate-only role will be added in a later release. | \\- |
 
   
   

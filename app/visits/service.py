@@ -211,7 +211,9 @@ def _items_text(count: int) -> str:
 
 def visit_log_out(db: Session, log: VisitLog, account: User) -> VisitLogOut:
     profile = db.get(Profile, log.profile_id)
-    adult = is_adult(profile.date_of_birth) if profile.date_of_birth else True
+    adult = (
+        is_adult(profile.date_of_birth, profile.majority_state) if profile.date_of_birth else True
+    )
     label = specialties.label(log.specialty, log.specialty_other)
     note = visible_note(db, profile, log.provider_note_id)
     added = wellness.items_added_by_visit(db, profile, log.id)
@@ -269,7 +271,9 @@ def _form(
     labs: list[LabOut] | None = None,
     notes_out=None,
 ) -> VisitLogForm:
-    adult = is_adult(profile.date_of_birth) if profile.date_of_birth else True
+    adult = (
+        is_adult(profile.date_of_birth, profile.majority_state) if profile.date_of_birth else True
+    )
     visit_date = note.appointment_date if note else None
     if visit_date is not None and visit_date > datetime.now(UTC).date():
         visit_date = None  # logged before the appointment's date: the client enters it
@@ -449,7 +453,7 @@ def create_visit_log(
             revision=1,
             review_status="pending",
         )
-        _fill(log, body, is_adult(profile.date_of_birth))
+        _fill(log, body, is_adult(profile.date_of_birth, profile.majority_state))
         db.add(log)
         db.flush()
         if note is not None:
@@ -473,7 +477,7 @@ def update_visit_log(
         db.refresh(log, with_for_update=True)
         profile = db.get(Profile, log.profile_id)
         check_can_use(profile)
-        _fill(log, body, is_adult(profile.date_of_birth))
+        _fill(log, body, is_adult(profile.date_of_birth, profile.majority_state))
         log.revision += 1
         log.review_status = "pending"
         log.review = None
@@ -579,7 +583,9 @@ def oracle_visits(db: Session, profile: Profile) -> tuple[contract.LoggedVisit, 
         .order_by(VisitLog.visit_date.desc(), VisitLog.created_at.desc())
         .limit(settings.oracle_visit_logs)
     ).all()
-    adult = is_adult(profile.date_of_birth) if profile.date_of_birth else True
+    adult = (
+        is_adult(profile.date_of_birth, profile.majority_state) if profile.date_of_birth else True
+    )
     return tuple(logged_visit(log, adult=adult) for log in logs)
 
 
@@ -685,7 +691,7 @@ def review_visit(db: Session, payload: dict[str, Any], oracle: Oracle) -> None:
         check_can_use(profile)
     except AppError:
         return  # turned off or being deleted: nothing more is done with it
-    adult = is_adult(profile.date_of_birth)
+    adult = is_adult(profile.date_of_birth, profile.majority_state)
     context = oracle_context(db, profile, account)
     visit = logged_visit(log, adult=adult)
     notes = _notes_for_oracle(db, profile, log)
